@@ -1,0 +1,57 @@
+Original input program:
+#include<stdio.h>
+
+int main()
+{
+	int**a ,**b,**c,**d,**e,**f;
+	int*g,*h,*p;
+	
+	a=b;
+	c=a;
+	e=c;
+	a=d;
+	e=f;
+	*e=g;
+	h=*e;
+	*e=p;
+
+	printf("Hello World!");
+	return 0;
+}
+
+
+Alias sets for function 'main':
+~~~~~~~~~~~~~~~~~Node From   %3 = alloca i32**, align 8Node From DerefLevel is1,  Node To   %11 = load i32**, i32*** %3, align 8Node To DerefLevel is 0
+~~~~~~~~~~~~~~~~~Node From   %11 = load i32**, i32*** %3, align 8Node From DerefLevel is0,  Node To   %2 = alloca i32**, align 8Node To DerefLevel is 1
+~~~~~~~~~~~~~~~~~Node From   %2 = alloca i32**, align 8Node From DerefLevel is1,  Node To   %12 = load i32**, i32*** %2, align 8Node To DerefLevel is 0
+~~~~~~~~~~~~~~~~~Node From   %12 = load i32**, i32*** %2, align 8Node From DerefLevel is0,  Node To   %4 = alloca i32**, align 8Node To DerefLevel is 1
+~~~~~~~~~~~~~~~~~Node From   %4 = alloca i32**, align 8Node From DerefLevel is1,  Node To   %13 = load i32**, i32*** %4, align 8Node To DerefLevel is 0
+~~~~~~~~~~~~~~~~~Node From   %13 = load i32**, i32*** %4, align 8Node From DerefLevel is0,  Node To   %6 = alloca i32**, align 8Node To DerefLevel is 1
+~~~~~~~~~~~~~~~~~Node From   %5 = alloca i32**, align 8Node From DerefLevel is1,  Node To   %14 = load i32**, i32*** %5, align 8Node To DerefLevel is 0
+~~~~~~~~~~~~~~~~~Node From   %14 = load i32**, i32*** %5, align 8Node From DerefLevel is0,  Node To   %2 = alloca i32**, align 8Node To DerefLevel is 1
+~~~~~~~~~~~~~~~~~Node From   %7 = alloca i32**, align 8Node From DerefLevel is1,  Node To   %15 = load i32**, i32*** %7, align 8Node To DerefLevel is 0
+~~~~~~~~~~~~~~~~~Node From   %15 = load i32**, i32*** %7, align 8Node From DerefLevel is0,  Node To   %6 = alloca i32**, align 8Node To DerefLevel is 1
+~~~~~~~~~~~~~~~~~Node From   %8 = alloca i32*, align 8Node From DerefLevel is1,  Node To   %16 = load i32*, i32** %8, align 8Node To DerefLevel is 0
+~~~~~~~~~~~~~~~~~Node From   %6 = alloca i32**, align 8Node From DerefLevel is1,  Node To   %17 = load i32**, i32*** %6, align 8Node To DerefLevel is 0
+~~~~~~~~~~~~~~~~~Node From   %16 = load i32*, i32** %8, align 8Node From DerefLevel is0,  Node To   %17 = load i32**, i32*** %6, align 8Node To DerefLevel is 1
+~~~~~~~~~~~~~~~~~Node From   %6 = alloca i32**, align 8Node From DerefLevel is1,  Node To   %18 = load i32**, i32*** %6, align 8Node To DerefLevel is 0
+~~~~~~~~~~~~~~~~~Node From   %18 = load i32**, i32*** %6, align 8Node From DerefLevel is1,  Node To   %19 = load i32*, i32** %18, align 8Node To DerefLevel is 0
+~~~~~~~~~~~~~~~~~Node From   %19 = load i32*, i32** %18, align 8Node From DerefLevel is0,  Node To   %9 = alloca i32*, align 8Node To DerefLevel is 1
+~~~~~~~~~~~~~~~~~Node From   %10 = alloca i32*, align 8Node From DerefLevel is1,  Node To   %20 = load i32*, i32** %10, align 8Node To DerefLevel is 0
+~~~~~~~~~~~~~~~~~Node From   %6 = alloca i32**, align 8Node From DerefLevel is1,  Node To   %21 = load i32**, i32*** %6, align 8Node To DerefLevel is 0
+~~~~~~~~~~~~~~~~~Node From   %20 = load i32*, i32** %10, align 8Node From DerefLevel is0,  Node To   %21 = load i32**, i32*** %6, align 8Node To DerefLevel is 1
+~~~~~~~~~~~~~~~~~Node From @.str = private unnamed_addr constant [13 x i8] c"Hello World!\00", align 1Node From DerefLevel is0,  Node To i8* getelementptr inbounds ([13 x i8], [13 x i8]* @.str, i32 0, i32 0)Node To DerefLevel is 0
+Alias Set Tracker: 11 alias sets for 13 pointer values.
+  AliasSet[0x41f2b80, 1] must alias, Mod       Pointers: (i32* %1, 4)
+  AliasSet[0x41f2c20, 1] must alias, Ref       Pointers: (i32*** %3, 8)
+  AliasSet[0x41f2cc0, 1] must alias, Mod/Ref   Pointers: (i32*** %2, 8)
+  AliasSet[0x41f3e00, 1] must alias, Mod/Ref   Pointers: (i32*** %4, 8)
+  AliasSet[0x41f3ea0, 1] must alias, Mod/Ref   Pointers: (i32*** %6, 8)
+  AliasSet[0x41f3f40, 1] must alias, Ref       Pointers: (i32*** %5, 8)
+  AliasSet[0x41f3fe0, 1] must alias, Ref       Pointers: (i32*** %7, 8)
+  AliasSet[0x41f4080, 1] must alias, Ref       Pointers: (i32** %8, 8)
+  AliasSet[0x41f4120, 4] may alias, Mod/Ref   Pointers: (i32** %17, 8), (i32** %18, 8), (i32** %21, 8)
+    1 Unknown instructions: i32 %22
+  AliasSet[0x41fdb40, 1] must alias, Mod       Pointers: (i32** %9, 8)
+  AliasSet[0x41fdbe0, 1] must alias, Ref       Pointers: (i32** %10, 8)
+
