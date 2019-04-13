@@ -1,0 +1,86 @@
+Alias sets for function 'main':
+~~~~~Instruction is   %1 = alloca i32, align 4
+~~~~~Instruction is   %2 = alloca i32**, align 8
+~~~~~Instruction is   %3 = alloca i32**, align 8
+~~~~~Instruction is   %4 = alloca i32**, align 8
+~~~~~Instruction is   %5 = alloca i32**, align 8
+~~~~~Instruction is   %6 = alloca i32**, align 8
+~~~~~Instruction is   %7 = alloca i32**, align 8
+~~~~~Instruction is   %8 = alloca i32*, align 8
+~~~~~Instruction is   %9 = alloca i32*, align 8
+~~~~~Instruction is   %10 = alloca i32*, align 8
+~~~~~Instruction is   store i32 0, i32* %1, align 4
+~~~~~Instruction is   %11 = load i32**, i32*** %3, align 8
+add DerefEdge is read
+~~~~~~~~~~~~~~~~~Node From   %3 = alloca i32**, align 8Node From DerefLevel is1,  Node To   %11 = load i32**, i32*** %3, align 8Node To DerefLevel is 0
+~~~~~Instruction is   store i32** %11, i32*** %2, align 8
+add DerefEdge is not read
+~~~~~~~~~~~~~~~~~Node From   %11 = load i32**, i32*** %3, align 8Node From DerefLevel is0,  Node To   %2 = alloca i32**, align 8Node To DerefLevel is 1
+~~~~~Instruction is   %12 = load i32**, i32*** %2, align 8
+add DerefEdge is read
+~~~~~~~~~~~~~~~~~Node From   %2 = alloca i32**, align 8Node From DerefLevel is1,  Node To   %12 = load i32**, i32*** %2, align 8Node To DerefLevel is 0
+~~~~~Instruction is   store i32** %12, i32*** %4, align 8
+add DerefEdge is not read
+~~~~~~~~~~~~~~~~~Node From   %12 = load i32**, i32*** %2, align 8Node From DerefLevel is0,  Node To   %4 = alloca i32**, align 8Node To DerefLevel is 1
+~~~~~Instruction is   %13 = load i32**, i32*** %4, align 8
+add DerefEdge is read
+~~~~~~~~~~~~~~~~~Node From   %4 = alloca i32**, align 8Node From DerefLevel is1,  Node To   %13 = load i32**, i32*** %4, align 8Node To DerefLevel is 0
+~~~~~Instruction is   store i32** %13, i32*** %6, align 8
+add DerefEdge is not read
+~~~~~~~~~~~~~~~~~Node From   %13 = load i32**, i32*** %4, align 8Node From DerefLevel is0,  Node To   %6 = alloca i32**, align 8Node To DerefLevel is 1
+~~~~~Instruction is   %14 = load i32**, i32*** %5, align 8
+add DerefEdge is read
+~~~~~~~~~~~~~~~~~Node From   %5 = alloca i32**, align 8Node From DerefLevel is1,  Node To   %14 = load i32**, i32*** %5, align 8Node To DerefLevel is 0
+~~~~~Instruction is   store i32** %14, i32*** %2, align 8
+add DerefEdge is not read
+~~~~~~~~~~~~~~~~~Node From   %14 = load i32**, i32*** %5, align 8Node From DerefLevel is0,  Node To   %2 = alloca i32**, align 8Node To DerefLevel is 1
+~~~~~Instruction is   %15 = load i32**, i32*** %7, align 8
+add DerefEdge is read
+~~~~~~~~~~~~~~~~~Node From   %7 = alloca i32**, align 8Node From DerefLevel is1,  Node To   %15 = load i32**, i32*** %7, align 8Node To DerefLevel is 0
+~~~~~Instruction is   store i32** %15, i32*** %6, align 8
+add DerefEdge is not read
+~~~~~~~~~~~~~~~~~Node From   %15 = load i32**, i32*** %7, align 8Node From DerefLevel is0,  Node To   %6 = alloca i32**, align 8Node To DerefLevel is 1
+~~~~~Instruction is   %16 = load i32*, i32** %8, align 8
+add DerefEdge is read
+~~~~~~~~~~~~~~~~~Node From   %8 = alloca i32*, align 8Node From DerefLevel is1,  Node To   %16 = load i32*, i32** %8, align 8Node To DerefLevel is 0
+~~~~~Instruction is   %17 = load i32**, i32*** %6, align 8
+add DerefEdge is read
+~~~~~~~~~~~~~~~~~Node From   %6 = alloca i32**, align 8Node From DerefLevel is1,  Node To   %17 = load i32**, i32*** %6, align 8Node To DerefLevel is 0
+~~~~~Instruction is   store i32* %16, i32** %17, align 8
+add DerefEdge is not read
+~~~~~~~~~~~~~~~~~Node From   %16 = load i32*, i32** %8, align 8Node From DerefLevel is0,  Node To   %17 = load i32**, i32*** %6, align 8Node To DerefLevel is 1
+~~~~~Instruction is   %18 = load i32**, i32*** %6, align 8
+add DerefEdge is read
+~~~~~~~~~~~~~~~~~Node From   %6 = alloca i32**, align 8Node From DerefLevel is1,  Node To   %18 = load i32**, i32*** %6, align 8Node To DerefLevel is 0
+~~~~~Instruction is   %19 = load i32*, i32** %18, align 8
+add DerefEdge is read
+~~~~~~~~~~~~~~~~~Node From   %18 = load i32**, i32*** %6, align 8Node From DerefLevel is1,  Node To   %19 = load i32*, i32** %18, align 8Node To DerefLevel is 0
+~~~~~Instruction is   store i32* %19, i32** %9, align 8
+add DerefEdge is not read
+~~~~~~~~~~~~~~~~~Node From   %19 = load i32*, i32** %18, align 8Node From DerefLevel is0,  Node To   %9 = alloca i32*, align 8Node To DerefLevel is 1
+~~~~~Instruction is   %20 = load i32*, i32** %10, align 8
+add DerefEdge is read
+~~~~~~~~~~~~~~~~~Node From   %10 = alloca i32*, align 8Node From DerefLevel is1,  Node To   %20 = load i32*, i32** %10, align 8Node To DerefLevel is 0
+~~~~~Instruction is   %21 = load i32**, i32*** %6, align 8
+add DerefEdge is read
+~~~~~~~~~~~~~~~~~Node From   %6 = alloca i32**, align 8Node From DerefLevel is1,  Node To   %21 = load i32**, i32*** %6, align 8Node To DerefLevel is 0
+~~~~~Instruction is   store i32* %20, i32** %21, align 8
+add DerefEdge is not read
+~~~~~~~~~~~~~~~~~Node From   %20 = load i32*, i32** %10, align 8Node From DerefLevel is0,  Node To   %21 = load i32**, i32*** %6, align 8Node To DerefLevel is 1
+~~~~~Instruction is   %22 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([13 x i8], [13 x i8]* @.str, i32 0, i32 0))
+add AssignEdge 
+~~~~~~~~~~~~~~~~~Node From @.str = private unnamed_addr constant [13 x i8] c"Hello World!\00", align 1Node From DerefLevel is0,  Node To i8* getelementptr inbounds ([13 x i8], [13 x i8]* @.str, i32 0, i32 0)Node To DerefLevel is 0
+~~~~~Instruction is   ret i32 0
+Alias Set Tracker: 11 alias sets for 13 pointer values.
+  AliasSet[0x522bb80, 1] must alias, Mod       Pointers: (i32* %1, 4)
+  AliasSet[0x522bc20, 1] must alias, Ref       Pointers: (i32*** %3, 8)
+  AliasSet[0x522bcc0, 1] must alias, Mod/Ref   Pointers: (i32*** %2, 8)
+  AliasSet[0x522ce00, 1] must alias, Mod/Ref   Pointers: (i32*** %4, 8)
+  AliasSet[0x522cea0, 1] must alias, Mod/Ref   Pointers: (i32*** %6, 8)
+  AliasSet[0x522cf40, 1] must alias, Ref       Pointers: (i32*** %5, 8)
+  AliasSet[0x522cfe0, 1] must alias, Ref       Pointers: (i32*** %7, 8)
+  AliasSet[0x522d080, 1] must alias, Ref       Pointers: (i32** %8, 8)
+  AliasSet[0x522d120, 4] may alias, Mod/Ref   Pointers: (i32** %17, 8), (i32** %18, 8), (i32** %21, 8)
+    1 Unknown instructions: i32 %22
+  AliasSet[0x5236b40, 1] must alias, Mod       Pointers: (i32** %9, 8)
+  AliasSet[0x5236be0, 1] must alias, Ref       Pointers: (i32** %10, 8)
