@@ -28,15 +28,12 @@ define i32 @main() #0 {
   store i32** %14, i32*** %2, align 8
   %15 = load i32**, i32*** %7, align 8
   store i32** %15, i32*** %6, align 8
-  ; *e=g
   %16 = load i32*, i32** %8, align 8
   %17 = load i32**, i32*** %6, align 8
   store i32* %16, i32** %17, align 8
-  ; h=*e
   %18 = load i32**, i32*** %6, align 8
   %19 = load i32*, i32** %18, align 8
   store i32* %19, i32** %9, align 8
-  ; *e=p
   %20 = load i32*, i32** %10, align 8
   %21 = load i32**, i32*** %6, align 8
   store i32* %20, i32** %21, align 8
