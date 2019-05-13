@@ -1,5 +1,5 @@
 import re
-filename = 'testPEG.ll'
+filename = 'testCall.ll'
 stackOp=[]
 stackLV=[]
 stackRV=[] #not use
@@ -26,6 +26,21 @@ with open(filename,'r') as f:
                 break
                 # skip annotation
             if (res2[0] == ';'):
+                #shows that is a branch
+                if('preds' in res2):
+                    #preds 表示前驱
+                    print('\n')
+                    lable = res2[1].replace('<label>','')
+                    lable = lable.replace(':','')
+                    preds = []
+                    for item in res2:
+                        if('%' in item ):
+                            preds.append(item)
+                    print("block label is "+ lable)
+                    print("preds:")
+                    for pred in preds:
+                        print(pred.replace('\n',''))
+                #print(res2)
                 continue
                 #skip source name
             if (res2[0] == 'source_name'):
@@ -74,7 +89,7 @@ with open(filename,'r') as f:
                 if(len(stackLV) == 0):
                     #judge whether it is an alloca statement or not
                     if(tmpSta.firstType == 'i32*' or tmpSta.firstType == 'i32**'):
-                        print("~~~~~~~~~~statement: "+ tmpSta.rightVal + "= &" + tmpSta.leftVal)
+                        print("~~~~~~~~~~ alloca statement?: "+ tmpSta.rightVal + "= &" + tmpSta.leftVal)
 
                 #if there is only one 'load' keyword in the stack
                 if (len(stackLV) == 1):
@@ -98,6 +113,22 @@ with open(filename,'r') as f:
                 if(len(stackLV) >= 3):
                     stackLV.clear()
                     continue
+
+            #branch for & if case
+            if(len(res2)>=3 and res2[2] == 'br'):
+                tmpSta = Statement()
+                tmpSta.Op = 'br'
+                tmpSta.firstType = res2[3]
+                if tmpSta.firstType != 'label':
+                    tmpSta.leftVal = res2[7]
+                    tmpSta.rightVal = res2[10].replace('\n','')
+                else:
+                    tmpSta.leftVal = res2[4].replace('\n','')
+                if tmpSta.rightVal == '':
+                    print("branch goto lable " + tmpSta.leftVal)
+                else:
+                    print("branch goto lable " + tmpSta.leftVal + " or lable " + tmpSta.rightVal)
+
 
 
 
