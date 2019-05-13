@@ -1,9 +1,10 @@
 import re
-filename = 'testCall.ll'
+filename = 'testPEG.ll'
 stackOp=[]
 stackLV=[]
 stackRV=[] #not use
-
+topLevel=('')#for record topLevel variable
+addressTaken=('')#for record addressTaken variable
 #create a class called 'Statement' to store each line
 class Statement:
     def __init__(self):
@@ -89,7 +90,7 @@ with open(filename,'r') as f:
                 if(len(stackLV) == 0):
                     #judge whether it is an alloca statement or not
                     if(tmpSta.firstType == 'i32*' or tmpSta.firstType == 'i32**'):
-                        print("~~~~~~~~~~ alloca statement?: "+ tmpSta.rightVal + "= &" + tmpSta.leftVal)
+                        print(tmpSta.secondType+' '+tmpSta.rightVal + " = alloca " +tmpSta.firstType+' '+tmpSta.leftVal)
 
                 #if there is only one 'load' keyword in the stack
                 if (len(stackLV) == 1):
@@ -105,9 +106,9 @@ with open(filename,'r') as f:
                     tmpStament2 = stackLV.pop()
                     tmpStament1 = stackLV.pop()
                     if (tmpStament1.leftVal == tmpSta.leftVal and tmpStament2.leftVal == tmpSta.rightVal):
-                        print("load: " + "*" + tmpStament2.rightVal + "=" + tmpStament1.rightVal)
+                        print("load: " + "*" + tmpStament2.rightVal + " = " + tmpStament1.rightVal)
                     if (tmpStament2.leftVal == tmpSta.leftVal and tmpStament1.leftVal == tmpStament2.rightVal):
-                        print("store: " + tmpSta.rightVal + "=" + "*" + tmpStament1.rightVal)
+                        print("store: " + tmpSta.rightVal + " = " + "*" + tmpStament1.rightVal)
 
                 #if there are more than two 'load' keywords in the satck
                 if(len(stackLV) >= 3):
