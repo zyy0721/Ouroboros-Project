@@ -12,24 +12,27 @@ define i32 @main() #0 {
   %5 = alloca i32*, align 8
   %6 = alloca i32*, align 8
   %7 = alloca i32*, align 8
+  %8 = alloca i32, align 4
   store i32 0, i32* %1, align 4
-  %8 = load i32**, i32*** %3, align 8
-  store i32** %8, i32*** %2, align 8
-  %9 = load i32*, i32** %5, align 8
-  %10 = load i32**, i32*** %2, align 8
-  store i32* %9, i32** %10, align 8
+  %9 = load i32**, i32*** %3, align 8
+  store i32** %9, i32*** %2, align 8
+  %10 = load i32*, i32** %5, align 8
   %11 = load i32**, i32*** %2, align 8
-  %12 = load i32*, i32** %11, align 8
-  store i32* %12, i32** %6, align 8
+  store i32* %10, i32** %11, align 8
+  %12 = load i32**, i32*** %2, align 8
+  %13 = load i32*, i32** %12, align 8
+  store i32* %13, i32** %6, align 8
   store i32** %6, i32*** %4, align 8
-  %13 = load i32*, i32** %7, align 8
-  %14 = load i32**, i32*** %3, align 8
-  store i32* %13, i32** %14, align 8
-  %15 = load i32*, i32** %7, align 8
-  %16 = load i32**, i32*** %4, align 8
-  store i32* %15, i32** %16, align 8
-  %17 = load i32*, i32** %6, align 8
-  store i32* %17, i32** %5, align 8
+  %14 = load i32*, i32** %7, align 8
+  %15 = load i32**, i32*** %3, align 8
+  store i32* %14, i32** %15, align 8
+  %16 = load i32*, i32** %7, align 8
+  %17 = load i32**, i32*** %4, align 8
+  store i32* %16, i32** %17, align 8
+  %18 = load i32*, i32** %6, align 8
+  store i32* %18, i32** %5, align 8
+  store i32 1, i32* %8, align 4
+  store i32* %8, i32** %7, align 8
   ret i32 0
 }
 
