@@ -1,5 +1,5 @@
 import re
-filename = 'testAdd.ll'
+filename = 'testPEG.ll'
 stackOp=[]
 stackLV=[]
 stackRV=[] #not use
@@ -72,8 +72,9 @@ with open(filename,'r') as f:
 
                 #if there is no 'load' keyword
                 if(len(stackLV) == 0):
-                    #filter the statement
-                    continue
+                    #judge whether it is an alloca statement or not
+                    if(tmpSta.firstType == 'i32*' or tmpSta.firstType == 'i32**'):
+                        print("~~~~~~~~~~statement: "+ tmpSta.rightVal + "= &" + tmpSta.leftVal)
 
                 #if there is only one 'load' keyword in the stack
                 if (len(stackLV) == 1):
@@ -95,6 +96,7 @@ with open(filename,'r') as f:
 
                 #if there are more than two 'load' keywords in the satck
                 if(len(stackLV) >= 3):
+                    stackLV.clear()
                     continue
 
 
