@@ -10,9 +10,9 @@ int main()
     c=3;
     d = a+b+c;
     d = a -b;
-    c= d*a;
+    c = d*a;
     b = c+1;
-    e =f;
+    e = f;
     if(b>0)
     {
         *e = g;

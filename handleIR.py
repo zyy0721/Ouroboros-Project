@@ -1,5 +1,5 @@
 import re
-filename = 'testPEG.ll'
+filename = 'testCase.ll'
 stackOp=[]
 stackLV=[]
 stackRV=[] #not use
@@ -100,7 +100,7 @@ with open(filename,'r') as f:
                         print("assign: " + tmpSta.rightVal + "=" + tmpStament.rightVal)
 
                 #if there are two 'load' keywords in the stack
-                if (len(stackLV) == 2):
+                if (len(stackLV) >= 2):
                     # fetch the top two values of stack
                     # the name of variable is for intuitively operating
                     tmpStament2 = stackLV.pop()
@@ -111,12 +111,14 @@ with open(filename,'r') as f:
                         print("store: " + tmpSta.rightVal + " = " + "*" + tmpStament1.rightVal)
 
                 #if there are more than two 'load' keywords in the satck
-                if(len(stackLV) >= 3):
-                    stackLV.clear()
-                    continue
+                #if(len(stackLV) >= 3):
+                #    stackLV.clear()
+                #    continue
 
             #branch for & if case
             if(len(res2)>=3 and res2[2] == 'br'):
+                #before leaving a block, should clear the whold stackLV
+                stackLV.clear()
                 tmpSta = Statement()
                 tmpSta.Op = 'br'
                 tmpSta.firstType = res2[3]
