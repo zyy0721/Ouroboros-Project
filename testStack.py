@@ -1,10 +1,10 @@
 
 import re
 #输入的dot文件
-filename = 'cfg.Casemain.dot'
+filename = 'cfg.Case2_Z4fun2PPi.dot'
 
 #输出想要的dot文件
-newFilename = 'cfg.zyytest.dot'
+newFilename = 'cfg.zyy.fun2test.dot'
 fobj = open(newFilename, 'wb+')
 
 #用来存操作符的栈
@@ -142,6 +142,33 @@ def analysisLine(line):
             # if(len(stackLV) >= 3):
             #    stackLV.clear()
             #    continue
+
+        # if is a call key word
+        if(len(res2)>=3 and res2[2]=='call'):
+            tmpSta = Statement()
+            tmpSta.Op = 'call'
+            tmpSta.firstType = res2[3]#return type of function
+            tmpSta.secondType = res2[4] # functionName & formal parameter type
+            #if there is one formal parameter not two more parameters
+            tmpSta.rightVal = res2[5].replace(")","")#
+            #找上一句load 指令，来找到真实的变量寄存器号，如果相等则继续
+            tmpStament = stackLV.pop()
+            if tmpStament.leftVal == tmpSta.rightVal:
+                tmpStr = "call " +tmpSta.firstType + tmpSta.secondType+" "+tmpStament.rightVal+")"+"\\l "
+                return tmpStr
+
+        #if is a switch key word
+        if (len(res2) >= 3 and res2[2] == 'switch'):
+            tmpSta = Statement()
+            tmpSta.Op = 'switch'
+            tmpSta.firstType = res2[3]
+            tmpSta.leftVal = res2[4]
+            #找上一句load指令，来找到真实的变量寄存号
+            tmpStament = stackLV.pop()
+            if tmpStament.leftVal == tmpSta.leftVal:
+                tmpStr = "switch" + " "+ tmpSta.firstType + " "+ tmpStament.rightVal + "\\l "
+                return tmpStr
+
         '''
         # branch for & if case
         if (len(res2) >= 3 and res2[2] == 'br'):
