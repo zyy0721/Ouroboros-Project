@@ -1,0 +1,5 @@
+digraph "CFG for '_Z4fun2PPi' function" {
+	label="CFG for '_Z4fun2PPi' function";
+
+	Node0x509f670 [shape=record,label="{%1:\l alloca i32** %2\l i32*** %2 = alloca i32** %0\l store: *%2 = @global\l }"];
+}

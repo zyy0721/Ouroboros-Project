@@ -1,0 +1,5 @@
+digraph "CFG for '_Z4fun1Pi' function" {
+	label="CFG for '_Z4fun1Pi' function";
+
+	Node0x509ec40 [shape=record,label="{%1:\l alloca i32* %2\l i32** %2 = alloca i32* %0\l assign: @global=%2\l }"];
+}
