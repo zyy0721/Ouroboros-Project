@@ -33,4 +33,6 @@ digraph "CFG for 'main' function" {
 	Node0x50a0f70 [shape=record,label="{%67:\l call void@_Z4fun2PPi(i32** %6)\l }"];
 	Node0x50a0f70 -> Node0x50ba500;
 	Node0x50ba500 [shape=record,label="{%69:\l }"];
+
+	Node1 [shape=record,label="{testest zyy\l }"];
 }

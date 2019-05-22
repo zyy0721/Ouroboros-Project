@@ -1,10 +1,10 @@
 
 import re
 #输入的dot文件
-filename = 'cfg.Case2_Z4fun2PPi.dot'
+filename = 'cfg.Case2main.dot'
 
 #输出想要的dot文件
-newFilename = 'cfg.zyy.fun2test.dot'
+newFilename = 'cfg.zyy.Case2maintest.dot'
 fobj = open(newFilename, 'wb+')
 
 #用来存操作符的栈
@@ -12,8 +12,9 @@ stackOp=[]
 #用来存statement的栈
 stackLV=[]
 stackRV=[] #not use
-topLevel=('')#for record topLevel variable
-addressTaken=('')#for record addressTaken variable
+allPointer=[] # to store pointer type variables
+topLevel=[]#for record topLevel variable
+addressTaken=[]#for record addressTaken variable
 #create a class called 'Statement' to store each line
 class Statement:
     def __init__(self):
@@ -73,9 +74,12 @@ def analysisLine(line):
             tmpSta.leftVal = res2[2]
             tmpSta.Op = 'alloca'
             tmpSta.firstType = res2[5]
-            tmpStr = "alloca " + tmpSta.firstType + " " + tmpSta.leftVal + "\\l "
-            print("alloca " + tmpSta.firstType + " " + tmpSta.leftVal)
-            return tmpStr
+            #skip int type variable
+            if tmpSta.firstType!= 'i32':
+                tmpStr = "alloca:" + tmpSta.firstType + " " + tmpSta.leftVal + "\\l "
+                allPointer.append(tmpSta.leftVal)
+                print("alloca " + tmpSta.firstType + " " + tmpSta.leftVal)
+                return tmpStr
             #continue
             #print("alloca statement1")
         # skip return 0 case
@@ -110,8 +114,9 @@ def analysisLine(line):
             if (len(stackLV) == 0 ):
                 # judge whether it is an alloca statement or not
                 if (tmpSta.firstType == 'i32*' or tmpSta.firstType == 'i32**'):
-                    tmpStr = tmpSta.secondType + ' ' + tmpSta.rightVal + " = alloca " + tmpSta.firstType + ' ' + tmpSta.leftVal + "\\l "
-                    print(tmpSta.secondType + ' ' + tmpSta.rightVal + " = alloca " + tmpSta.firstType + ' ' + tmpSta.leftVal)
+                    tmpStr = "alloca:"+' ' + tmpSta.rightVal + "=" +  ' ' + tmpSta.leftVal + "\\l "
+                    addressTaken.append(tmpSta.leftVal)
+                    print("alloca:"+tmpSta.secondType + ' ' + tmpSta.rightVal + "=" + tmpSta.firstType + ' ' + tmpSta.leftVal)
                     return tmpStr
 
             # if there is only one 'load' keyword in the stack
@@ -119,7 +124,7 @@ def analysisLine(line):
                 # fetch the top value of stack
                 tmpStament = stackLV.pop()
                 if (tmpStament.leftVal == tmpSta.leftVal):
-                    tmpStr = "assign: " + tmpSta.rightVal + "=" + tmpStament.rightVal + "\\l "
+                    tmpStr = "assign:" +' '+tmpSta.rightVal + "=" +' '+tmpStament.rightVal + "\\l "
                     print("assign: " + tmpSta.rightVal + "=" + tmpStament.rightVal)
                     return tmpStr
 
@@ -157,7 +162,8 @@ def analysisLine(line):
                 tmpStr = "call " +tmpSta.firstType + tmpSta.secondType+" "+tmpStament.rightVal+")"+"\\l "
                 return tmpStr
 
-        #if is a switch key word
+        #if is a switch key word, nothing to do
+        '''
         if (len(res2) >= 3 and res2[2] == 'switch'):
             tmpSta = Statement()
             tmpSta.Op = 'switch'
@@ -168,6 +174,8 @@ def analysisLine(line):
             if tmpStament.leftVal == tmpSta.leftVal:
                 tmpStr = "switch" + " "+ tmpSta.firstType + " "+ tmpStament.rightVal + "\\l "
                 return tmpStr
+        '''
+
 
         '''
         # branch for & if case
@@ -228,7 +236,37 @@ with open(filename,'r') as f:
 
         #没有label，直接写到新文件中
         else:
+            strContent=""
+            if "}" in line:
+                for item in allPointer:
+                    if item not in addressTaken:
+                        strContent += item +" addressTaken" + "\\l "
+                        print(strContent)
+                for item in addressTaken:
+                    strContent += item + " topLevel" + "\\l "
+                strBlock = "Node1 [shape=record,label=" + '"' + "{" + strContent + "}" + '"' + "];"
+                input3 = bytes(strBlock,encoding="utf8")
+                fobj.write(input3)
             input1 = bytes(line, encoding="utf8")
             fobj.write(input1)
 
+        # to write a tributary block for displaying addressTaken and toplevel
+        # Node1 [shape=record,label="{testest zyy\l }"];
 
+
+
+fobj.close()
+
+print("all pointer type variables")
+for item in allPointer:
+    print(item)
+
+
+print("all addressTaken variables")
+for item in addressTaken:
+    print(item)
+
+print("top level")
+for item in allPointer:
+    if item not in addressTaken:
+        print(item)

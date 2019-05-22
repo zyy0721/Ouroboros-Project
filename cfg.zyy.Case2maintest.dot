@@ -1,27 +1,27 @@
 digraph "CFG for 'main' function" {
 	label="CFG for 'main' function";
 
-	Node0x509fa50 [shape=record,label="{%0:\l alloca i32 %1\l alloca i32 %2\l alloca i32 %3\l alloca i32 %4\l alloca i32 %5\l alloca i32** %6\l alloca i32** %7\l alloca i32** %8\l alloca i32* %9\l alloca i32* %10\l alloca i32* %11\l assign: %6=%7\l load: @global = *%6\l |{<s0>T|<s1>F}}"];
+	Node0x509fa50 [shape=record,label="{%0:\l alloca:i32** %6\l alloca:i32** %7\l alloca:i32** %8\l alloca:i32* %9\l alloca:i32* %10\l alloca:i32* %11\l assign: %6= %7\l load: @global = *%6\l |{<s0>T|<s1>F}}"];
 	Node0x509fa50:s0 -> Node0x509fcb0;
 	Node0x509fa50:s1 -> Node0x50a0d40;
-	Node0x509fcb0 [shape=record,label="{%30:\l store: *%6 = %9\l load: %10 = *%6\l i32*** %8 = alloca i32** %10\l store: *%7 = %11\l }"];
+	Node0x509fcb0 [shape=record,label="{%30:\l store: *%6 = %9\l load: %10 = *%6\l alloca: %8= %10\l store: *%7 = %11\l }"];
 	Node0x509fcb0 -> Node0x50a13d0;
-	Node0x50a0d40 [shape=record,label="{%37:\l store: *%8 = %11\l assign: %9=%10\l i32** %11 = alloca i32* %3\l }"];
+	Node0x50a0d40 [shape=record,label="{%37:\l store: *%8 = %11\l assign: %9= %10\l alloca: %11= %3\l }"];
 	Node0x50a0d40 -> Node0x50a13d0;
 	Node0x50a13d0 [shape=record,label="{%41:\l }"];
 	Node0x50a13d0 -> Node0x50a1780;
 	Node0x50a1780 [shape=record,label="{%42:\l |{<s0>T|<s1>F}}"];
 	Node0x50a1780:s0 -> Node0x50a1900;
 	Node0x50a1780:s1 -> Node0x50a1950;
-	Node0x50a1900 [shape=record,label="{%45:\l load: %10 = *%8\l assign: %9=%11\l }"];
+	Node0x50a1900 [shape=record,label="{%45:\l load: %10 = *%8\l assign: %9= %11\l }"];
 	Node0x50a1900 -> Node0x50a1780;
-	Node0x50a1950 [shape=record,label="{%49:\l switch i32 %4\l |{<s0>def|<s1>1|<s2>2}}"];
+	Node0x50a1950 [shape=record,label="{%49:\l |{<s0>def|<s1>1|<s2>2}}"];
 	Node0x50a1950:s0 -> Node0x50a1d10;
 	Node0x50a1950:s1 -> Node0x50a1d60;
 	Node0x50a1950:s2 -> Node0x50a1db0;
-	Node0x50a1d60 [shape=record,label="{%51:\l i32** %11 = alloca i32* %5\l }"];
+	Node0x50a1d60 [shape=record,label="{%51:\l alloca: %11= %5\l }"];
 	Node0x50a1d60 -> Node0x50a2160;
-	Node0x50a1db0 [shape=record,label="{%55:\l i32** %11 = alloca i32* %2\l }"];
+	Node0x50a1db0 [shape=record,label="{%55:\l alloca: %11= %2\l }"];
 	Node0x50a1db0 -> Node0x50a2160;
 	Node0x50a1d10 [shape=record,label="{%61:\l }"];
 	Node0x50a1d10 -> Node0x50a2160;
@@ -33,4 +33,4 @@ digraph "CFG for 'main' function" {
 	Node0x50a0f70 [shape=record,label="{%67:\l call void@_Z4fun2PPi(i32** %6)\l }"];
 	Node0x50a0f70 -> Node0x50ba500;
 	Node0x50ba500 [shape=record,label="{%69:\l }"];
-}
+Node1 [shape=record,label="{%6 addressTaken\l %7 addressTaken\l %8 addressTaken\l %9 addressTaken\l %11 addressTaken\l %10 topLevel\l %3 topLevel\l %5 topLevel\l %2 topLevel\l }"];}
