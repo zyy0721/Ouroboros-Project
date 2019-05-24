@@ -1,10 +1,10 @@
 
 import re
 #输入的dot文件
-filename = 'cfg.Case2main.dot'
+filename = 'cfg.Easymain.dot'
 
 #输出想要的dot文件
-newFilename = 'cfg.zyy.Case2maintest.dot'
+newFilename = 'cfg.zyy.Easymaintest.dot'
 fobj = open(newFilename, 'wb+')
 
 #用来存操作符的栈
@@ -129,7 +129,7 @@ def analysisLine(line):
                     return tmpStr
 
             # if there are two 'load' keywords in the stack
-            if (len(stackLV) >= 2):
+            if (len(stackLV) == 2):
                 # fetch the top two values of stack
                 # the name of variable is for intuitively operating
                 tmpStament2 = stackLV.pop()
@@ -144,9 +144,24 @@ def analysisLine(line):
                     return tmpStr
 
             # if there are more than two 'load' keywords in the satck
-            # if(len(stackLV) >= 3):
-            #    stackLV.clear()
-            #    continue
+            # could be *x = *y case
+            # need to be handled like
+            # t = *y
+            # *x = t
+            if(len(stackLV) >= 3):
+                tmpStament3 = stackLV.pop()
+                tmpStament2 = stackLV.pop()
+                tmpStament1 = stackLV.pop()
+                tmpStr = ""
+                if tmpStament1.leftVal == tmpStament2.rightVal :
+                    tmpStr = "load: " + tmpStament2.leftVal+" = " + "*" + tmpStament1.rightVal + "\\l "
+                    print("load: " + tmpStament2.leftVal+" = " +  "*" + tmpStament1.rightVal)
+                if tmpStament3.leftVal == tmpSta.rightVal and tmpSta.leftVal == tmpStament2.leftVal:
+                    tmpStr += "store: " + "*"+ tmpStament3.rightVal+" = "+tmpStament2.leftVal + "\\l "
+                    print("store: " + "*"+ tmpStament3.rightVal+" = "+tmpStament2.leftVal)
+                return tmpStr
+
+
 
         # if is a call key word
         if(len(res2)>=3 and res2[2]=='call'):
