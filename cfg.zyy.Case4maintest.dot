@@ -1,0 +1,12 @@
+digraph "CFG for 'main' function" {
+	label="CFG for 'main' function";
+
+	Node0x41e90b0 [shape=record,label="{%0:\l alloca:i32* %2\l alloca:i32* %3\l alloca:i32** %4\l alloca:i32** %5\l alloca:i32* %8\l alloca:%struct.PointerCase %9\l assign: %12 = %2\l assign: %14 = %5\l assign: %3 = %15\l store: *%18 = %3\l alloca: %20 = %2\l alloca: %4 = %21\l store: *%5 = %22\l |{<s0>T|<s1>F}}"];
+	Node0x41e90b0:s0 -> Node0x41e9920;
+	Node0x41e90b0:s1 -> Node0x41eafd0;
+	Node0x41e9920 [shape=record,label="{%27:\l assign: %6 = %28\l assign: %2 = %30\l assign: %3 = %32\l }"];
+	Node0x41e9920 -> Node0x41eb700;
+	Node0x41eafd0 [shape=record,label="{%34:\l }"];
+	Node0x41eafd0 -> Node0x41eb700;
+	Node0x41eb700 [shape=record,label="{%43:\l }"];
+Node1 [shape=record,label="{%3 addressTaken\l %4 addressTaken\l %5 addressTaken\l %8 addressTaken\l %9 addressTaken\l %2 topLevel\l %21 topLevel\l }"];}

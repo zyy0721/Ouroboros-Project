@@ -1,10 +1,10 @@
 
 import re
 #输入的dot文件
-filename = 'cfg.Easymain.dot'
+filename = 'cfg.Case4main.dot'
 
 #输出想要的dot文件
-newFilename = 'cfg.zyy.Easymaintest.dot'
+newFilename = 'cfg.zyy.Case4maintest.dot'
 fobj = open(newFilename, 'wb+')
 
 #用来存操作符的栈
@@ -26,7 +26,9 @@ class Statement:
 
 def analysisLine(line):
     # split each line to get what we want
-    res2 = re.split(',| ', line)
+    print(line)
+    res2 = re.split(",| ", line)
+    print(res2)
     # skip space line
     if (len(res2) == 0):
         #continue
@@ -68,12 +70,19 @@ def analysisLine(line):
             #continue
             print("@.str")
         '''
+
+
+
         # alloca statement
         if (len(res2) >= 5 and res2[4] == 'alloca'):
             tmpSta = Statement()
             tmpSta.leftVal = res2[2]
             tmpSta.Op = 'alloca'
-            tmpSta.firstType = res2[5]
+            if 'i32]'  in res2 or 'i32*]' in res2 or 'i32**]' in res2 :
+                tmpSta.firstType = res2[7].replace(']','')
+            else:
+                tmpSta.firstType = res2[5]
+            print(tmpSta.firstType)
             #skip int type variable
             if tmpSta.firstType!= 'i32':
                 tmpStr = "alloca:" + tmpSta.firstType + " " + tmpSta.leftVal + "\\l "
@@ -99,6 +108,17 @@ def analysisLine(line):
             tmpSta.rightVal = res2[8]
             stackLV.append(tmpSta)
 
+        # getelementptr
+        if(len(res2) >=5 and res2[4] == 'getelementptr'):
+            print(res2)
+            tmpSta = Statement()
+            tmpSta.Op = 'getelementptr'
+            tmpSta.leftVal = res2[2]
+            tmpSta.rightVal = res2[9]
+            tmpSta.secondType=res2[15] #it means the index of a pointer variable in the struct object
+            stackLV.append(tmpSta)
+
+
         # when we meet the key word 'store', we should check the 'stackLV'. When the size of stackLV is 1, that is to say it's assignment .
         # When the size of stackLV is 2, we will go further to determine it's a deref statement or not.
         if (len(res2) >= 3 and res2[2] == 'store'):
@@ -114,51 +134,81 @@ def analysisLine(line):
             if (len(stackLV) == 0 ):
                 # judge whether it is an alloca statement or not
                 if (tmpSta.firstType == 'i32*' or tmpSta.firstType == 'i32**'):
-                    tmpStr = "alloca:"+' ' + tmpSta.rightVal + "=" +  ' ' + tmpSta.leftVal + "\\l "
+                    tmpStr = "alloca:"+' ' + tmpSta.rightVal + " = " + tmpSta.leftVal + "\\l "
                     addressTaken.append(tmpSta.leftVal)
-                    print("alloca:"+tmpSta.secondType + ' ' + tmpSta.rightVal + "=" + tmpSta.firstType + ' ' + tmpSta.leftVal)
+                    print("alloca:"+tmpSta.secondType + ' ' + tmpSta.rightVal + " = " + tmpSta.firstType + ' ' + tmpSta.leftVal)
                     return tmpStr
 
             # if there is only one 'load' keyword in the stack
             if (len(stackLV) == 1):
                 # fetch the top value of stack
                 tmpStament = stackLV.pop()
-                if (tmpStament.leftVal == tmpSta.leftVal):
-                    tmpStr = "assign:" +' '+tmpSta.rightVal + "=" +' '+tmpStament.rightVal + "\\l "
-                    print("assign: " + tmpSta.rightVal + "=" + tmpStament.rightVal)
-                    return tmpStr
+                if tmpStament.Op == 'getelementptr':
+                    if tmpStament.leftVal == tmpSta.rightVal:
+                        tmpStr = "alloca: " +tmpStament.rightVal+"."+tmpStament.secondType+" = "+tmpSta.leftVal+"\\l "
+                        print(tmpStr)
+                        return tmpStr
+                    if tmpStament.leftVal == tmpSta.leftVal:
+                        tmpStr = "alloca: "+tmpSta.rightVal+" = "+tmpStament.rightVal+"."+tmpStament.secondType+"\\l "
+                        print(tmpStr)
+                        return tmpStr
+                else:
+                    if (tmpStament.leftVal == tmpSta.leftVal):
+                        tmpStr = "assign:" +' '+tmpSta.rightVal + " = " +tmpStament.rightVal + "\\l "
+                        print("assign: " + tmpSta.rightVal + " = " + tmpStament.rightVal)
+                        return tmpStr
 
             # if there are two 'load' keywords in the stack
+            # or one load & one getelementptr
             if (len(stackLV) == 2):
                 # fetch the top two values of stack
                 # the name of variable is for intuitively operating
                 tmpStament2 = stackLV.pop()
                 tmpStament1 = stackLV.pop()
-                if (tmpStament1.leftVal == tmpSta.leftVal and tmpStament2.leftVal == tmpSta.rightVal):
-                    tmpStr = "store: " + "*" + tmpStament2.rightVal + " = " + tmpStament1.rightVal + "\\l "
-                    print("store: " + "*" + tmpStament2.rightVal + " = " + tmpStament1.rightVal)
-                    return tmpStr
-                if (tmpStament2.leftVal == tmpSta.leftVal and tmpStament1.leftVal == tmpStament2.rightVal):
-                    tmpStr = "load: " + tmpSta.rightVal + " = " + "*" + tmpStament1.rightVal + "\\l "
-                    print("load: " + tmpSta.rightVal + " = " + "*" + tmpStament1.rightVal)
-                    return tmpStr
+                if tmpStament2.Op == 'getelementptr' :
+                    if (tmpStament1.leftVal == tmpSta.leftVal and tmpStament2.leftVal == tmpSta.rightVal):
+                        tmpStr = "assign: "+ tmpStament2.rightVal+"."+tmpStament2.secondType +" = "+ tmpStament1.rightVal + "\\l "
+                        print(tmpStr)
+                        return tmpStr
+                elif tmpStament1.Op == 'getelementptr' :
+                    if (tmpStament1.leftVal == tmpStament2.rightVal and tmpStament2.leftVal == tmpSta.leftVal):
+                        tmpStr = "assign: "+ tmpSta.rightVal + " = " + tmpStament1.rightVal+"."+tmpStament1.secondType + "\\l "
+                        print(tmpStr)
+                else :
+                    if (tmpStament1.leftVal == tmpSta.leftVal and tmpStament2.leftVal == tmpSta.rightVal):
+                        tmpStr = "store: " + "*" + tmpStament2.rightVal + " = " + tmpStament1.rightVal + "\\l "
+                        print("store: " + "*" + tmpStament2.rightVal + " = " + tmpStament1.rightVal)
+                        return tmpStr
+                    if (tmpStament2.leftVal == tmpSta.leftVal and tmpStament1.leftVal == tmpStament2.rightVal):
+                        tmpStr = "load: " + tmpSta.rightVal + " = " + "*" + tmpStament1.rightVal + "\\l "
+                        print("load: " + tmpSta.rightVal + " = " + "*" + tmpStament1.rightVal)
+                        return tmpStr
 
             # if there are more than two 'load' keywords in the satck
             # could be *x = *y case
             # need to be handled like
             # t = *y
             # *x = t
-            if(len(stackLV) >= 3):
+            if(len(stackLV) == 3):
                 tmpStament3 = stackLV.pop()
                 tmpStament2 = stackLV.pop()
                 tmpStament1 = stackLV.pop()
                 tmpStr = ""
-                if tmpStament1.leftVal == tmpStament2.rightVal :
-                    tmpStr = "load: " + tmpStament2.leftVal+" = " + "*" + tmpStament1.rightVal + "\\l "
-                    print("load: " + tmpStament2.leftVal+" = " +  "*" + tmpStament1.rightVal)
-                if tmpStament3.leftVal == tmpSta.rightVal and tmpSta.leftVal == tmpStament2.leftVal:
-                    tmpStr += "store: " + "*"+ tmpStament3.rightVal+" = "+tmpStament2.leftVal + "\\l "
-                    print("store: " + "*"+ tmpStament3.rightVal+" = "+tmpStament2.leftVal)
+                if tmpStament2.Op == 'getelementptr':
+                    if (tmpStament1.leftVal == tmpSta.leftVal and tmpStament2.leftVal == tmpStament3.rightVal and tmpStament3.leftVal == tmpSta.rightVal):
+                        tmpStr = "store: "+"*"+tmpStament2.rightVal+"."+tmpStament2.secondType+" = "+tmpStament1.rightVal+"\\l "
+                        print(tmpStr)
+                elif tmpStament1.Op == 'getelementptr':
+                    if (tmpStament1.leftVal == tmpStament2.rightVal and tmpStament2.leftVal == tmpSta.leftVal and tmpStament3.leftVal == tmpSta.rightVal):
+                        tmpStr = "store: "+"*"+tmpStament3.rightVal+" = "+tmpStament1.rightVal+"."+tmpStament1.secondType+"\\l "
+                        print(tmpStr)
+                else :
+                    if tmpStament1.leftVal == tmpStament2.rightVal :
+                        tmpStr = "load: " + tmpStament2.leftVal+" = " + "*" + tmpStament1.rightVal + "\\l "
+                        print("load: " + tmpStament2.leftVal+" = " +  "*" + tmpStament1.rightVal)
+                    if tmpStament3.leftVal == tmpSta.rightVal and tmpSta.leftVal == tmpStament2.leftVal:
+                        tmpStr += "store: " + "*"+ tmpStament3.rightVal+" = "+tmpStament2.leftVal + "\\l "
+                        print("store: " + "*"+ tmpStament3.rightVal+" = "+tmpStament2.leftVal)
                 return tmpStr
 
 
@@ -228,6 +278,7 @@ with open(filename,'r') as f:
                 fobj.write(input1)
             else:
                 #说明是一个block，则需要进一步处理（但不排除，有其他case没有考虑到
+                line = line.replace('\l...','')
                 strLine = line.split("\\l")#依据\l 进行划分
                 print(strLine[0])
                 input1 = bytes(strLine[0]+"\\l ", encoding="utf8")
