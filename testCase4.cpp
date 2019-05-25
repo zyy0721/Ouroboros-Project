@@ -25,7 +25,8 @@ int main()
     pointerCase.e = & aa;
     dd = &pointerCase.a;
     *ee = pointerCase.b;
-
+    bb = *pointerCase.e;
+    pointerCase.a = *dd;
     if(gg != 0)
     {
         gg = ArrayTmp[0];
