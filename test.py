@@ -5,18 +5,43 @@
 #!@File   : test.py
 
 import re
-filename = 'testCase4.ll'
-strLine = "{testest zyy\l %12 = getelementptr inbounds %struct.PointerCase, %struct.PointerCase* %9,\l... i32 0, i32 0\l}"
-if '...' in strLine:
-    print("hhhhhhh")
-if '\l...' in strLine:
-    strLine = strLine.replace('\l...','')
-    print("00000000000000")
+class Statement:
+    def __init__(self):
+        self.leftVal = ''
+        self.Op = ''
+        self.firstType = ''
+        self.secondType = ''
+        self.rightVal = ''
 
-print(strLine)
+filename = 'testCase4.ll'
+stack=[]
+sta1 = Statement()
+sta2 = Statement()
+sta3 = Statement()
+sta1.Op = '+'
+sta2.Op = '-'
+sta3.Op = '*'
+stack.append(sta1)
+stack.append(sta2)
+stack.append(sta3)
+for item in stack:
+    print(item.Op)
+
+strLine = "  %36 = getelementptr inbounds [10 x i32*], [10 x i32*]* %8, i64 0, i64 0"
+res = re.split(",| ",strLine)
+count = 0
+for item in res:
+    print(count, item)
+    count +=1
+#print(res)
+tmpStr = "call " + "void" + " " + "zyyfunc" + "( "
+
+
+'''
 with open(filename,'r') as f:
 
     for line in f:
         res = re.split(",| ",line)
         print(line)
         print(res)
+'''

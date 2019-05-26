@@ -1,0 +1,5 @@
+digraph "CFG for 'main' function" {
+	label="CFG for 'main' function";
+
+	Node0x3d12bd0 [shape=record,label="{%0:\l alloca:i32* %1\l alloca:i32* %2\l alloca:i32** %3\l alloca:i32** %4\l load: %7 = *%2\l store: *%1 = %7\l load: %10 = *%4\l store: *%3 = %10\l call void @_Z3funiPiPS_( %5, %2, %3)\l }"];
+	Node1 [shape=record,label="{%1 addressTaken\l %2 addressTaken\l %3 addressTaken\l %4 addressTaken\l }"];}

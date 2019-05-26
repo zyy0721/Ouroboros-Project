@@ -32,12 +32,6 @@ define i32 @main() #1 {
   %10 = load i32*, i32** %9, align 8
   %11 = load i32**, i32*** %3, align 8
   store i32* %10, i32** %11, align 8
-  %12 = load i32**, i32*** %4, align 8
-  %13 = load i32*, i32** %12, align 8
-  %14 = load i32, i32* %13, align 4
-  %15 = load i32**, i32*** %3, align 8
-  %16 = load i32*, i32** %15, align 8
-  store i32 %14, i32* %16, align 4
   %17 = load i32, i32* %5, align 4
   %18 = load i32*, i32** %2, align 8
   %19 = load i32**, i32*** %3, align 8

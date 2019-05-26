@@ -13,7 +13,6 @@ int main()
 	*a = *b;
 	int **e,**f;
 	*e = *f;
-	**e = **f;
 	int aa;
 	fun(aa,b,e);
 }
