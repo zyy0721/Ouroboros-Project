@@ -261,8 +261,7 @@ def analysisLine(line):
             tmpSta.secondType = funcName[0] # functionName
             #if there is one formal parameter not two more parameters
 
-            #找上一句load 指令，来找到真实的变量寄存器号，如果相等则继续
-            tmpStr = "call " + tmpSta.firstType + " "+tmpSta.secondType + "( "
+            tmpStr = "call " + tmpSta.firstType + " "+tmpSta.secondType + "("
             print(tmpStr)
             for i in range(len(stackLV)):
                 if i == len(stackLV)-1:
