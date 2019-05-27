@@ -1,0 +1,12 @@
+digraph "CFG for '_Z4fun2iPiPS_S_' function" {
+	label="CFG for '_Z4fun2iPiPS_S_' function";
+
+	Node0x4f45760 [shape=record,label="{%4:\l alloca:i32* %6\l alloca:i32** %7\l alloca:i32* %8\l alloca: %6 = %1\l alloca: %7 = %2\l alloca: %8 = %3\l |{<s0>T|<s1>F}}"];
+	Node0x4f45760:s0 -> Node0x4f457f0;
+	Node0x4f45760:s1 -> Node0x4f45d20;
+	Node0x4f457f0 [shape=record,label="{%11:\l alloca: @globalA = %5\l store: *%7 = %6\l load: %8 = *%7\l assign: %6 = %8\l }"];
+	Node0x4f457f0 -> Node0x4f462b0;
+	Node0x4f45d20 [shape=record,label="{%17:\l alloca: @globalB = %8\l alloca: %6 = %5\l store: *@globalB = %6\l load: %8 = *%7\l }"];
+	Node0x4f45d20 -> Node0x4f462b0;
+	Node0x4f462b0 [shape=record,label="{%22:\l }"];
+	Node1 [shape=record,label="{%6 topLevel\l %7 topLevel\l @globalA topLevel\l @globalB topLevel\l %1 addressTaken\l %2 addressTaken\l %3 addressTaken\l %5 addressTaken\l %8 addressTaken\l }"];}

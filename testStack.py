@@ -1,10 +1,10 @@
 
 import re
 #输入的dot文件
-filename = 'cfg.easymain.dot'
+filename = 'cfg.Case5fun2.dot'
 
 #输出想要的dot文件
-newFilename = 'cfg.zyy.easyTestfun.dot'
+newFilename = 'cfg.zyy.Case5fun2test.dot'
 fobj = open(newFilename, 'wb+')
 
 #用来存操作符的栈
@@ -104,7 +104,8 @@ def analysisLine(line):
                 # judge whether it is an alloca statement or not
                 if (tmpSta.firstType == 'i32*' or tmpSta.firstType == 'i32**'):
                     tmpStr = "alloca:"+' ' + tmpSta.rightVal + " = " + tmpSta.leftVal + "\\l "
-                    addressTaken.append(tmpSta.leftVal)
+                    if tmpSta.leftVal not in addressTaken:
+                        addressTaken.append(tmpSta.leftVal)
                     if tmpSta.rightVal not in allPointer:
                         allPointer.append(tmpSta.rightVal)
                     return tmpStr
@@ -117,14 +118,17 @@ def analysisLine(line):
                     if tmpStament.firstType != 'i32':
                         if tmpStament.leftVal == tmpSta.rightVal:
                             tmpStr = "alloca: " +tmpStament.rightVal+"."+tmpStament.secondType+" = "+tmpSta.leftVal+"\\l "
-                            addressTaken.append(tmpSta.leftVal)
+                            if tmpSta.leftVal not in addressTaken:
+                                addressTaken.append(tmpSta.leftVal)
                             tmpPointer = tmpStament.rightVal+"."+tmpStament.secondType
                             if tmpPointer not in allPointer:
                                 allPointer.append(tmpPointer)
                             return tmpStr
                         if tmpStament.leftVal == tmpSta.leftVal:
                             tmpStr = "alloca: "+tmpSta.rightVal+" = "+tmpStament.rightVal+"."+tmpStament.secondType+"\\l "
-                            addressTaken.append(tmpStament.rightVal+"."+tmpStament.secondType)
+                            tmpPointer = tmpStament.rightVal+"."+tmpStament.secondType
+                            if tmpPointer not in addressTaken:
+                                addressTaken.append(tmpPointer)
                             tmpPointer = tmpStament.rightVal+"."+tmpStament.secondType
                             if tmpPointer not in allPointer:
                                 allPointer.append(tmpPointer)
@@ -217,7 +221,7 @@ def analysisLine(line):
                                 allPointer.append(tmpStament3.rightVal)
                         if (tmpStament1.leftVal == tmpStament2.rightVal and tmpStament2.leftVal == tmpStament3.rightVal and tmpStament3.leftVal == tmpSta.leftVal):
                             tmpStr = "load: "+tmpSta.rightVal+" = "+"*"+tmpStament1.rightVal+"."+tmpStament1.secondType+"\\l "
-                            tmpPointer = tmpStament2.rightVal+"."+tmpStament2.secondType
+                            tmpPointer = tmpStament1.rightVal+"."+tmpStament1.secondType
                             if tmpPointer not in allPointer:
                                 allPointer.append(tmpPointer)
                             if tmpSta.rightVal not in allPointer:
