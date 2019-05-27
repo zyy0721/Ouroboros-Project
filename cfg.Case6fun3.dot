@@ -1,0 +1,5 @@
+digraph "CFG for '_Z4fun3iPi' function" {
+	label="CFG for '_Z4fun3iPi' function";
+
+	Node0x499b9b0 [shape=record,label="{%2:\l  %3 = alloca i32, align 4\l  %4 = alloca i32*, align 8\l  store i32 %0, i32* %3, align 4\l  store i32* %1, i32** %4, align 8\l  store i32* %3, i32** %4, align 8\l  ret void\l}"];
+}

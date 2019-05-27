@@ -1,0 +1,12 @@
+digraph "CFG for '_Z4fun2iPiPS_S_' function" {
+	label="CFG for '_Z4fun2iPiPS_S_' function";
+
+	Node0x499a6b0 [shape=record,label="{%4:\l  %5 = alloca i32**, align 8\l  %6 = alloca i32, align 4\l  %7 = alloca i32*, align 8\l  %8 = alloca i32**, align 8\l  %9 = alloca i32*, align 8\l  store i32 %0, i32* %6, align 4\l  store i32* %1, i32** %7, align 8\l  store i32** %2, i32*** %8, align 8\l  store i32* %3, i32** %9, align 8\l  %10 = load i32, i32* %6, align 4\l  %11 = icmp sgt i32 %10, 0\l  br i1 %11, label %12, label %19\l|{<s0>T|<s1>F}}"];
+	Node0x499a6b0:s0 -> Node0x499a740;
+	Node0x499a6b0:s1 -> Node0x499ac60;
+	Node0x499a740 [shape=record,label="{%12:\l\l  store i32* %6, i32** @globalA, align 8\l  %13 = load i32*, i32** %7, align 8\l  %14 = load i32**, i32*** %8, align 8\l  store i32* %13, i32** %14, align 8\l  %15 = load i32**, i32*** %8, align 8\l  %16 = load i32*, i32** %15, align 8\l  store i32* %16, i32** %9, align 8\l  %17 = load i32*, i32** %9, align 8\l  store i32* %17, i32** %7, align 8\l  %18 = load i32**, i32*** %8, align 8\l  store i32** %18, i32*** %5, align 8\l  br label %25\l}"];
+	Node0x499a740 -> Node0x499b2d0;
+	Node0x499ac60 [shape=record,label="{%19:\l\l  store i32** %9, i32*** @globalB, align 8\l  store i32* %6, i32** %7, align 8\l  %20 = load i32*, i32** %7, align 8\l  %21 = load i32**, i32*** @globalB, align 8\l  store i32* %20, i32** %21, align 8\l  %22 = load i32**, i32*** %8, align 8\l  %23 = load i32*, i32** %22, align 8\l  store i32* %23, i32** %9, align 8\l  %24 = load i32**, i32*** @globalB, align 8\l  store i32** %24, i32*** %5, align 8\l  br label %25\l}"];
+	Node0x499ac60 -> Node0x499b2d0;
+	Node0x499b2d0 [shape=record,label="{%25:\l\l  %26 = load i32**, i32*** %5, align 8\l  ret i32** %26\l}"];
+}
