@@ -1,0 +1,5 @@
+digraph "CFG for '_Z4fun1iPiPS_' function" {
+	label="CFG for '_Z4fun1iPiPS_' function";
+
+	Node0x949da40 [shape=record,label="{entry:\l  %n.addr = alloca i32, align 4\l  %ptr.addr = alloca i32*, align 8\l  %pptr.addr = alloca i32**, align 8\l  store i32 %n, i32* %n.addr, align 4\l  store i32* %ptr, i32** %ptr.addr, align 8\l  store i32** %pptr, i32*** %pptr.addr, align 8\l  %0 = load i32*, i32** %ptr.addr, align 8\l  store i32* %0, i32** @globalA, align 8\l  %1 = load i32**, i32*** @globalB, align 8\l  store i32** %1, i32*** %pptr.addr, align 8\l  %2 = load i32*, i32** %ptr.addr, align 8\l  ret i32* %2\l}"];
+}
