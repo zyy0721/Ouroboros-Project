@@ -1,0 +1,5 @@
+digraph "CFG for '_Z4fun1iPiPS_' function" {
+	label="CFG for '_Z4fun1iPiPS_' function";
+
+	Node0x4999870 [shape=record,label="{%3:\l alloca:i32* %5\l alloca:i32** %6\l alloca: %5 = %1\l alloca: %6 = %2\l assign: @globalA = %5\l assign: %6 = @globalB\l ret %5\l }"];
+	Node1 [shape=record,label="{%5 topLevel\l %6 topLevel\l @globalA topLevel\l @globalB topLevel\l %1 addressTaken\l %2 addressTaken\l }"];}

@@ -1,0 +1,12 @@
+digraph "CFG for '_Z4fun2iPiPS_S_' function" {
+	label="CFG for '_Z4fun2iPiPS_S_' function";
+
+	Node0x499a6b0 [shape=record,label="{%4:\l alloca:i32** %5\l alloca:i32* %7\l alloca:i32** %8\l alloca:i32* %9\l alloca: %7 = %1\l alloca: %8 = %2\l alloca: %9 = %3\l |{<s0>T|<s1>F}}"];
+	Node0x499a6b0:s0 -> Node0x499a740;
+	Node0x499a6b0:s1 -> Node0x499ac60;
+	Node0x499a740 [shape=record,label="{%12:\l alloca: @globalA = %6\l store: *%8 = %7\l load: %9 = *%8\l assign: %7 = %9\l assign: %5 = %8\l }"];
+	Node0x499a740 -> Node0x499b2d0;
+	Node0x499ac60 [shape=record,label="{%19:\l alloca: @globalB = %9\l alloca: %7 = %6\l store: *@globalB = %7\l load: %9 = *%8\l assign: %5 = @globalB\l }"];
+	Node0x499ac60 -> Node0x499b2d0;
+	Node0x499b2d0 [shape=record,label="{%25:\l ret %5\l }"];
+	Node1 [shape=record,label="{%5 topLevel\l %7 topLevel\l %8 topLevel\l @globalA topLevel\l @globalB topLevel\l %1 addressTaken\l %2 addressTaken\l %3 addressTaken\l %6 addressTaken\l %9 addressTaken\l }"];}

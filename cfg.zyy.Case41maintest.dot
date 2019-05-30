@@ -1,0 +1,12 @@
+digraph "CFG for 'main' function" {
+	label="CFG for 'main' function";
+
+	Node0x36a4240 [shape=record,label="{%0:\l alloca:i32* %2\l alloca:i32* %3\l alloca:i32** %4\l alloca:i32** %5\l alloca:i32* %8\l alloca:%struct.PointerCase %9\l assign: %9.0 = %2\l assign: %9.2 = %5\l assign: %3 = %9.0\l store: *%9.2 = %3\l alloca: %9.3 = %2\l alloca: %4 = %9.0\l store: *%5 = %9.1\l load: %3 = *%9.3\l load: %9.0 = *%4\l |{<s0>T|<s1>F}}"];
+	Node0x36a4240:s0 -> Node0x36a4ab0;
+	Node0x36a4240:s1 -> Node0x36a5950;
+	Node0x36a4ab0 [shape=record,label="{%33:\l assign: %2 = %8.0\l assign: %3 = %8.1\l }"];
+	Node0x36a4ab0 -> Node0x36a6c60;
+	Node0x36a5950 [shape=record,label="{%40:\l assign: %2 = %8.i\l }"];
+	Node0x36a5950 -> Node0x36a6c60;
+	Node0x36a6c60 [shape=record,label="{%49:\l }"];
+	Node1 [shape=record,label="{%3 topLevel\l %4 topLevel\l %5 topLevel\l %8 topLevel\l %9 topLevel\l %9.2 topLevel\l %9.3 topLevel\l %9.1 topLevel\l %8.0 topLevel\l %8.1 topLevel\l %8.i topLevel\l %2 addressTaken\l %9.0 addressTaken\l }"];}

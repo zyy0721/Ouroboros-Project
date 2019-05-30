@@ -27,12 +27,24 @@ stack.append(sta3)
 for item in stack:
     print(item.Op)
 
-strLine = "  %36 = getelementptr inbounds [10 x i32*], [10 x i32*]* %8, i64 0, i64 0"
+strLine = "  %181 = call noalias i8* @malloc(i64 40) #4"
+strLine2 = "  %183 = call i8* @_Znam(i64 40) #5"
 res = re.split(",| ",strLine)
+res2 = re.split(",| ",strLine2)
 count = 0
 for item in res:
     print(count, item)
     count +=1
+
+if 'malloc' in strLine:
+    print(1111111111111111111111)
+
+count2 = 0;
+for item in res2:
+    print(count2,item)
+    count2 +=1
+if '_Znam' in strLine2:
+    print(22222222222222222)
 #print(res)
 tmpStr = "call " + "void" + " " + "zyyfunc" + "( "
 
