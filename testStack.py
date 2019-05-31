@@ -11,9 +11,13 @@ fobj = open(newFilename, 'wb+')
 stackOp=[]
 #用来存statement的栈
 stackLV=[]
+#用来存每个函数的形参栈
 FormalParameter=[] #to store every function's formal parameters
+#用来存储每个Pointer类型变量
 allPointer=[] # to store pointer type variables
+#用来存储每个topLevel类型的变量
 topLevel=[]#for record topLevel variable
+#用来存储每个address Taken类型的变量
 addressTaken=[]#for record addressTaken variable
 #create a class called 'Statement' to store each line
 class Statement:
@@ -26,9 +30,7 @@ class Statement:
 
 def analysisLine(line):
     # split each line to get what we want
-    print(line)
     res2 = re.split(",| ", line)
-    print(res2)
     # skip space line
     if (len(res2) == 0):
         #continue
@@ -49,17 +51,16 @@ def analysisLine(line):
                 tmpSta.firstType = res2[7].replace(']','')
             else:
                 tmpSta.firstType = res2[5]
-
+            #如果有addr属性 说明是形参
             if 'addr' in tmpSta.leftVal:
                 FormalParameter.append(tmpSta.leftVal)
 
-            #skip int type variable
+            #skip int type variable 跳过int类型的变量
             if tmpSta.firstType!= 'i32':
                 tmpStr = "alloca:" + tmpSta.firstType + " " + tmpSta.leftVal + "\\l "
                 allPointer.append(tmpSta.leftVal)
                 return tmpStr
-            #continue
-            #print("alloca statement1")
+
         # skip return 0 case
         if (len(res2) >= 3 and res2[2] == 'store' and res2[4] == 0):
             #continue
@@ -82,6 +83,7 @@ def analysisLine(line):
             tmpSta = Statement()
             tmpSta.Op = 'getelementptr'
             tmpSta.leftVal = res2[2]
+            #用 ‘x’ 来区分是否为数组
             if 'x' not in res2:
                 tmpSta.rightVal = res2[9]
                 tmpSta.secondType=res2[15] #it means the index of a pointer variable in the struct object
@@ -105,9 +107,8 @@ def analysisLine(line):
             funcName = res2[6].split('(')
             tmpSta.secondType = funcName[0] # functionName
 
-
             tmpStr = "call " + tmpSta.leftVal+" = "+tmpSta.firstType+" "+tmpSta.secondType + "("
-
+            #在调用该函数处时，输出 传入该函数的实参 实现：
             for i in range(len(stackLV)):
                 if i == len(stackLV)-1:
                     tmpStr += stackLV[i].rightVal + ")" + "\\l "
@@ -417,9 +418,9 @@ with open(filename,'r') as f:
                 fobj.write(input1)
                 i = 1
                 while i < len(strLine):
-                    print(strLine[i])
+                    #对每一行进行分析
                     tmpStr = analysisLine(strLine[i])
-                    #print(analysisLine(strLine[i]))
+
                     if tmpStr != None:
                         input1 = bytes(tmpStr,encoding="utf8")
                         fobj.write(input1)
@@ -435,11 +436,12 @@ with open(filename,'r') as f:
         #没有label，直接写到新文件中
         else:
             strContent=""
+            #如果碰到} 说明整个文件读结束，需要写入一个新的node1来传一些后续所需的信息
             if "}" in line:
                 for item in allPointer:
                     if item not in addressTaken:
                         strContent += item +" topLevel" + "\\l "
-                        print(strContent)
+
                 #print addressTaken variables
                 for item in addressTaken:
                     strContent += item + " addressTaken" + "\\l "
