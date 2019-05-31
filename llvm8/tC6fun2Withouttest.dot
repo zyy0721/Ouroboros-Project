@@ -1,0 +1,12 @@
+digraph "CFG for '_Z4fun2iPiPS_S_' function" {
+	label="CFG for '_Z4fun2iPiPS_S_' function";
+
+	Node0x949ea00 [shape=record,label="{entry:\l alloca:i32** %retval\l alloca:i32* %ptr.addr\l alloca:i32** %pptr.addr\l alloca:i32* %ptr1.addr\l |{<s0>T|<s1>F}}"];
+	Node0x949ea00:s0 -> Node0x949f010;
+	Node0x949ea00:s1 -> Node0x949f0e0;
+	Node0x949f010 [shape=record,label="{if.then:                                          \l alloca: @globalA = %n.addr\l store: *%pptr.addr = %ptr.addr\l load: %ptr1.addr = *%pptr.addr\l assign: %ptr.addr = %ptr1.addr\l assign: %retval = %pptr.addr\l }"];
+	Node0x949f010 -> Node0x949f800;
+	Node0x949f0e0 [shape=record,label="{if.else:                                          \l alloca: @globalB = %ptr1.addr\l alloca: %ptr.addr = %n.addr\l store: *@globalB = %ptr.addr\l load: %ptr1.addr = *%pptr.addr\l assign: %retval = @globalB\l }"];
+	Node0x949f0e0 -> Node0x949f800;
+	Node0x949f800 [shape=record,label="{return:                                           \l ret %retval\l }"];
+	Node1 [shape=record,label="{%retval topLevel\l %ptr.addr topLevel\l %pptr.addr topLevel\l @globalA topLevel\l @globalB topLevel\l %n.addr addressTaken\l %ptr1.addr addressTaken\l %n.addr formarlParameter\l %ptr.addr formarlParameter\l %pptr.addr formarlParameter\l %ptr1.addr formarlParameter\l }"];}

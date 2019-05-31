@@ -30,14 +30,14 @@ int main()
     {
         *e = g;
         h = *e;
-        q = &h;
+        q = &h;//h is address taken
         *f = p;
     }
     else
     {
         *q = p;
         g = h;
-        p = &b;
+        p = &b;//b is address taken
     }
 
     while(a!=0)
@@ -50,11 +50,11 @@ int main()
     {
         case 1:
             d = a + c;
-            p = &d;
+            p = &d;//d is address taken
             break;
         case 2:
             a = d + (c - 1)*2;
-            p = &a;
+            p = &a;//a is address taken addressTaken
             break;
             
         default:

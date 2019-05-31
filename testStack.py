@@ -1,17 +1,17 @@
 
 import re
 #输入的dot文件
-filename = 'cfg.Case6fun3.dot'
+filename = 'llvm8/tC6fun3Without.dot'
 
 #输出想要的dot文件
-newFilename = 'cfg.zyy.Case6fun3test.dot'
+newFilename = 'llvm8/tC6fun3Withouttest.dot'
 fobj = open(newFilename, 'wb+')
 
 #用来存操作符的栈
 stackOp=[]
 #用来存statement的栈
 stackLV=[]
-stackRV=[] #not use
+FormalParameter=[] #to store every function's formal parameters
 allPointer=[] # to store pointer type variables
 topLevel=[]#for record topLevel variable
 addressTaken=[]#for record addressTaken variable
@@ -40,6 +40,7 @@ def analysisLine(line):
             # skip annotation
 
         # alloca statement
+        #在判断alloca语句的同时，通过是否有addr属性决定形参
         if (len(res2) >= 5 and res2[4] == 'alloca'):
             tmpSta = Statement()
             tmpSta.leftVal = res2[2]
@@ -48,6 +49,10 @@ def analysisLine(line):
                 tmpSta.firstType = res2[7].replace(']','')
             else:
                 tmpSta.firstType = res2[5]
+
+            if 'addr' in tmpSta.leftVal:
+                FormalParameter.append(tmpSta.leftVal)
+
             #skip int type variable
             if tmpSta.firstType!= 'i32':
                 tmpStr = "alloca:" + tmpSta.firstType + " " + tmpSta.leftVal + "\\l "
@@ -136,12 +141,16 @@ def analysisLine(line):
             if (len(stackLV) == 0 ):
                 # judge whether it is an alloca statement or not
                 if (tmpSta.firstType == 'i32*' or tmpSta.firstType == 'i32**'):
-                    tmpStr = "alloca:"+' ' + tmpSta.rightVal + " = " + tmpSta.leftVal + "\\l "
-                    if tmpSta.leftVal not in addressTaken:
-                        addressTaken.append(tmpSta.leftVal)
-                    if tmpSta.rightVal not in allPointer:
-                        allPointer.append(tmpSta.rightVal)
-                    return tmpStr
+                    tmpLeftVal = tmpSta.leftVal + ".addr"
+                    if tmpLeftVal == tmpSta.rightVal:
+                        print("........................")
+                    else:
+                        tmpStr = "alloca:"+' ' + tmpSta.rightVal + " = " + tmpSta.leftVal + "\\l "
+                        if tmpSta.leftVal not in addressTaken:
+                            addressTaken.append(tmpSta.leftVal)
+                        if tmpSta.rightVal not in allPointer:
+                            allPointer.append(tmpSta.rightVal)
+                        return tmpStr
 
             # if there is only one 'load' keyword in the stack
             # or if there is a 'call' instruction in the stack
@@ -431,8 +440,13 @@ with open(filename,'r') as f:
                     if item not in addressTaken:
                         strContent += item +" topLevel" + "\\l "
                         print(strContent)
+                #print addressTaken variables
                 for item in addressTaken:
                     strContent += item + " addressTaken" + "\\l "
+                #print function's parameters
+                for item in FormalParameter:
+                    strContent += item + " formarlParameter" + "\\l "
+
                 strBlock = "\tNode1 [shape=record,label=" + '"' + "{" + strContent + "}" + '"' + "];"
                 input3 = bytes(strBlock,encoding="utf8")
                 fobj.write(input3)
