@@ -1,10 +1,10 @@
 
 import re
 #输入的dot文件
-filename = 'llvm8/tC6fun3Without.dot'
+filename = 'llvm8/tC6main.dot'
 
 #输出想要的dot文件
-newFilename = 'llvm8/tC6fun3Withouttest.dot'
+newFilename = 'llvm8/tC6maintest.dot'
 fobj = open(newFilename, 'wb+')
 
 #用来存操作符的栈
@@ -107,7 +107,7 @@ def analysisLine(line):
             funcName = res2[6].split('(')
             tmpSta.secondType = funcName[0] # functionName
 
-            tmpStr = "call " + tmpSta.leftVal+" = "+tmpSta.firstType+" "+tmpSta.secondType + "("
+            tmpStr = "call: " + tmpSta.leftVal+" = "+tmpSta.firstType+" "+tmpSta.secondType + "("
             #在调用该函数处时，输出 传入该函数的实参 实现：
             for i in range(len(stackLV)):
                 if i == len(stackLV)-1:
@@ -365,7 +365,7 @@ def analysisLine(line):
             tmpSta.secondType = funcName[0] # functionName
             #if there is one formal parameter not two more parameters
 
-            tmpStr = "call " + "NULL"+" = "+tmpSta.firstType + " "+tmpSta.secondType + "("
+            tmpStr = "call: " + "NULL"+" = "+tmpSta.firstType + " "+tmpSta.secondType + "("
             print(tmpStr)
             for i in range(len(stackLV)):
                 if i == len(stackLV)-1:

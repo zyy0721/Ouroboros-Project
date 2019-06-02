@@ -28,11 +28,11 @@ digraph "CFG for 'main' function" {
 	Node0x94a3ef0 [shape=record,label="{sw.epilog:                                        \l |{<s0>T|<s1>F}}"];
 	Node0x94a3ef0:s0 -> Node0x94a4430;
 	Node0x94a3ef0:s1 -> Node0x94a4510;
-	Node0x94a4430 [shape=record,label="{if.then10:                                        \l call %call = i32* @_Z4fun1iPiPS_(%a, %g, %e)\l assign: %p = %call\l }"];
+	Node0x94a4430 [shape=record,label="{if.then10:                                        \l call: %call = i32* @_Z4fun1iPiPS_(%a, %g, %e)\l assign: %p = %call\l }"];
 	Node0x94a4430 -> Node0x94a4a70;
-	Node0x94a4510 [shape=record,label="{if.else11:                                        \l call %call12 = i32** @_Z4fun2iPiPS_S_(%b, %h, %q, %p)\l assign: %e = %call12\l }"];
+	Node0x94a4510 [shape=record,label="{if.else11:                                        \l call: %call12 = i32** @_Z4fun2iPiPS_S_(%b, %h, %q, %p)\l assign: %e = %call12\l }"];
 	Node0x94a4510 -> Node0x94a4a70;
-	Node0x94a4a70 [shape=record,label="{if.end13:                                         \l call NULL = void @_Z4fun3iPi(%c, %g)\l |{<s0>T|<s1>F}}"];
+	Node0x94a4a70 [shape=record,label="{if.end13:                                         \l call: NULL = void @_Z4fun3iPi(%c, %g)\l |{<s0>T|<s1>F}}"];
 	Node0x94a4a70:s0 -> Node0x94a50f0;
 	Node0x94a4a70:s1 -> Node0x94a51a0;
 	Node0x94a50f0 [shape=record,label="{if.then15:                                        \l assign: %pointerCase.0 = %g\l assign: %h = %pointerCase.1\l store: *%pointerCase.2 = %p\l load: %h = *%pointerCase.3\l |{<s0>T|<s1>F}}"];
@@ -48,7 +48,7 @@ digraph "CFG for 'main' function" {
 	Node0x94a66c0 [shape=record,label="{for.cond23:                                       \l |{<s0>T|<s1>F}}"];
 	Node0x94a66c0:s0 -> Node0x94a6830;
 	Node0x94a66c0:s1 -> Node0x94a14d0;
-	Node0x94a6830 [shape=record,label="{for.body25:                                       \l call NULL = void @_Z4fun3iPi(%a, %p)\l }"];
+	Node0x94a6830 [shape=record,label="{for.body25:                                       \l call: NULL = void @_Z4fun3iPi(%a, %p)\l }"];
 	Node0x94a6830 -> Node0x94a17c0;
 	Node0x94a17c0 [shape=record,label="{for.inc:                                          \l }"];
 	Node0x94a17c0 -> Node0x94a66c0;
