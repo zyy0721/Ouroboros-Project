@@ -1,0 +1,5 @@
+digraph "CFG for '_Z4fun6iPiPS_' function" {
+	label="CFG for '_Z4fun6iPiPS_' function";
+
+	Node0x8ddbc80 [shape=record,label="{entry}"];
+}
