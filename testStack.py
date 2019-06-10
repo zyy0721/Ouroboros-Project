@@ -1,10 +1,10 @@
 
 import re
 #输入的dot文件
-filename = 'llvm8/testMymain.dot'
+filename = 'llvm8/testExfun2.dot'
 
 #输出想要的dot文件
-newFilename = 'llvm8/testMymaintest.dot'
+newFilename = 'llvm8/testExfun2test.dot'
 fobj = open(newFilename, 'wb+')
 
 #用来存操作符的栈
