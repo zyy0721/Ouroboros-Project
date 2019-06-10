@@ -1,10 +1,10 @@
 
 import re
 #输入的dot文件
-filename = 'llvm8/tC6main.dot'
+filename = 'llvm8/testMymain.dot'
 
 #输出想要的dot文件
-newFilename = 'llvm8/tC6maintest.dot'
+newFilename = 'llvm8/testMymaintest.dot'
 fobj = open(newFilename, 'wb+')
 
 #用来存操作符的栈
@@ -110,13 +110,18 @@ def analysisLine(line):
             tmpStr = "call: " + tmpSta.leftVal+" = "+tmpSta.firstType+" "+tmpSta.secondType + "("
             #在调用该函数处时，输出 传入该函数的实参 实现：
             for i in range(len(stackLV)):
-                if i == len(stackLV)-1:
-                    tmpStr += stackLV[i].rightVal + ")" + "\\l "
-                else:
-                    tmpStr += stackLV[i].rightVal+", "
+                #为了防止出现连续多个call函数存在而导致出现多余逗号的错误，加入了statement Op的 判断
+                if stackLV[i].Op != 'call':
+                    if i == len(stackLV)-1:
+                        tmpStr += stackLV[i].rightVal + ")" + "\\l "
+                    else:
+
+                        tmpStr += stackLV[i].rightVal+", "
+
             #remove all load statement
             for i in range(len(stackLV)):
                 stackLV.pop()
+
 
             #用来区分是否是malloc或者new类型，如果是则不把call语句加入stackLV，需要进行特殊的单独处理
             #

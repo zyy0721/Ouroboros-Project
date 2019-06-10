@@ -32,7 +32,7 @@ digraph "CFG for 'main' function" {
 	Node0x97fa7a0 -> Node0x97fade0;
 	Node0x97fa880 [shape=record,label="{if.else11:                                        \l call: %call12 = i32** @_Z4fun2iPiPS_S_(%b, %h, %q, %p)\l assign: %e = %call12\l }"];
 	Node0x97fa880 -> Node0x97fade0;
-	Node0x97fade0 [shape=record,label="{if.end13:                                         \l call: %call14 = i32* @_Z4fun3iPi(%c, %g)\l call: %call15 = i32* @_Z4fun4iPi(, %c, %g)\l |{<s0>T|<s1>F}}"];
+	Node0x97fade0 [shape=record,label="{if.end13:                                         \l call: %call14 = i32* @_Z4fun3iPi(%c, %g)\l call: %call15 = i32* @_Z4fun4iPi(%c, %g)\l |{<s0>T|<s1>F}}"];
 	Node0x97fade0:s0 -> Node0x97f83b0;
 	Node0x97fade0:s1 -> Node0x97f8460;
 	Node0x97f83b0 [shape=record,label="{if.then17:                                        \l assign: %pointerCase.0 = %g\l assign: %h = %pointerCase.1\l store: *%pointerCase.2 = %p\l load: %h = *%pointerCase.3\l |{<s0>T|<s1>F}}"];
