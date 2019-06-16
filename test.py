@@ -5,6 +5,7 @@
 #!@File   : test.py
 
 import re
+import time
 class Statement:
     def __init__(self):
         self.leftVal = ''
@@ -53,3 +54,6 @@ with open(filename,'r') as f:
         print(line)
         print(res)
 '''
+vstr ="T"+int(time.time()).__str__()
+
+print(vstr)

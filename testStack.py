@@ -1,10 +1,11 @@
 
 import re
+import time
 #输入的dot文件
-filename = 'llvm8/testExfun2.dot'
+filename = 'llvm8/testEx1fun3.dot'
 
 #输出想要的dot文件
-newFilename = 'llvm8/testExfun2test.dot'
+newFilename = 'llvm8/testEx1fun3test.dot'
 fobj = open(newFilename, 'wb+')
 
 #用来存操作符的栈
@@ -196,6 +197,17 @@ def analysisLine(line):
                         if tmpStament.rightVal not in allPointer:
                             allPointer.append(tmpStament.rightVal)
                         return tmpStr
+                    #*pptr = &n 的例子
+                    if tmpStament.leftVal == tmpSta.rightVal:
+                        tmpVal = "T"+int(time.time()).__str__()
+                        tmpStr = "alloca: "+ tmpVal+" = "+tmpSta.leftVal+"\\l " + "store: "+"*"+tmpStament.rightVal+" = "+tmpVal+"\\l "
+                        if tmpSta.leftVal not in addressTaken:
+                            addressTaken.append(tmpSta.leftVal)
+                        if tmpStament.rightVal not in allPointer:
+                            allPointer.append(tmpStament.rightVal)
+                        return tmpStr
+
+
 
             # if there are two 'load' keywords in the stack
             # or one load & one getelementptr
@@ -391,9 +403,15 @@ def analysisLine(line):
             if tmpSta.firstType != 'void':
                 tmpSta.leftVal = res2[4]
             if tmpSta.firstType != 'void' and tmpSta.firstType != 'i32':
-                if len(stackLV)>=1:
+                if len(stackLV)==1:
                     tmpStament1 = stackLV.pop()
                     if tmpSta.leftVal == tmpStament1.leftVal:
+                        tmpStr = 'ret ' + tmpStament1.rightVal + "\\l "
+                        return tmpStr
+                if len(stackLV) ==2:
+                    tmpStament2 = stackLV.pop()
+                    tmpStament1 = stackLV.pop()
+                    if tmpStament1.leftVal == tmpStament2.rightVal and tmpStament2.leftVal == tmpSta.leftVal:
                         tmpStr = 'ret ' + tmpStament1.rightVal + "\\l "
                         return tmpStr
 
