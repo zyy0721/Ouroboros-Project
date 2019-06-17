@@ -8,6 +8,10 @@ filename = 'llvm8/testEx1fun3.dot'
 newFilename = 'llvm8/testEx1fun3test.dot'
 fobj = open(newFilename, 'wb+')
 
+#输出singleTon的结果txt文件
+singleTontxt = 'llvm8/singleTonResult.txt'
+fsT = open(singleTontxt,'a+')
+
 #用来存操作符的栈
 stackOp=[]
 #用来存statement的栈
@@ -20,6 +24,10 @@ allPointer=[] # to store pointer type variables
 topLevel=[]#for record topLevel variable
 #用来存储每个address Taken类型的变量
 addressTaken=[]#for record addressTaken variable
+#将所有的alloca变量都放入singleTon中
+singleTon = []
+#将所有的new 或者malloca出来的变量放入notSingleTon中
+notSingleTon = []
 #create a class called 'Statement' to store each line
 class Statement:
     def __init__(self):
@@ -48,6 +56,8 @@ def analysisLine(line):
             tmpSta = Statement()
             tmpSta.leftVal = res2[2]
             tmpSta.Op = 'alloca'
+            #把所有的alloca变量加入singleTon中
+            singleTon.append(tmpSta.leftVal)
             if 'i32]'  in res2 or 'i32*]' in res2 or 'i32**]' in res2 :
                 tmpSta.firstType = res2[7].replace(']','')
             else:
@@ -61,6 +71,8 @@ def analysisLine(line):
                 tmpStr = "alloca:" + tmpSta.firstType + " " + tmpSta.leftVal + "\\l "
                 allPointer.append(tmpSta.leftVal)
                 return tmpStr
+
+
 
         # skip return 0 case
         if (len(res2) >= 3 and res2[2] == 'store' and res2[4] == 0):
@@ -113,11 +125,36 @@ def analysisLine(line):
             for i in range(len(stackLV)):
                 #为了防止出现连续多个call函数存在而导致出现多余逗号的错误，加入了statement Op的 判断
                 if stackLV[i].Op != 'call':
+                    #如果是最后一行，需要特殊处理 加上括号 \\l 等
                     if i == len(stackLV)-1:
-                        tmpStr += stackLV[i].rightVal + ")" + "\\l "
+                        tmpleftVal = stackLV[i].leftVal#当前语句的左值
+                        flag = 0#标志，判断是否出现了特例
+                        for j in range(len(stackLV)):
+                            if tmpleftVal == stackLV[j].rightVal:
+                                # 如果当前语句的左值等于某个语句的右值，说明是个特例
+                                tmpStr += "*"+stackLV[i].rightVal + ")" + "\\l "
+                                flag =1 #设置为1，说明出现了特例
+                                break
+                        if flag == 0:#只对非特例进行处理
+                            tmpStr += stackLV[i].rightVal + ")" + "\\l "
                     else:
+                        tmpleftVal = stackLV[i].leftVal
+                        flag = 0
+                        for j in range(len(stackLV)):
+                            if tmpleftVal == stackLV[j].rightVal:
+                                #如果当前语句的左值等于某个语句的右值，说明是个特例
+                                tmpStr += "*"+stackLV[i].rightVal+", "
+                                flag = 1
+                                break
 
-                        tmpStr += stackLV[i].rightVal+", "
+                        if flag == 0:#只对非特例处理
+                            if i == 0:#刚开始要写
+                                tmpStr += stackLV[i].rightVal + ", "
+                            if i >= 1:#0之后，把中间过程的语句省略掉
+                                if stackLV[i].rightVal != stackLV[i-1].leftVal:
+                                    tmpStr += stackLV[i].rightVal + ", "
+
+
 
             #remove all load statement
             for i in range(len(stackLV)):
@@ -153,6 +190,17 @@ def analysisLine(line):
                         print("........................")
                     else:
                         tmpStr = "alloca:"+' ' + tmpSta.rightVal + " = " + tmpSta.leftVal + "\\l "
+                        print("stackLv =0 " + tmpStr)
+                        # 在这里判断是否为 非singleton
+                        #需要区分 &n 和真正new、malloc的类型
+                        #&n 的类型 语句的左值 是% + 变量名（非数字）
+                        #new、malloc的类型 语句的左值是% + 数字
+                        #先去除%号，得到原始内容
+                        tmpleftValStr = tmpSta.leftVal.replace('%','')
+                        if tmpleftValStr.isdigit():
+                            #如果全是数字，则是new、malloc类型
+                            notSingleTon.append(tmpSta.rightVal)
+
                         if tmpSta.leftVal not in addressTaken:
                             addressTaken.append(tmpSta.leftVal)
                         if tmpSta.rightVal not in allPointer:
@@ -185,6 +233,7 @@ def analysisLine(line):
                             return tmpStr
                 elif tmpStament.Op =='call':
                     tmpStr = "assign: "+ tmpSta.rightVal + " = " + tmpSta.leftVal + "\\l "
+                    print(",,,,,,," + tmpStr)
                     addressTaken.append(tmpSta.leftVal)
                     if tmpSta.rightVal not in allPointer:
                         allPointer.append(tmpSta.rightVal)
@@ -192,6 +241,7 @@ def analysisLine(line):
                 else:
                     if (tmpStament.leftVal == tmpSta.leftVal):
                         tmpStr = "assign:" +' '+tmpSta.rightVal + " = " +tmpStament.rightVal + "\\l "
+
                         if tmpSta.rightVal not in allPointer:
                             allPointer.append(tmpSta.rightVal)
                         if tmpStament.rightVal not in allPointer:
@@ -422,7 +472,12 @@ def analysisLine(line):
 #读取文件
 with open(filename,'r') as f:
     #按行读入
+    functionName=""
     for line in f:
+        if 'digraph' in line:
+            findNameLine = re.split("'| ",line)
+            functionName = findNameLine[4]
+            print("function Name is " + functionName)
         #res = re.split('\| ', line)
         input2=''
         # 以label为关键字,判断是否为一个block
@@ -480,10 +535,23 @@ with open(filename,'r') as f:
 
         # to write a tributary block for displaying addressTaken and toplevel
         # Node1 [shape=record,label="{testest zyy\l }"];
+    #在这里写 singleTon文件？
+    strSingleTon=""
+    for item in notSingleTon:
+        strSingleTon += functionName+"."+item+" notSingleTon"+"\n"
+    for item in singleTon:
+        if item not in notSingleTon:
+            strSingleTon += functionName+"." + item + " isSingleTon"+"\n"
+
+    fsT.write(strSingleTon)
+
+
+
 
 
 
 fobj.close()
+fsT.close()
 
 print("all pointer type variables")
 for item in allPointer:

@@ -1,0 +1,13 @@
+_Z4fun1iPiPS_.%newP notSingleTon
+_Z4fun1iPiPS_.%newPP notSingleTon
+_Z4fun1iPiPS_.%n.addr isSingleTon
+_Z4fun1iPiPS_.%ptr.addr isSingleTon
+_Z4fun1iPiPS_.%pptr.addr isSingleTon
+_Z4fun2iPiPS_S_.%retval isSingleTon
+_Z4fun2iPiPS_S_.%n.addr isSingleTon
+_Z4fun2iPiPS_S_.%ptr.addr isSingleTon
+_Z4fun2iPiPS_S_.%pptr.addr isSingleTon
+_Z4fun2iPiPS_S_.%ptr1.addr isSingleTon
+_Z4fun3iPiPS_.%n.addr isSingleTon
+_Z4fun3iPiPS_.%ptr.addr isSingleTon
+_Z4fun3iPiPS_.%pptr.addr isSingleTon

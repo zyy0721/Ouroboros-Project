@@ -57,3 +57,13 @@ with open(filename,'r') as f:
 vstr ="T"+int(time.time()).__str__()
 
 print(vstr)
+
+singleTon = 'llvm8/singleTon.txt'
+fobj = open(singleTon,'a+')
+
+single = "funa12.fdsa" + "\n"
+fobj.write(single)
+single = "fdsa.fdsa"
+fobj.write(single)
+
+fobj.close()
