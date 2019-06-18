@@ -11,3 +11,17 @@ _Z4fun2iPiPS_S_.%ptr1.addr isSingleTon
 _Z4fun3iPiPS_.%n.addr isSingleTon
 _Z4fun3iPiPS_.%ptr.addr isSingleTon
 _Z4fun3iPiPS_.%pptr.addr isSingleTon
+abort_on_oom.%retval isSingleTon
+abort_on_oom.%retcode.addr isSingleTon
+abort_socket_nonblocking.%csd.addr isSingleTon
+abort_socket_nonblocking.%rv isSingleTon
+abort_socket_nonblocking.%osd isSingleTon
+abort_socket_nonblocking.%opt isSingleTon
+abort_socket_nonblocking.%sr__ isSingleTon
+abort_on_oom.%retval isSingleTon
+abort_on_oom.%retcode.addr isSingleTon
+abort_socket_nonblocking.%csd.addr isSingleTon
+abort_socket_nonblocking.%rv isSingleTon
+abort_socket_nonblocking.%osd isSingleTon
+abort_socket_nonblocking.%opt isSingleTon
+abort_socket_nonblocking.%sr__ isSingleTon

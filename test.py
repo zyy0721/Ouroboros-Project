@@ -28,15 +28,14 @@ stack.append(sta3)
 for item in stack:
     print(item.Op)
 
-strLine = "  %n.addr = alloca i32, align 4"
+strLine = "  %l_onoff = getelementptr inbounds %struct.conn_state_t, %struct.conn_state_t* %opt, i32 0, i32 0"
 
 res = re.split(",| ",strLine)
 
 count = 0
 for item in res:
-    if 'addr' in item:
-        print(count, item)
-        count +=1
+    print(count, item)
+    count +=1
 
 if 'malloc' in strLine:
     print(1111111111111111111111)
@@ -54,16 +53,3 @@ with open(filename,'r') as f:
         print(line)
         print(res)
 '''
-vstr ="T"+int(time.time()).__str__()
-
-print(vstr)
-
-singleTon = 'llvm8/singleTon.txt'
-fobj = open(singleTon,'a+')
-
-single = "funa12.fdsa" + "\n"
-fobj.write(single)
-single = "fdsa.fdsa"
-fobj.write(single)
-
-fobj.close()

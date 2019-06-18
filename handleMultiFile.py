@@ -14,7 +14,7 @@ import time
 #fobj = open(newFilename, 'wb+')
 
 #输出singleTon的结果txt文件
-singleTontxt = 'singleTonResult.txt'
+singleTontxt = 'D:\Ouroboros\codes\Ouroboros-Project\\testfile\httpd\\res\singleTonResult.txt'
 fsT = open(singleTontxt,'a+')
 
 #用来存操作符的栈
@@ -102,10 +102,14 @@ def analysisLine(line):
             tmpSta = Statement()
             tmpSta.Op = 'getelementptr'
             tmpSta.leftVal = res2[2]
-            #用 ‘x’ 来区分是否为数组
+            #用 ‘x’ 来区分是否为数组,有bug，还没有考虑到变量名称带有x的情况
             if 'x' not in res2:
+                print("in getelementptr shows res2 size is",len(res2),res2)
                 tmpSta.rightVal = res2[9]
-                tmpSta.secondType=res2[15] #it means the index of a pointer variable in the struct object
+                if len(res2) == 16:
+                    tmpSta.secondType=res2[15] #it means the index of a pointer variable in the struct object
+                if len(res2) == 13:
+                    tmpSta.secondType=res2[12] #it means the index of a pointer variable in the struct object
             else:#it means an array type
                 if len(res2) == 24:#it means a two-dimensional array
                     tmpSta.firstType = res2[10].replace(']','')
@@ -474,13 +478,13 @@ def analysisLine(line):
 
 
 
-path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile"
+path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\httpd\llvm8"
 files = os.listdir(path)
 count = 0
 for file in files:
     filename = os.path.join(path,file)
     print("full path is"+filename)
-    newFilename = filename.replace(".dot","") + count.__str__() +"Res.dot"
+    newFilename = filename.replace(".dot","").replace("llvm8","res") +"Res"+count.__str__() +".dot"
     fobj = open(newFilename, 'wb+')
     #读取文件
     with open(filename,'r') as f:
