@@ -14,7 +14,7 @@ import time
 #fobj = open(newFilename, 'wb+')
 
 #输出singleTon的结果txt文件
-singleTontxt = 'D:\Ouroboros\codes\Ouroboros-Project\\testfile\httpd\\res\singleTonResult.txt'
+singleTontxt = 'D:\Ouroboros\codes\Ouroboros-Project\\testfile\\vim\\res\singleTonResult.txt'
 fsT = open(singleTontxt,'a+')
 
 #用来存操作符的栈
@@ -478,7 +478,7 @@ def analysisLine(line):
 
 
 
-path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\httpd\llvm8"
+path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\vim\llvm8"
 files = os.listdir(path)
 count = 0
 for file in files:
