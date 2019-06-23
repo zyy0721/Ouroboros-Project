@@ -14,7 +14,7 @@ import time
 #fobj = open(newFilename, 'wb+')
 
 #输出singleTon的结果txt文件
-singleTontxt = 'D:\Ouroboros\codes\Ouroboros-Project\\testfile\\vim\\res\singleTonResult.txt'
+singleTontxt = 'D:\Github\Ouroboros-Project\\testfile\httpd\\res\singleTonResult.txt'
 fsT = open(singleTontxt,'a+')
 
 #用来存操作符的栈
@@ -164,8 +164,6 @@ def analysisLine(line):
                                 if stackLV[i].rightVal != stackLV[i-1].leftVal:
                                     tmpStr += stackLV[i].rightVal + ", "
 
-
-
             #remove all load statement
             for i in range(len(stackLV)):
                 stackLV.pop()
@@ -176,6 +174,7 @@ def analysisLine(line):
             if 'malloc' in line or 'Znam' in line :
                 tmpStr = ""
             else:
+                print("ddddddddddddddddddd",tmpSta.leftVal)
                 stackLV.append(tmpSta)
 
             return tmpStr
@@ -471,14 +470,22 @@ def analysisLine(line):
                 if len(stackLV) ==2:
                     tmpStament2 = stackLV.pop()
                     tmpStament1 = stackLV.pop()
+                    print("cccccccccccccccccccccc")
                     if tmpStament1.leftVal == tmpStament2.rightVal and tmpStament2.leftVal == tmpSta.leftVal:
                         tmpStr = 'ret ' + tmpStament1.rightVal + "\\l "
                         return tmpStr
+                    #排除call 函数后，直接ret，没有ret语句的bug
+                    if tmpStament1.Op == 'call':
+                        print("aaaaaaaaaaaaaaaaaaaaa")
+                        if tmpStament2.leftVal == tmpSta.leftVal:
+                            print("bbbbbbbbbbbbbbbbb")
+                            tmpStr = 'ret ' + tmpStament2.rightVal + "\\l "
+                            return tmpStr
 
 
 
 
-path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\vim\llvm8"
+path = "D:\Github\Ouroboros-Project\\testfile\\httpd\llvm8"
 files = os.listdir(path)
 count = 0
 for file in files:
@@ -556,11 +563,9 @@ for file in files:
 
         #在这里写 singleTon文件？
         strSingleTon=""
-        for item in notSingleTon:
-            strSingleTon += functionName+"."+item+" notSingleTon"+"\n"
         for item in singleTon:
             if item not in notSingleTon:
-                strSingleTon += functionName+"." + item + " isSingleTon"+"\n"
+                strSingleTon += functionName+"." + item +"\n"
 
         fsT.write(strSingleTon)
 
@@ -579,16 +584,3 @@ for file in files:
     count += 1
     fobj.close()
 fsT.close()
-print("all pointer type variables")
-for item in allPointer:
-    print(item)
-
-
-print("all addressTaken variables")
-for item in addressTaken:
-    print(item)
-
-print("top level")
-for item in allPointer:
-    if item not in addressTaken:
-        print(item)
