@@ -15,7 +15,7 @@ import time
 # fobj = open(newFilename, 'wb+')
 
 # 输出singleTon的结果txt文件
-singleTontxt = 'D:\Ouroboros\codes\Ouroboros-Project\\testfile\\httpd\\res\singleTonResult.txt'
+singleTontxt = 'D:\Ouroboros\codes\Ouroboros-Project\\testfile\\vim\\res\singleTonResult.txt'
 fsT = open(singleTontxt, 'a+')
 
 # 用来存操作符的栈
@@ -126,7 +126,7 @@ def analysisLine(line):
             tmpSta.Op = 'alloca'
             # 把所有的alloca变量加入singleTon中
             singleTon.append(tmpSta.leftVal)
-            if 'i32]' in res2 or 'i32*]' in res2 or 'i32**]' in res2:
+            if 'i32]' in res2 or 'i32*]' in res2 or 'i32**]' in res2 or 'i8]' in res2:
                 tmpSta.firstType = res2[7].replace(']', '')
             else:
                 tmpSta.firstType = res2[5]
@@ -136,7 +136,7 @@ def analysisLine(line):
                     FormalParameter.append(tmpSta.leftVal)
 
             # skip int type variable 跳过int类型的变量
-            if tmpSta.firstType != 'i32':
+            if tmpSta.firstType != 'i32' and tmpSta.firstType != 'i8':
                 tmpStr = "alloca:" + tmpSta.firstType + " " + tmpSta.leftVal + "\\l "
                 allPointer.append(tmpSta.leftVal)
                 return tmpStr
@@ -167,10 +167,16 @@ def analysisLine(line):
             if 'x' not in res2:
                 print("in getelementptr shows res2 size is", len(res2), res2)
                 tmpSta.rightVal = res2[9]
-                if len(res2) == 16:
-                    tmpSta.secondType = res2[15]  # it means the index of a pointer variable in the struct object
-                if len(res2) == 13:
-                    tmpSta.secondType = res2[12]  # it means the index of a pointer variable in the struct object
+                if '!dbg' in res2:
+                    if len(res2) == 19:
+                        tmpSta.secondType = res2[15]  # it means the index of a pointer variable in the struct object
+                    if len(res2) == 16:
+                        tmpSta.secondType = res2[12]  # it means the index of a pointer variable in the struct object
+                else:
+                    if len(res2) == 16:
+                        tmpSta.secondType = res2[15]  # it means the index of a pointer variable in the struct object
+                    if len(res2) == 13:
+                        tmpSta.secondType = res2[12]  # it means the index of a pointer variable in the struct object
             else:  # it means an array type
                 if len(res2) == 24:  # it means a two-dimensional array
                     tmpSta.firstType = res2[10].replace(']', '')
@@ -445,7 +451,7 @@ def analysisLine(line):
                                 if tmpPointer not in allPointer:
                                     allPointer.append(tmpPointer)
                                 return tmpStr
-                elif tmpStament.Op == 'call':
+                elif tmpStament.Op == 'call':#这种情况不会再出现，而且很奇怪，为什么我之前写的时候，明明是assign语句把tmpSta.leftVal给加入到了addressTaken里面去，感觉是不是弄错了，晕
                     if tmpSta.firstType != 'i32':  # 过滤掉int类型
                         tmpStr = "assign: " + tmpSta.rightVal + " = " + tmpSta.leftVal + "\\l "
                         print(",,,,,,," + tmpStr)
@@ -671,6 +677,10 @@ def analysisLine(line):
 
                 tmpSta.secondType = pppfunctionName
             tmpStr = "call: " + "NULL" + " = " + tmpSta.firstType + " " + tmpSta.secondType + "("
+            if '@llvm.dbg' in tmpSta.secondType:#过滤掉 含有llvm.dbg的语句
+                tmpStr = ""
+                funformalPara.clear()
+                return tmpStr
             print(tmpStr)
             sizeOfFunctionPara = len(funformalPara)  # 函数形参个数
             for item in funformalPara:
@@ -733,6 +743,8 @@ def analysisLine(line):
                                 else:
                                     if sizeOfFunctionPara == 1:
                                         tmpStr += actualParaToWrite + ")" + "\\l "
+                                        print("here size is 111111333NULL",tmpStr)
+                                        break
                             else:
                                 tmpStr += actualParaToWrite + ")" + "\\l "
                                 print(tmpStr)
@@ -809,7 +821,7 @@ def analysisLine(line):
                             return tmpStr
 
 
-path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\httpd\llvm8"
+path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\vim\llvm8"
 files = os.listdir(path)
 count = 0
 for file in files:
