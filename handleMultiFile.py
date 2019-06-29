@@ -67,15 +67,18 @@ def getFunctionPara(line):
             if len(resz) == 2:
                 if ('%' in resz[1] or '@' in resz[1]):
                     print("1111", resz[1])
-                    funformalPara.append(resz[1])
+                    if '%cond' not in resz[1] and '%conv' not in resz[1]:
+                        funformalPara.append(resz[1])
             if len(resz) == 3:
                 if '@.str' not in resz[2] and 'inbounds' not in resz[2] and ']' not in resz[2] and (
                         '%' in resz[2] or '@' in resz[2]):
-                    funformalPara.append(resz[2])
-                    print("~~~~~~~~~~~~~~the formalPara is ", resz[2])
+                    if '%cond' not in resz[2] and '%conv' not in resz[2]:
+                        funformalPara.append(resz[2])
+                        print("~~~~~~~~~~~~~~the formalPara is ", resz[2])
             if len(resz) == 4:
-                if resz[2] == 'zeroext':
-                    funformalPara.append(resz[3])
+                if resz[2] == 'zeroext' or resz[2] == 'signext':
+                    if '%cond' not in resz[3] and '%conv' not in resz[3]:
+                        funformalPara.append(resz[3])
     '''
     if 'getelementptr' in line:
         res1 = re.split(",", res[1])
@@ -285,6 +288,8 @@ def analysisLine(line):
                         # 就把当前指令的右操作数 用作实参
                         actualParaToWrite = tmpStament1.rightVal
                         print("leftval in funformalPara and the actParaToW is ", actualParaToWrite)
+                        #删去已经匹配上的形参
+                        funformalPara.remove(tmpStament1.leftVal)
                         # 并且pop掉当前的指令
                         stackLV.pop()
                         # 需要判断一下是否还能继续往上回溯
@@ -359,18 +364,15 @@ def analysisLine(line):
                 # stackLV.append(tmpSta)
 
             #在离开前需要检查一下tmpStr是否为完整的句子
-            #需要把形参中为%call等形式的参数放进去
+            #需要把形参中为%call等形式的参数放进去，6.29修改正，把剩余形参都加入进去
             if ')\\l ' not in tmpStr:
-                #说明是不完整的句子
+                #说明是不完整的句子，然后把剩余的形参都输出
                 for i in range(len(funformalPara)):
                     if i == len(funformalPara) -1:
-                        if '%call' in funformalPara[i]:
-                            tmpStr += funformalPara[i] + ")\\l "
-                        else:
-                            tmpStr += ")\\l "
+                        #if '%call' in funformalPara[i]:
+                        tmpStr += funformalPara[i] + ")\\l "
                     else:
-                        if '%call' in funformalPara[i]:
-                            tmpStr += funformalPara[i] + ","
+                        tmpStr += funformalPara[i] + ","
 
 
 
@@ -734,6 +736,8 @@ def analysisLine(line):
                             # 如果当前指令的左操作数在形参列表中出现
                             # 就把当前指令的右操作数 用作实参
                             actualParaToWrite = tmpStament1.rightVal
+                            #删除掉已经匹配上的形参
+                            funformalPara.remove(tmpStament1.leftVal)
                             # 并且pop掉当前的指令
                             stackLV.pop()
                             if len(stackLV) != 0:
@@ -779,13 +783,9 @@ def analysisLine(line):
                 #说明是不完整的句子
                 for i in range(len(funformalPara)):
                     if i == len(funformalPara) -1:
-                        if '%call' in funformalPara[i]:
-                            tmpStr += funformalPara[i] + ")\\l "
-                        else:
-                            tmpStr += ")\\l "
+                        tmpStr += funformalPara[i] + ")\\l "
                     else:
-                        if '%call' in funformalPara[i]:
-                            tmpStr += funformalPara[i] + ","
+                        tmpStr += funformalPara[i] + ","
 
 
             funformalPara.clear()

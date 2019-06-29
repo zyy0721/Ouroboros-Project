@@ -39,7 +39,8 @@ print(stack[-1].Op)
 #strLine = "  %call = call i32 @find_listeners(%struct.ap_listen_rec** @ap_listeners, %struct.ap_listen_rec** null, i8* %0, i16 zeroext %1)"
 #strLine = "  %call = call i64 @write(i32 2, i8* %0, i64 %conv)"
 #strLine = "  %call2 = call i32 @setsockopt(i32 %2, i32 1, i32 13, i8* %3, i32 8) #11"
-strLine = "  %call = call i32 @A_is_ok(i32 %0), !dbg !40868"
+#strLine = "  %call = call i32 @A_is_ok(i32 %0), !dbg !40868"
+strLine = "  %call887 = call i8* @infinity_str(i32 %conv886, i8 signext %394, i32 %395, i32 %396), !dbg !514441"
     #for i in range(len(res2)):
     #    print(count4,res2[i])
 
@@ -86,6 +87,7 @@ def getFunctionPara(line):
                 if resz[2] == 'zeroext':
                     funformalPara.append(resz[3])
     print("~~~~~~~~~~~~funciton formalPara is :")
+    funformalPara.remove('%395')
     for item in funformalPara:
         print(item)
     '''
@@ -121,6 +123,7 @@ def getFunctionPara(line):
                     funformalPara.append(res2[2])
     print("funciton formalPara is :")
     '''
+
 getFunctionPara(strLine)
 
 
