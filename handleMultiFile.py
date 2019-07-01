@@ -924,9 +924,8 @@ for file in files:
 
         # 在这里写 singleTon文件？
         strSingleTon = ""
-        for item in singleTon:
-            if item not in notSingleTon:
-                strSingleTon += functionName + "." + item + "\n"
+        for item in singleTon:#所有的local variable都看成是singleTon
+            strSingleTon += functionName + "." + item + "\n"
 
         fsT.write(strSingleTon)
 
