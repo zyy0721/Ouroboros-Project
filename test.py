@@ -40,7 +40,8 @@ print(stack[-1].Op)
 #strLine = "  %call = call i64 @write(i32 2, i8* %0, i64 %conv)"
 #strLine = "  %call2 = call i32 @setsockopt(i32 %2, i32 1, i32 13, i8* %3, i32 8) #11"
 #strLine = "  %call = call i32 @A_is_ok(i32 %0), !dbg !40868"
-strLine = "  %call887 = call i8* @infinity_str(i32 %conv886, i8 signext %394, i32 %395, i32 %396), !dbg !514441"
+#strLine = "  %call887 = call i8* @infinity_str(i32 %conv886, i8 signext %394, i32 %395, i32 %396), !dbg !514441"
+strLine = "  call void @ap_relieve_child_processes(void (i32, i32, i32)* @event_note_child_killed)"
     #for i in range(len(res2)):
     #    print(count4,res2[i])
 
@@ -87,7 +88,7 @@ def getFunctionPara(line):
                 if resz[2] == 'zeroext':
                     funformalPara.append(resz[3])
     print("~~~~~~~~~~~~funciton formalPara is :")
-    funformalPara.remove('%395')
+
     for item in funformalPara:
         print(item)
     '''
@@ -127,6 +128,104 @@ def getFunctionPara(line):
 getFunctionPara(strLine)
 
 
+#line = "  %yy_buffer_stack_top17 = getelementptr inbounds %struct.yyguts_t, %struct.yyguts_t* %33, i32 0, i32 3, !10"
+#line = "  %arrayidx10 = getelementptr inbounds %struct.yy_buffer_state*, %struct.yy_buffer_state** %25, i64 %27, !10"
+#line = "  %v_type = getelementptr inbounds %struct.typval_T, %struct.typval_T* %0, i32 0, i32 0, !dbg !80290, !10"
+#line = "  %incdec.ptr = getelementptr inbounds %struct.hashitem_S, %struct.hashitem_S* %19, i32 1, !dbg !80248, !10"
+#, !10
+#line = "  store i32 %23, i32* %yy_n_chars11, align 8, !10"
+#line = "  store %struct.hashitem_S* %incdec.ptr, %struct.hashitem_S** %hi, align 8, !dbg !80248, !10"
+# line = "  %28 = load i32, i32* %abort, align 4, !dbg !80272, !10"
+#line = "  %tobool = icmp ne %struct.yy_buffer_state** %4, null, !10"
+#  %cmp = icmp eq i32 %1, 6, !dbg !80291
+line = "  %cmp1 = icmp ne %struct.dictvar_S* %4, null, !dbg !80301, !10"
+
+res2 = re.split(",| ", line)
+print("res2 is ",res2)
+#icmp
+tmpSta = Statement()
+tmpSta.Op = 'icmp'
+tmpSta.firstType = res2[5] #'ne' or 'eq'
+tmpSta.secondType = res2[6] #true type
+tmpSta.leftVal = res2[7] #op1
+tmpSta.rightVal = res2[9] #op2
+if '!dbg' in res2:
+    tmpSta.linenumber = res2[14]
+else:
+    tmpSta.linenumber = res2[11]
+if res2[9] == 'null':
+    print("this is null",res2[9])
+print("Statement Op is: ", tmpSta.Op,", leftVal is: ",tmpSta.leftVal,", firstType is: ",tmpSta.firstType,", rightVal is: ",tmpSta.rightVal,", secondType is: ",tmpSta.secondType,", linenumber is: ",tmpSta.linenumber)
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~test ok
+#load test
+# tmpSta = Statement()
+# tmpSta.Op = 'load'
+# tmpSta.leftVal = res2[2]
+# tmpSta.firstType = res2[5]
+# tmpSta.secondType = res2[7]
+# tmpSta.rightVal = res2[8]
+# if '!dbg' in res2:
+#     tmpSta.linenumber = res2[16]
+# else:
+#     tmpSta.linenumber = res2[13]
+#
+# print("Statement Op is: ", tmpSta.Op,", leftVal is: ",tmpSta.leftVal,", firstType is: ",tmpSta.firstType,", rightVal is: ",tmpSta.rightVal,", secondType is: ",tmpSta.secondType,", linenumber is: ",tmpSta.linenumber)
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~test ok
+# getelementptr
+# tmpSta = Statement()
+# tmpSta.Op = 'getelementptr'
+# tmpSta.leftVal = res2[2]
+# # 用 ‘x’ 来区分是否为数组,有bug，还没有考虑到变量名称带有x的情况
+# if 'x' not in res2:
+#     print("in getelementptr shows res2 size is", len(res2), res2)
+#     tmpSta.rightVal = res2[9]
+#     tmpSta.firstType = res2[6]
+#     if '!dbg' in res2:
+#         if len(res2) == 21:
+#             tmpSta.secondType = res2[15]  # it means the index of a pointer variable in the struct object
+#             tmpSta.linenumber = res2[20]
+#         if len(res2) == 18:
+#             tmpSta.secondType = res2[12]  # it means the index of a pointer variable in the struct object
+#             tmpSta.linenumber = res2[17]
+#     else:
+#         if len(res2) == 18:
+#             tmpSta.secondType = res2[15]  # it means the index of a pointer variable in the struct object
+#             tmpSta.linenumber = res2[17]
+#         if len(res2) == 15:
+#             tmpSta.secondType = res2[12]  # it means the index of a pointer variable in the struct object
+#             tmpSta.linenumber = res2[14]
+# else:  # it means an array type
+#     if len(res2) == 24:  # it means a two-dimensional array
+#         tmpSta.firstType = res2[10].replace(']', '')
+#         tmpSta.rightVal = res2[17]
+#         tmpSta.secondType = res2[23]
+#     else:
+#         tmpSta.firstType = res2[8].replace(']',
+#                                            '')  # a key word to judge whether should go further calculation, only pointer type needed
+#         tmpSta.rightVal = res2[13]
+#         tmpSta.secondType = res2[19]
+#
+# print("Statement Op is: ", tmpSta.Op,", leftVal is: ",tmpSta.leftVal,", firstType is: ",tmpSta.firstType,", rightVal is: ",tmpSta.rightVal,", secondType is: ",tmpSta.secondType,", linenumber is: ",tmpSta.linenumber)
+# #,", linenumber is: ",tmpSta.linenumber
+
+#store
+#
+# tmpSta = Statement()
+# tmpSta.Op = 'store'
+# tmpSta.leftVal = res2[4]
+# tmpSta.firstType = res2[3]
+# tmpSta.rightVal = res2[7]
+# tmpSta.secondType = res2[6]
+# if '!dbg' in res2:
+#     tmpSta.linenumber = res2[15]
+# else:
+#     tmpSta.linenumber = res2[12]
+# print("Statement Op is: ", tmpSta.Op,", leftVal is: ",tmpSta.leftVal,", firstType is: ",tmpSta.firstType,", rightVal is: ",tmpSta.rightVal,", secondType is: ",tmpSta.secondType,", linenumber is: ",tmpSta.linenumber)
+#,", linenumber is: ",tmpSta.linenumber
+
+
 #strPPP = "  %call158 = call i8* (%struct.apr_pool_t*, i8*, ...) @apr_psprintf(%struct.apr_pool_t* %178, i8* getelementptr inbounds ([3 x i8], [3 x i8]* @.str.19.1633, i32 0, i32 0), i32 %conv157)"
 #getFunctionPara(strPPP)
 
@@ -150,10 +249,7 @@ for i in range(len(res1)):
     count1 +=1
 funformalPara.clear()
 '''
-#print(res)
-tmpStr = " %call12"
-if 'call' in tmpStr:
-    print("there is a call substring")
+
 
 
 '''

@@ -15,7 +15,7 @@ import time
 # fobj = open(newFilename, 'wb+')
 
 # 输出singleTon的结果txt文件
-singleTontxt = 'D:\Ouroboros\codes\Ouroboros-Project\\testfile\\vim\\res\singleTonResult.txt'
+singleTontxt = 'D:\Ouroboros\codes\Ouroboros-Project\\testfile\\httpd\\res\singleTonResult.txt'
 fsT = open(singleTontxt, 'a+')
 
 # 用来存操作符的栈
@@ -48,6 +48,7 @@ class Statement:
         self.firstType = ''
         self.secondType = ''
         self.rightVal = ''
+        self.linenumber = ''
 
 # 该函数用于，获取每条call指令的函数形参列表
 def getFunctionPara(line):
@@ -170,6 +171,7 @@ def analysisLine(line):
             if 'x' not in res2:
                 print("in getelementptr shows res2 size is", len(res2), res2)
                 tmpSta.rightVal = res2[9]
+                tmpSta.firstType = res2[6]
                 if '!dbg' in res2:
                     if len(res2) == 19:
                         tmpSta.secondType = res2[15]  # it means the index of a pointer variable in the struct object
@@ -380,6 +382,29 @@ def analysisLine(line):
             funformalPara.clear()
             print("in call case before return tmpStr is", tmpStr)
             return tmpStr
+
+        #icmp instruction
+        if (len(res2) >=5 and res2[4] == 'icmp'):
+            tmpSta = Statement()
+            tmpSta.Op = 'icmp'
+            tmpSta.firstType = res2[5]  # 'ne' or 'eq'
+            tmpSta.secondType = res2[6]  # true type
+            tmpSta.leftVal = res2[7]  # op1
+            tmpSta.rightVal = res2[9]  # op2
+            # if '!dbg' in res2:
+            #     tmpSta.linenumber = res2[14]
+            # else:
+            #     tmpSta.linenumber = res2[11]
+
+
+            if tmpSta.firstType == 'ne' or tmpSta.firstType == 'eq' :
+                if tmpSta.rightVal == 'null':
+                    if len(stackLV) >= 1:
+                        tmpStament1 = stackLV.pop()
+                        if tmpStament1.leftVal == tmpSta.leftVal:
+                            tmpStr = "cmp: "+ tmpStament1.rightVal + tmpSta.linenumber+"\\l "
+                            return tmpStr
+
 
         # when we meet the key word 'store', we should check the 'stackLV'. When the size of stackLV is 1, that is to say it's assignment .
         # When the size of stackLV is 2, we will go further to determine it's a deref statement or not.
@@ -821,7 +846,7 @@ def analysisLine(line):
                             return tmpStr
 
 
-path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\vim\llvm8"
+path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\httpd\llvm8"
 files = os.listdir(path)
 count = 0
 for file in files:
