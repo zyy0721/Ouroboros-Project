@@ -199,9 +199,14 @@ def analysisLine(line):
             tmpSta = Statement()
             tmpSta.Op = 'call'
             tmpSta.leftVal = res2[2]
-            tmpSta.firstType = res2[5]  # return type of function
-            funcName = res2[6].split('(')
-            tmpSta.secondType = funcName[0]  # functionName
+            if res2[5] == 'zeroext':
+                tmpSta.firstType = res2[6]
+                funcName = res2[7].split('(')
+                tmpSta.secondType = funcName[0]
+            else:
+                tmpSta.firstType = res2[5]  # return type of function
+                funcName = res2[6].split('(')
+                tmpSta.secondType = funcName[0]  # functionName
 
             pppfunctionName=""
             # 获取函数的形参列表
@@ -406,6 +411,18 @@ def analysisLine(line):
                             return tmpStr
 
 
+        #bitcast instruction
+        if (len(res2) >=5 and res2[4] == 'bitcast'):
+            tmpSta = Statement()
+            tmpSta.Op = 'bitcast'
+            tmpSta.leftVal = res2[2]
+            tmpSta.firstType = res2[5]
+            tmpSta.rightVal = res2[6]
+            tmpSta.secondType = res2[8]
+            if len(stackLV) >= 1:
+                tmpStament1 = stackLV[-1]
+                if tmpStament1.leftVal == tmpSta.rightVal:
+                    stackLV[-1].leftVal = tmpSta.leftVal
         # when we meet the key word 'store', we should check the 'stackLV'. When the size of stackLV is 1, that is to say it's assignment .
         # When the size of stackLV is 2, we will go further to determine it's a deref statement or not.
         if (len(res2) >= 3 and res2[2] == 'store'):
@@ -497,13 +514,14 @@ def analysisLine(line):
                         return tmpStr
                     # *pptr = &n 的例子
                     if tmpStament.leftVal == tmpSta.rightVal:
-                        tmpVal = "T" + int(time.time()).__str__()
-                        tmpStr = "alloca: " + tmpVal + " = " + tmpSta.leftVal + "\\l " + "store: " + "*" + tmpStament.rightVal + " = " + tmpVal + "\\l "
-                        if tmpSta.leftVal not in addressTaken:
-                            addressTaken.append(tmpSta.leftVal)
-                        if tmpStament.rightVal not in allPointer:
-                            allPointer.append(tmpStament.rightVal)
-                        return tmpStr
+                        if tmpSta.firstType != 'i8' and tmpSta.firstType != 'i32' and tmpSta.firstType != 'i64':
+                            tmpVal = "T" + int(time.time()).__str__()
+                            tmpStr = "alloca: " + tmpVal + " = " + tmpSta.leftVal + "\\l " + "store: " + "*" + tmpStament.rightVal + " = " + tmpVal + "\\l "
+                            if tmpSta.leftVal not in addressTaken:
+                                addressTaken.append(tmpSta.leftVal)
+                            if tmpStament.rightVal not in allPointer:
+                                allPointer.append(tmpStament.rightVal)
+                            return tmpStr
 
             # if there are two 'load' keywords in the stack
             # or one load & one getelementptr
@@ -775,7 +793,11 @@ def analysisLine(line):
                                         print("here size is 111111333NULL",tmpStr)
                                         break
                             else:
-                                tmpStr += actualParaToWrite + ")" + "\\l "
+                                if sizeOfFunctionPara != 1:#如果已经把最后的一条load 指令pop掉，且只剩一个实际要写的实参，但是由于存在形参里有%call的变量存在，
+                                    #所以需要额外判断一下是不是只剩一个形参要写，如果不是
+                                    tmpStr += actualParaToWrite + ","
+                                else:#如果是
+                                    tmpStr += actualParaToWrite + ")" + "\\l "
                                 print(tmpStr)
                                 print("here size is 111111111111111111111111111NULL2")
                                 break  # 写完最后一个实参 要break掉

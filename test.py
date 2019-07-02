@@ -26,6 +26,8 @@ stack.append(sta1)
 stack.append(sta2)
 stack.append(sta3)
 
+stack[-1].Op = 'zyy'
+sta2.Op = '/'
 print(stack[-2])
 for item in stack:
     print(item.Op)
@@ -41,7 +43,9 @@ print(stack[-1].Op)
 #strLine = "  %call2 = call i32 @setsockopt(i32 %2, i32 1, i32 13, i8* %3, i32 8) #11"
 #strLine = "  %call = call i32 @A_is_ok(i32 %0), !dbg !40868"
 #strLine = "  %call887 = call i8* @infinity_str(i32 %conv886, i8 signext %394, i32 %395, i32 %396), !dbg !514441"
-strLine = "  call void @ap_relieve_child_processes(void (i32, i32, i32)* @event_note_child_killed)"
+#strLine = "  call void @ap_relieve_child_processes(void (i32, i32, i32)* @event_note_child_killed)"
+#strLine = "  call void @apr_table_addn(%struct.apr_table_t* %73, i8* getelementptr inbounds ([5 x i8], [5 x i8]* @.str.10.1625, i32 0, i32 0), i8* %call78)"
+strLine = "  call void @apr_table_addn(%struct.apr_table_t* %73, i8* getelementptr inbounds ([5 x i8], [5 x i8]* @.str.10.1625, i32 0, i32 0), i8* %call78)"
     #for i in range(len(res2)):
     #    print(count4,res2[i])
 
@@ -128,6 +132,18 @@ def getFunctionPara(line):
 getFunctionPara(strLine)
 
 
+bitcastLine = "  %4 = bitcast %struct.ap_conf_vector_t* %3 to i8**"
+res22 = re.split(",| ",bitcastLine)
+print("res bitcast is ", res22)
+tmpSta = Statement()
+tmpSta.Op = 'bitcast'
+tmpSta.leftVal = res22[2]
+tmpSta.firstType = res22[5]
+tmpSta.rightVal = res22[6]
+tmpSta.secondType = res22[8]
+print("Statement Op is: ", tmpSta.Op,", leftVal is: ",tmpSta.leftVal,", firstType is: ",tmpSta.firstType,", rightVal is: ",tmpSta.rightVal,", secondType is: ",tmpSta.secondType)
+
+
 #line = "  %yy_buffer_stack_top17 = getelementptr inbounds %struct.yyguts_t, %struct.yyguts_t* %33, i32 0, i32 3, !10"
 #line = "  %arrayidx10 = getelementptr inbounds %struct.yy_buffer_state*, %struct.yy_buffer_state** %25, i64 %27, !10"
 #line = "  %v_type = getelementptr inbounds %struct.typval_T, %struct.typval_T* %0, i32 0, i32 0, !dbg !80290, !10"
@@ -138,6 +154,7 @@ getFunctionPara(strLine)
 # line = "  %28 = load i32, i32* %abort, align 4, !dbg !80272, !10"
 #line = "  %tobool = icmp ne %struct.yy_buffer_state** %4, null, !10"
 #  %cmp = icmp eq i32 %1, 6, !dbg !80291
+
 line = "  %cmp1 = icmp ne %struct.dictvar_S* %4, null, !dbg !80301, !10"
 
 res2 = re.split(",| ", line)
@@ -228,6 +245,10 @@ print("Statement Op is: ", tmpSta.Op,", leftVal is: ",tmpSta.leftVal,", firstTyp
 
 #strPPP = "  %call158 = call i8* (%struct.apr_pool_t*, i8*, ...) @apr_psprintf(%struct.apr_pool_t* %178, i8* getelementptr inbounds ([3 x i8], [3 x i8]* @.str.19.1633, i32 0, i32 0), i32 %conv157)"
 #getFunctionPara(strPPP)
+
+strZero = "  %call14 = call zeroext i8 @get_reg_type(i32 %10, i64* %reglen), !dbg !102696"
+resZ = re.split(",| ",strZero)
+print("resZ is : " ,resZ)
 
 '''
 for i in range(len(res1)):
