@@ -15,7 +15,7 @@ import time
 # fobj = open(newFilename, 'wb+')
 
 # 输出singleTon的结果txt文件
-singleTontxt = 'D:\Ouroboros\codes\Ouroboros-Project\\testfile\\httpd\\res\singleTonResult.txt'
+singleTontxt = 'D:\Ouroboros\codes\Ouroboros-Project\\testfile\\vim\\res\singleTonResult.txt'
 fsT = open(singleTontxt, 'a+')
 
 # 用来存操作符的栈
@@ -160,6 +160,8 @@ def analysisLine(line):
             tmpSta.firstType = res2[5]
             tmpSta.secondType = res2[7]
             tmpSta.rightVal = res2[8]
+            if '!dbg' in res2:
+                tmpSta.linenumber = res2[14]
             stackLV.append(tmpSta)
 
         # getelementptr
@@ -175,8 +177,10 @@ def analysisLine(line):
                 if '!dbg' in res2:
                     if len(res2) == 19:
                         tmpSta.secondType = res2[15]  # it means the index of a pointer variable in the struct object
+                        tmpSta.linenumber = res2[18]
                     if len(res2) == 16:
                         tmpSta.secondType = res2[12]  # it means the index of a pointer variable in the struct object
+                        tmpSta.linenumber = res2[15]
                 else:
                     if len(res2) == 16:
                         tmpSta.secondType = res2[15]  # it means the index of a pointer variable in the struct object
@@ -207,7 +211,8 @@ def analysisLine(line):
                 tmpSta.firstType = res2[5]  # return type of function
                 funcName = res2[6].split('(')
                 tmpSta.secondType = funcName[0]  # functionName
-
+            if '!dbg' in res2:
+                tmpSta.linenumber = res2[-1]
             pppfunctionName=""
             # 获取函数的形参列表
             funformalPara.clear()
@@ -242,7 +247,7 @@ def analysisLine(line):
                 print("in call block~", item)
 
             if sizeOfFunctionPara == 0:
-                tmpStr += ")" + "\\l "
+                tmpStr += ")" +tmpSta.linenumber+ "\\l "
             else:
 
                 # 在调用该函数处时，输出 传入该函数的实参 实现：
@@ -268,7 +273,7 @@ def analysisLine(line):
                                 continue
 
                         if sizeOfFunctionPara == 1:
-                            tmpStr += actualParaToWrite + ")" + "\\l "
+                            tmpStr += actualParaToWrite + ")" +tmpSta.linenumber+ "\\l "
                             print("the whole tmpStr1111 is ", tmpStr)
                             print("here size is 111111111111111111111111111")
                             break  # 写完最后一个实参 要break掉
@@ -285,7 +290,7 @@ def analysisLine(line):
                         print("actToDW not null ,and is ", actualParaToWrite)
                         if len(stackLV) == 1:
                             # 如果只剩当前的这个条语句了，也是要写
-                            tmpStr += actualParaToWrite + ")" + "\\l "
+                            tmpStr += actualParaToWrite + ")" +tmpSta.linenumber+ "\\l "
                             print("here size is 11222222NULL", tmpStr)
                         stackLV.pop()
                         continue
@@ -308,13 +313,13 @@ def analysisLine(line):
                                 continue
                             else:
                                 if sizeOfFunctionPara == 1:
-                                    tmpStr += actualParaToWrite + ")" + "\\l "
+                                    tmpStr += actualParaToWrite + ")" +tmpSta.linenumber+ "\\l "
                                     print("the whole tmpStr22222 is ", tmpStr)
                                     print(tmpStr)
                                     print("here size is 111111111111111111111111111")
                                     break  # 写完最后一个实参 要break掉
                         else:
-                            tmpStr += actualParaToWrite + ")" + "\\l "
+                            tmpStr += actualParaToWrite + ")" +tmpSta.linenumber+ "\\l "
                             print("the whole tmpStr3333 is ", tmpStr)
                             print(tmpStr)
                             print("here size is 111111111111111111111111111")
@@ -372,12 +377,12 @@ def analysisLine(line):
 
             #在离开前需要检查一下tmpStr是否为完整的句子
             #需要把形参中为%call等形式的参数放进去，6.29修改正，把剩余形参都加入进去
-            if ')\\l ' not in tmpStr:
+            if ')!' not in tmpStr:
                 #说明是不完整的句子，然后把剩余的形参都输出
                 for i in range(len(funformalPara)):
                     if i == len(funformalPara) -1:
                         #if '%call' in funformalPara[i]:
-                        tmpStr += funformalPara[i] + ")\\l "
+                        tmpStr += funformalPara[i] + ")"+tmpSta.linenumber+"\\l "
                     else:
                         tmpStr += funformalPara[i] + ","
 
@@ -396,11 +401,8 @@ def analysisLine(line):
             tmpSta.secondType = res2[6]  # true type
             tmpSta.leftVal = res2[7]  # op1
             tmpSta.rightVal = res2[9]  # op2
-            # if '!dbg' in res2:
-            #     tmpSta.linenumber = res2[14]
-            # else:
-            #     tmpSta.linenumber = res2[11]
-
+            if '!dbg' in res2:
+                tmpSta.linenumber = res2[12]
 
             if tmpSta.firstType == 'ne' or tmpSta.firstType == 'eq' :
                 if tmpSta.rightVal == 'null':
@@ -409,7 +411,6 @@ def analysisLine(line):
                         if tmpStament1.leftVal == tmpSta.leftVal:
                             tmpStr = "cmp: "+ tmpStament1.rightVal + tmpSta.linenumber+"\\l "
                             return tmpStr
-
 
         #bitcast instruction
         if (len(res2) >=5 and res2[4] == 'bitcast'):
@@ -433,6 +434,8 @@ def analysisLine(line):
             tmpSta.firstType = res2[3]
             tmpSta.rightVal = res2[7]
             tmpSta.secondType = res2[6]
+            if '!dbg' in res2:
+                tmpSta.linenumber = res2[13]
 
             # if there is no 'load' keyword
             if (len(stackLV) == 0):
@@ -444,7 +447,7 @@ def analysisLine(line):
                     else:
                         # 如果左操作数是个一个call函数的返回值的话，就是要记作assign
                         if 'call' in tmpSta.leftVal:
-                            tmpStr = "assign: " + tmpSta.rightVal + " = " + tmpSta.leftVal + "\\l "
+                            tmpStr = "assign: " + tmpSta.rightVal + " = " + tmpSta.leftVal + tmpSta.linenumber+"\\l "
                             if tmpSta.rightVal not in allPointer:
                                 allPointer.append(tmpSta.rightVal)
                             if tmpSta.leftVal not in allPointer:
@@ -452,7 +455,7 @@ def analysisLine(line):
                             return tmpStr
                         else:
 
-                            tmpStr = "alloca:" + ' ' + tmpSta.rightVal + " = " + tmpSta.leftVal + "\\l "
+                            tmpStr = "alloca:" + ' ' + tmpSta.rightVal + " = " + tmpSta.leftVal + tmpSta.linenumber+"\\l "
                             print("stackLv =0 " + tmpStr)
                             # 在这里判断是否为 非singleton
                             # 需要区分 &n 和真正new、malloc的类型
@@ -479,7 +482,7 @@ def analysisLine(line):
                     if tmpStament.firstType != 'i32':
                         if tmpSta.firstType != 'i32':  # 同时要求store语句的前半句，不能为int类型
                             if tmpStament.leftVal == tmpSta.rightVal:
-                                tmpStr = "alloca: " + tmpStament.rightVal + "." + tmpStament.secondType + " = " + tmpSta.leftVal + "\\l "
+                                tmpStr = "alloca: " + tmpStament.rightVal + "." + tmpStament.secondType + " = " + tmpSta.leftVal + tmpSta.linenumber+"\\l "
                                 if tmpSta.leftVal not in addressTaken:
                                     addressTaken.append(tmpSta.leftVal)
                                 tmpPointer = tmpStament.rightVal + "." + tmpStament.secondType
@@ -487,7 +490,7 @@ def analysisLine(line):
                                     allPointer.append(tmpPointer)
                                 return tmpStr
                             if tmpStament.leftVal == tmpSta.leftVal:
-                                tmpStr = "alloca: " + tmpSta.rightVal + " = " + tmpStament.rightVal + "." + tmpStament.secondType + "\\l "
+                                tmpStr = "alloca: " + tmpSta.rightVal + " = " + tmpStament.rightVal + "." + tmpStament.secondType + tmpSta.linenumber+"\\l "
                                 tmpPointer = tmpStament.rightVal + "." + tmpStament.secondType
                                 if tmpPointer not in addressTaken:
                                     addressTaken.append(tmpPointer)
@@ -497,7 +500,7 @@ def analysisLine(line):
                                 return tmpStr
                 elif tmpStament.Op == 'call':#这种情况不会再出现，而且很奇怪，为什么我之前写的时候，明明是assign语句把tmpSta.leftVal给加入到了addressTaken里面去，感觉是不是弄错了，晕
                     if tmpSta.firstType != 'i32':  # 过滤掉int类型
-                        tmpStr = "assign: " + tmpSta.rightVal + " = " + tmpSta.leftVal + "\\l "
+                        tmpStr = "assign: " + tmpSta.rightVal + " = " + tmpSta.leftVal + tmpSta.linenumber+"\\l "
                         print(",,,,,,," + tmpStr)
                         addressTaken.append(tmpSta.leftVal)
                         if tmpSta.rightVal not in allPointer:
@@ -505,7 +508,7 @@ def analysisLine(line):
                         return tmpStr
                 else:
                     if (tmpStament.leftVal == tmpSta.leftVal):
-                        tmpStr = "assign:" + ' ' + tmpSta.rightVal + " = " + tmpStament.rightVal + "\\l "
+                        tmpStr = "assign:" + ' ' + tmpSta.rightVal + " = " + tmpStament.rightVal + tmpSta.linenumber+"\\l "
 
                         if tmpSta.rightVal not in allPointer:
                             allPointer.append(tmpSta.rightVal)
@@ -516,7 +519,7 @@ def analysisLine(line):
                     if tmpStament.leftVal == tmpSta.rightVal:
                         if tmpSta.firstType != 'i8' and tmpSta.firstType != 'i32' and tmpSta.firstType != 'i64':
                             tmpVal = "T" + int(time.time()).__str__()
-                            tmpStr = "alloca: " + tmpVal + " = " + tmpSta.leftVal + "\\l " + "store: " + "*" + tmpStament.rightVal + " = " + tmpVal + "\\l "
+                            tmpStr = "alloca: " + tmpVal + " = " + tmpSta.leftVal + tmpSta.linenumber+"\\l " + "store: " + "*" + tmpStament.rightVal + " = " + tmpVal + tmpSta.linenumber+"\\l "
                             if tmpSta.leftVal not in addressTaken:
                                 addressTaken.append(tmpSta.leftVal)
                             if tmpStament.rightVal not in allPointer:
@@ -533,7 +536,7 @@ def analysisLine(line):
                 if tmpStament2.Op == 'getelementptr':
                     if tmpStament2.firstType != 'i32':
                         if (tmpStament1.leftVal == tmpSta.leftVal and tmpStament2.leftVal == tmpSta.rightVal):
-                            tmpStr = "assign: " + tmpStament2.rightVal + "." + tmpStament2.secondType + " = " + tmpStament1.rightVal + "\\l "
+                            tmpStr = "assign: " + tmpStament2.rightVal + "." + tmpStament2.secondType + " = " + tmpStament1.rightVal + tmpSta.linenumber+"\\l "
                             tmpPointer = tmpStament2.rightVal + "." + tmpStament2.secondType
                             if tmpPointer not in allPointer:
                                 allPointer.append(tmpPointer)
@@ -544,7 +547,7 @@ def analysisLine(line):
                         # like pointerCase.d = &PointerArray[5];
                         if tmpStament1.Op == 'getelementptr':
                             if tmpSta.leftVal == tmpStament1.leftVal and tmpSta.rightVal == tmpStament2.leftVal:
-                                tmpStr = "alloca: " + tmpStament2.rightVal + "." + tmpStament2.secondType + " = " + tmpStament1.rightVal + "." + tmpStament1.secondType + "\\l "
+                                tmpStr = "alloca: " + tmpStament2.rightVal + "." + tmpStament2.secondType + " = " + tmpStament1.rightVal + "." + tmpStament1.secondType + tmpSta.linenumber+"\\l "
                                 tmpPointer1 = tmpStament2.rightVal + "." + tmpStament2.secondType
                                 tmpPointer2 = tmpStament1.rightVal + "." + tmpStament1.secondType
                                 if tmpPointer2 not in addressTaken:
@@ -555,7 +558,7 @@ def analysisLine(line):
                 elif tmpStament1.Op == 'getelementptr':
                     if tmpStament1.firstType != 'i32':
                         if (tmpStament1.leftVal == tmpStament2.rightVal and tmpStament2.leftVal == tmpSta.leftVal):
-                            tmpStr = "assign: " + tmpSta.rightVal + " = " + tmpStament1.rightVal + "." + tmpStament1.secondType + "\\l "
+                            tmpStr = "assign: " + tmpSta.rightVal + " = " + tmpStament1.rightVal + "." + tmpStament1.secondType + tmpSta.linenumber+"\\l "
                             tmpPointer = tmpStament1.rightVal + "." + tmpStament1.secondType
                             if tmpPointer not in allPointer:
                                 allPointer.append(tmpPointer)
@@ -564,14 +567,14 @@ def analysisLine(line):
                             return tmpStr
                 else:
                     if (tmpStament1.leftVal == tmpSta.leftVal and tmpStament2.leftVal == tmpSta.rightVal):
-                        tmpStr = "store: " + "*" + tmpStament2.rightVal + " = " + tmpStament1.rightVal + "\\l "
+                        tmpStr = "store: " + "*" + tmpStament2.rightVal + " = " + tmpStament1.rightVal + tmpSta.linenumber+"\\l "
                         if tmpStament1.rightVal not in allPointer:
                             allPointer.append(tmpStament1.rightVal)
                         if tmpStament2.rightVal not in allPointer:
                             allPointer.append(tmpStament2.rightVal)
                         return tmpStr
                     if (tmpStament2.leftVal == tmpSta.leftVal and tmpStament1.leftVal == tmpStament2.rightVal):
-                        tmpStr = "load: " + tmpSta.rightVal + " = " + "*" + tmpStament1.rightVal + "\\l "
+                        tmpStr = "load: " + tmpSta.rightVal + " = " + "*" + tmpStament1.rightVal + tmpSta.linenumber+"\\l "
                         if tmpSta.rightVal not in allPointer:
                             allPointer.append(tmpSta.rightVal)
                         if tmpStament1.rightVal not in allPointer:
@@ -592,7 +595,7 @@ def analysisLine(line):
                     if tmpStament2.firstType != 'i32':
                         if (
                                 tmpStament1.leftVal == tmpSta.leftVal and tmpStament2.leftVal == tmpStament3.rightVal and tmpStament3.leftVal == tmpSta.rightVal):
-                            tmpStr = "store: " + "*" + tmpStament2.rightVal + "." + tmpStament2.secondType + " = " + tmpStament1.rightVal + "\\l "
+                            tmpStr = "store: " + "*" + tmpStament2.rightVal + "." + tmpStament2.secondType + " = " + tmpStament1.rightVal + tmpSta.linenumber+"\\l "
                             tmpPointer = tmpStament2.rightVal + "." + tmpStament2.secondType
                             if tmpPointer not in allPointer:
                                 allPointer.append(tmpPointer)
@@ -600,7 +603,7 @@ def analysisLine(line):
                                 allPointer.append(tmpStament1.rightVal)
 
                         if (tmpStament2.leftVal == tmpStament3.rightVal and tmpStament3.leftVal == tmpSta.leftVal):
-                            tmpStr = "assign: " + tmpSta.rightVal + " = " + tmpStament2.rightVal + ".i" + "\\l "
+                            tmpStr = "assign: " + tmpSta.rightVal + " = " + tmpStament2.rightVal + ".i" + tmpSta.linenumber+"\\l "
                             tmpPointer = tmpStament2.rightVal + ".i"
                             if tmpSta.rightVal not in allPointer:
                                 allPointer.append(tmpSta.rightVal)
@@ -611,7 +614,7 @@ def analysisLine(line):
                     if tmpStament1.firstType != 'i32':
                         if (
                                 tmpStament1.leftVal == tmpStament2.rightVal and tmpStament2.leftVal == tmpSta.leftVal and tmpStament3.leftVal == tmpSta.rightVal):
-                            tmpStr = "store: " + "*" + tmpStament3.rightVal + " = " + tmpStament1.rightVal + "." + tmpStament1.secondType + "\\l "
+                            tmpStr = "store: " + "*" + tmpStament3.rightVal + " = " + tmpStament1.rightVal + "." + tmpStament1.secondType + tmpSta.linenumber+"\\l "
                             tmpPointer = tmpStament1.rightVal + "." + tmpStament1.secondType
                             if tmpPointer not in allPointer:
                                 allPointer.append(tmpPointer)
@@ -619,7 +622,7 @@ def analysisLine(line):
                                 allPointer.append(tmpStament3.rightVal)
                         if (
                                 tmpStament1.leftVal == tmpStament2.rightVal and tmpStament2.leftVal == tmpStament3.rightVal and tmpStament3.leftVal == tmpSta.leftVal):
-                            tmpStr = "load: " + tmpSta.rightVal + " = " + "*" + tmpStament1.rightVal + "." + tmpStament1.secondType + "\\l "
+                            tmpStr = "load: " + tmpSta.rightVal + " = " + "*" + tmpStament1.rightVal + "." + tmpStament1.secondType + tmpSta.linenumber+"\\l "
                             tmpPointer = tmpStament1.rightVal + "." + tmpStament1.secondType
                             if tmpPointer not in allPointer:
                                 allPointer.append(tmpPointer)
@@ -628,7 +631,7 @@ def analysisLine(line):
 
                         if tmpStament3.Op == 'getelementptr':
                             if tmpStament1.leftVal == tmpStament2.rightVal and tmpStament2.leftVal == tmpSta.leftVal and tmpStament3.leftVal == tmpSta.rightVal:
-                                tmpStr = "assign: " + tmpStament1.rightVal + "." + tmpStament1.secondType + " = " + tmpStament3.rightVal + "." + tmpStament3.secondType + "\\l "
+                                tmpStr = "assign: " + tmpStament1.rightVal + "." + tmpStament1.secondType + " = " + tmpStament3.rightVal + "." + tmpStament3.secondType + tmpSta.linenumber+"\\l "
                                 tmpPointer1 = tmpStament1.rightVal + "." + tmpStament1.secondType
                                 tmpPointer2 = tmpStament3.rightVal + "." + tmpStament3.secondType
                                 if tmpPointer1 not in allPointer:
@@ -640,7 +643,7 @@ def analysisLine(line):
                     if tmpStament3.firstType != 'i32':
                         if (
                                 tmpStament1.leftVal == tmpStament2.rightVal and tmpStament2.leftVal == tmpSta.leftVal and tmpStament3.leftVal == tmpSta.rightVal):
-                            tmpStr = "load: " + tmpStament3.rightVal + "." + tmpStament3.secondType + " = " + "*" + tmpStament1.rightVal + "\\l "
+                            tmpStr = "load: " + tmpStament3.rightVal + "." + tmpStament3.secondType + " = " + "*" + tmpStament1.rightVal + tmpSta.linenumber+"\\l "
                             tmpPointer = tmpStament3.rightVal + "." + tmpStament3.secondType
                             if tmpPointer not in allPointer:
                                 allPointer.append(tmpPointer)
@@ -650,13 +653,13 @@ def analysisLine(line):
 
                 else:
                     if tmpStament1.leftVal == tmpStament2.rightVal:
-                        tmpStr = "load: " + tmpStament2.leftVal + " = " + "*" + tmpStament1.rightVal + "\\l "
+                        tmpStr = "load: " + tmpStament2.leftVal + " = " + "*" + tmpStament1.rightVal + tmpSta.linenumber+"\\l "
                         if tmpStament2.leftVal not in allPointer:
                             allPointer.append(tmpStament2.leftVal)
                         if tmpStament1.rightVal not in allPointer:
                             allPointer.append(tmpStament1.rightVal)
                     if tmpStament3.leftVal == tmpSta.rightVal and tmpSta.leftVal == tmpStament2.leftVal:
-                        tmpStr += "store: " + "*" + tmpStament3.rightVal + " = " + tmpStament2.leftVal + "\\l "
+                        tmpStr += "store: " + "*" + tmpStament3.rightVal + " = " + tmpStament2.leftVal + tmpSta.linenumber+"\\l "
                         if tmpStament3.rightVal not in allPointer:
                             allPointer.append(tmpStament3.rightVal)
                         if tmpStament2.leftVal not in allPointer:
@@ -670,7 +673,7 @@ def analysisLine(line):
                 tmpStament1 = stackLV.pop()
                 if tmpStament1.Op == 'getelementptr' and tmpStament3.Op == 'getelementptr':
                     if tmpStament1.leftVal == tmpStament2.rightVal and tmpStament2.leftVal == tmpSta.leftVal and tmpStament3.leftVal == tmpStament4.rightVal and tmpStament4.leftVal == tmpSta.rightVal:
-                        tmpStr = "store: " + "*" + tmpStament3.rightVal + "." + tmpStament3.secondType + " = " + tmpStament1.rightVal + "." + tmpStament1.secondType + "\\l "
+                        tmpStr = "store: " + "*" + tmpStament3.rightVal + "." + tmpStament3.secondType + " = " + tmpStament1.rightVal + "." + tmpStament1.secondType + tmpSta.linenumber+"\\l "
                         tmpPointer1 = tmpStament3.rightVal + "." + tmpStament3.secondType
                         tmpPointer2 = tmpStament1.rightVal + "." + tmpStament1.secondType
                         if tmpPointer1 not in allPointer:
@@ -680,7 +683,7 @@ def analysisLine(line):
                         return tmpStr
                 if tmpStament1.Op == 'getelementptr' and tmpStament4.Op == 'getelementptr':
                     if tmpStament1.leftVal == tmpStament2.rightVal and tmpStament2.leftVal == tmpStament3.rightVal and tmpStament3.leftVal == tmpSta.leftVal and tmpStament4.leftVal == tmpSta.rightVal:
-                        tmpStr = "load: " + tmpStament4.rightVal + "." + tmpStament4.secondType + " = " + "*" + tmpStament1.rightVal + "." + tmpStament1.secondType + "\\l "
+                        tmpStr = "load: " + tmpStament4.rightVal + "." + tmpStament4.secondType + " = " + "*" + tmpStament1.rightVal + "." + tmpStament1.secondType + tmpSta.linenumber+"\\l "
                         tmpPointer1 = tmpStament4.rightVal + "." + tmpStament4.secondType
                         tmpPointer2 = tmpStament1.rightVal + "." + tmpStament1.secondType
                         if tmpPointer1 not in allPointer:
@@ -697,7 +700,8 @@ def analysisLine(line):
             funcName = res2[4].split('(')
             tmpSta.secondType = funcName[0]  # functionName
             # if there is one formal parameter not two more parameters
-
+            if '!dbg' in res2:
+                tmpSta.linenumber = res2[-1]
 
             pppfunctionName=""
             # 获取函数的形参列表
@@ -732,7 +736,7 @@ def analysisLine(line):
                 print("in void call function formalPara is", item)
             # 需要先判断是否有stackLV存在
             if sizeOfFunctionPara == 0:
-                tmpStr += ")" + "\\l "
+                tmpStr += ")" + tmpSta.linenumber+"\\l "
             else:
                 if len(stackLV) != 0:
                     # 在调用该函数处时，输出 传入该函数的实参 实现：
@@ -756,7 +760,7 @@ def analysisLine(line):
 
 
                             if sizeOfFunctionPara == 1:
-                                tmpStr += actualParaToWrite + ")" + "\\l "
+                                tmpStr += actualParaToWrite + ")" + tmpSta.linenumber+"\\l "
                                 print(tmpStr)
                                 print("here size is 111111111111111111111111111NULL")
                                 break  # 写完最后一个实参 要break掉
@@ -770,7 +774,7 @@ def analysisLine(line):
                             actualParaToWrite = tmpStament1.rightVal
                             if len(stackLV) == 1:
                                 #如果只剩当前的这个条语句了，也是要写
-                                tmpStr += actualParaToWrite + ")" + "\\l "
+                                tmpStr += actualParaToWrite + ")" + tmpSta.linenumber+"\\l "
                                 print("here size is 11222222NULL",tmpStr)
                             stackLV.pop()
                             continue
@@ -789,7 +793,7 @@ def analysisLine(line):
                                     continue
                                 else:
                                     if sizeOfFunctionPara == 1:
-                                        tmpStr += actualParaToWrite + ")" + "\\l "
+                                        tmpStr += actualParaToWrite + ")" + tmpSta.linenumber+"\\l "
                                         print("here size is 111111333NULL",tmpStr)
                                         break
                             else:
@@ -797,7 +801,7 @@ def analysisLine(line):
                                     #所以需要额外判断一下是不是只剩一个形参要写，如果不是
                                     tmpStr += actualParaToWrite + ","
                                 else:#如果是
-                                    tmpStr += actualParaToWrite + ")" + "\\l "
+                                    tmpStr += actualParaToWrite + ")" + tmpSta.linenumber+"\\l "
                                 print(tmpStr)
                                 print("here size is 111111111111111111111111111NULL2")
                                 break  # 写完最后一个实参 要break掉
@@ -826,11 +830,11 @@ def analysisLine(line):
             '''
             #在离开前需要检查一下tmpStr是否为完整的句子
             #需要把形参中为%call等形式的参数放进去
-            if ')\\l ' not in tmpStr:
+            if ')!' not in tmpStr:
                 #说明是不完整的句子
                 for i in range(len(funformalPara)):
                     if i == len(funformalPara) -1:
-                        tmpStr += funformalPara[i] + ")\\l "
+                        tmpStr += funformalPara[i] + ")"+tmpSta.linenumber+"\\l "
                     else:
                         tmpStr += funformalPara[i] + ","
 
@@ -843,6 +847,9 @@ def analysisLine(line):
         if (len(res2) >= 3 and res2[2] == 'ret'):
             tmpSta = Statement()
             tmpSta.Op = 'ret'
+            if '!dbg' in res2:
+                tmpSta.linenumber = res2[-1]
+
             tmpSta.firstType = res2[3]  # return value's type
             if tmpSta.firstType != 'void':
                 tmpSta.leftVal = res2[4]
@@ -850,25 +857,25 @@ def analysisLine(line):
                 if len(stackLV) == 1:
                     tmpStament1 = stackLV.pop()
                     if tmpSta.leftVal == tmpStament1.leftVal:
-                        tmpStr = 'ret ' + tmpStament1.rightVal + "\\l "
+                        tmpStr = 'ret ' + tmpStament1.rightVal + tmpSta.linenumber+"\\l "
                         return tmpStr
                 if len(stackLV) == 2:
                     tmpStament2 = stackLV.pop()
                     tmpStament1 = stackLV.pop()
                     print("cccccccccccccccccccccc")
                     if tmpStament1.leftVal == tmpStament2.rightVal and tmpStament2.leftVal == tmpSta.leftVal:
-                        tmpStr = 'ret ' + tmpStament1.rightVal + "\\l "
+                        tmpStr = 'ret ' + tmpStament1.rightVal + tmpSta.linenumber+"\\l "
                         return tmpStr
                     # 排除call 函数后，直接ret，没有ret语句的bug
                     if tmpStament1.Op == 'call':
                         print("aaaaaaaaaaaaaaaaaaaaa")
                         if tmpStament2.leftVal == tmpSta.leftVal:
                             print("bbbbbbbbbbbbbbbbb")
-                            tmpStr = 'ret ' + tmpStament2.rightVal + "\\l "
+                            tmpStr = 'ret ' + tmpStament2.rightVal + tmpSta.linenumber+"\\l "
                             return tmpStr
 
 
-path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\httpd\llvm8"
+path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\vim\llvm8"
 files = os.listdir(path)
 count = 0
 for file in files:
