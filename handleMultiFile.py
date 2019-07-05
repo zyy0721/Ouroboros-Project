@@ -15,7 +15,7 @@ import time
 # fobj = open(newFilename, 'wb+')
 
 # 输出singleTon的结果txt文件
-singleTontxt = 'D:\Ouroboros\codes\Ouroboros-Project\\testfile\\vim\\res\singleTonResult.txt'
+singleTontxt = 'D:\Ouroboros\codes\Ouroboros-Project\\testfile\\httpd\debug\\res\singleTonResult.txt'
 fsT = open(singleTontxt, 'a+')
 
 # 用来存操作符的栈
@@ -158,10 +158,14 @@ def analysisLine(line):
             tmpSta.Op = 'load'
             tmpSta.leftVal = res2[2]
             tmpSta.firstType = res2[5]
-            tmpSta.secondType = res2[7]
-            tmpSta.rightVal = res2[8]
+            if 'getelementptr' in res2:
+                tmpSta.rightVal = res2[13]
+                tmpSta.secondType = res2[19].replace(")","") #index
+            else:
+                tmpSta.secondType = res2[7]
+                tmpSta.rightVal = res2[8]
             if '!dbg' in res2:
-                tmpSta.linenumber = res2[14]
+                tmpSta.linenumber = res2[-1]
             stackLV.append(tmpSta)
 
         # getelementptr
@@ -177,10 +181,10 @@ def analysisLine(line):
                 if '!dbg' in res2:
                     if len(res2) == 19:
                         tmpSta.secondType = res2[15]  # it means the index of a pointer variable in the struct object
-                        tmpSta.linenumber = res2[18]
+                        tmpSta.linenumber = res2[-1]
                     if len(res2) == 16:
                         tmpSta.secondType = res2[12]  # it means the index of a pointer variable in the struct object
-                        tmpSta.linenumber = res2[15]
+                        tmpSta.linenumber = res2[-1]
                 else:
                     if len(res2) == 16:
                         tmpSta.secondType = res2[15]  # it means the index of a pointer variable in the struct object
@@ -236,6 +240,10 @@ def analysisLine(line):
                                 pppfunctionName = resz[0]
                                 tmpSta.secondType = pppfunctionName
                                 print("PPP function Name is ", resz[0])
+                        if len(resz) == 5:
+                            if '@' in resz[1]:
+                                pppfunctionName=resz[1]
+                                print("ppp function name could be ", resz[1])
 
 
             tmpStr = "call: " + tmpSta.leftVal + " = " + tmpSta.firstType + " " + tmpSta.secondType + "("
@@ -402,14 +410,17 @@ def analysisLine(line):
             tmpSta.leftVal = res2[7]  # op1
             tmpSta.rightVal = res2[9]  # op2
             if '!dbg' in res2:
-                tmpSta.linenumber = res2[12]
+                tmpSta.linenumber = res2[-1]
 
             if tmpSta.firstType == 'ne' or tmpSta.firstType == 'eq' :
                 if tmpSta.rightVal == 'null':
                     if len(stackLV) >= 1:
                         tmpStament1 = stackLV.pop()
                         if tmpStament1.leftVal == tmpSta.leftVal:
-                            tmpStr = "cmp: "+ tmpStament1.rightVal + tmpSta.linenumber+"\\l "
+                            if tmpStament1.secondType.isdigit():
+                                tmpStr = "cmp: "+ tmpStament1.rightVal+ "."+ tmpStament1.secondType + tmpSta.linenumber+"\\l "
+                            else:
+                                tmpStr = "cmp: " + tmpStament1.rightVal + tmpSta.linenumber + "\\l "
                             return tmpStr
 
         #bitcast instruction
@@ -432,16 +443,29 @@ def analysisLine(line):
             tmpSta.Op = 'store'
             tmpSta.leftVal = res2[4]
             tmpSta.firstType = res2[3]
-            tmpSta.rightVal = res2[7]
-            tmpSta.secondType = res2[6]
+            if 'getelementptr' in res2:
+                tmpSta.rightVal = res2[12]
+                tmpSta.secondType = res2[18].replace(")","")#index
+            else:
+                tmpSta.rightVal = res2[7]
+                tmpSta.secondType = res2[6]
             if '!dbg' in res2:
-                tmpSta.linenumber = res2[13]
+                tmpSta.linenumber = res2[-1]
 
             # if there is no 'load' keyword
             if (len(stackLV) == 0):
                 # judge whether it is an alloca statement or not
                 if (tmpSta.firstType == 'i32*' or tmpSta.firstType == 'i32**'):
                     tmpLeftVal = tmpSta.leftVal + ".addr"
+
+                    if '.addr' in tmpSta.rightVal:
+                        tmpSta_rightVal = tmpSta.rightVal.replace(".addr","")
+                        tmpSta_leftVal = tmpSta.leftVal.replace(tmpSta_rightVal,"")
+                        if tmpSta_leftVal.isdigit():
+                            print("maybe this case: store i32 * % retval1, i32 ** % retval.addr, do nothing")
+                            return ""
+                    #也有可能会存在这种例子，store i32 * % retval1, i32 ** % retval.addr, align 8
+
                     if tmpLeftVal == tmpSta.rightVal:
                         print("........................")
                     else:
@@ -482,9 +506,12 @@ def analysisLine(line):
                     if tmpStament.firstType != 'i32':
                         if tmpSta.firstType != 'i32':  # 同时要求store语句的前半句，不能为int类型
                             if tmpStament.leftVal == tmpSta.rightVal:
-                                tmpStr = "alloca: " + tmpStament.rightVal + "." + tmpStament.secondType + " = " + tmpSta.leftVal + tmpSta.linenumber+"\\l "
-                                if tmpSta.leftVal not in addressTaken:
-                                    addressTaken.append(tmpSta.leftVal)
+                                if tmpSta.leftVal == 'null':
+                                    tmpStr = "assign: " + tmpStament.rightVal + "." + tmpStament.secondType + " = " + "NULL" + tmpSta.linenumber + "\\l "
+                                else:
+                                    tmpStr = "alloca: " + tmpStament.rightVal + "." + tmpStament.secondType + " = " + tmpSta.leftVal + tmpSta.linenumber+"\\l "
+                                    if tmpSta.leftVal not in addressTaken:
+                                        addressTaken.append(tmpSta.leftVal)
                                 tmpPointer = tmpStament.rightVal + "." + tmpStament.secondType
                                 if tmpPointer not in allPointer:
                                     allPointer.append(tmpPointer)
@@ -603,12 +630,22 @@ def analysisLine(line):
                                 allPointer.append(tmpStament1.rightVal)
 
                         if (tmpStament2.leftVal == tmpStament3.rightVal and tmpStament3.leftVal == tmpSta.leftVal):
-                            tmpStr = "assign: " + tmpSta.rightVal + " = " + tmpStament2.rightVal + ".i" + tmpSta.linenumber+"\\l "
-                            tmpPointer = tmpStament2.rightVal + ".i"
-                            if tmpSta.rightVal not in allPointer:
-                                allPointer.append(tmpSta.rightVal)
-                            if tmpPointer not in allPointer:
-                                allPointer.append(tmpPointer)
+                            if tmpStament3.Op == 'getelementptr' and tmpStament1.secondType.isdigit():
+                                if tmpStament1.leftVal == tmpStament2.rightVal:
+                                    tmpStr = "assign: " + tmpSta.rightVal + "." + tmpSta.secondType + " = " + tmpStament1.rightVal+ "." + tmpStament1.secondType+ "."+ tmpStament2.secondType+tmpSta.linenumber+"\\l "
+                                    tmp1 = tmpSta.rightVal + "." + tmpSta.secondType
+                                    tmp2 = tmpStament1.rightVal+ "." + tmpStament1.secondType+ "."+ tmpStament2.secondType
+                                    if tmp1 not in allPointer:
+                                        allPointer.append(tmp1)
+                                    if tmp2 not in allPointer:
+                                        allPointer.append(tmp2)
+                            else:
+                                tmpStr = "assign: " + tmpSta.rightVal + " = " + tmpStament2.rightVal + ".i" + tmpSta.linenumber+"\\l "
+                                tmpPointer = tmpStament2.rightVal + ".i"
+                                if tmpSta.rightVal not in allPointer:
+                                    allPointer.append(tmpSta.rightVal)
+                                if tmpPointer not in allPointer:
+                                    allPointer.append(tmpPointer)
 
                 elif tmpStament1.Op == 'getelementptr':
                     if tmpStament1.firstType != 'i32':
@@ -723,6 +760,10 @@ def analysisLine(line):
                                 print("add ppp")
                                 pppfunctionName=resz[0]
                                 print("PPP function Name is ", resz[0])
+                        if len(resz) == 5:
+                            if '@' in resz[1]:
+                                pppfunctionName=resz[1]
+                                print("ppp function name could be ", resz[1])
 
                 tmpSta.secondType = pppfunctionName
             tmpStr = "call: " + "NULL" + " = " + tmpSta.firstType + " " + tmpSta.secondType + "("
@@ -875,7 +916,8 @@ def analysisLine(line):
                             return tmpStr
 
 
-path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\vim\llvm8"
+path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\httpd\debug\llvm8"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\vim\llvm8"
 files = os.listdir(path)
 count = 0
 for file in files:

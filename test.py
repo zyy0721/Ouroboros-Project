@@ -45,7 +45,10 @@ print(stack[-1].Op)
 #strLine = "  %call887 = call i8* @infinity_str(i32 %conv886, i8 signext %394, i32 %395, i32 %396), !dbg !514441"
 #strLine = "  call void @ap_relieve_child_processes(void (i32, i32, i32)* @event_note_child_killed)"
 #strLine = "  call void @apr_table_addn(%struct.apr_table_t* %73, i8* getelementptr inbounds ([5 x i8], [5 x i8]* @.str.10.1625, i32 0, i32 0), i8* %call78)"
-strLine = "  call void @apr_table_addn(%struct.apr_table_t* %73, i8* getelementptr inbounds ([5 x i8], [5 x i8]* @.str.10.1625, i32 0, i32 0), i8* %call78)"
+#strLine = "  call void @apr_table_addn(%struct.apr_table_t* %73, i8* getelementptr inbounds ([5 x i8], [5 x i8]* @.str.10.1625, i32 0, i32 0), i8* %call78)"
+#strLine = "  call void (i8*, i32, i32, i32, i32, %struct.request_rec.1168*, i8*, ...) bitcast (void (i8*, i32, i32, i32, i32, %struct.request_rec*, i8*, ...)* @ap_log_rerror_ to void (i8*, i32, i32, i32, i32, %struct.request_rec.1168*, i8*, ...)*)(i8* getelementptr inbounds ([19 x i8], [19 x i8]* @.str.7.2598, i32 0, i32 0), i32 539, i32 %cond89, i32 3, i32 %115, %struct.request_rec.1168* %116, i8* getelementptr inbounds ([51 x i8], [51 x i8]* @.str.8.2599, i32 0, i32 0), i64 %117, i64 %118, i64 %119), !dbg !91696"
+#strLine = "  call void bitcast (void (%struct.ap_filter_t*)* @ap_remove_output_filter to void (%struct.ap_filter_t.1169*)*)(%struct.ap_filter_t.1169* %46), !dbg !91557"
+strLine = "  %call = call i32 bitcast (i32 (%struct.ap_filter_t*, %struct.apr_bucket_brigade*)* @ap_pass_brigade to i32 (%struct.ap_filter_t.1169*, %struct.apr_bucket_brigade*)*)(%struct.ap_filter_t.1169* %48, %struct.apr_bucket_brigade* %49), !dbg !91561"
     #for i in range(len(res2)):
     #    print(count4,res2[i])
 
@@ -91,6 +94,9 @@ def getFunctionPara(line):
             if len(resz) ==4:
                 if resz[2] == 'zeroext':
                     funformalPara.append(resz[3])
+            if len(resz) == 5:
+                if '@' in resz[1]:
+                    print("function name could be ",resz[1])
     print("~~~~~~~~~~~~funciton formalPara is :")
 
     for item in funformalPara:
@@ -250,7 +256,8 @@ print("Statement Op is: ", tmpSta.Op,", leftVal is: ",tmpSta.leftVal,", firstTyp
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~call instruction test ok
-strLine = "  %call14 = call zeroext i8 @get_reg_type(i32 %10, i64* %reglen), !dbg !102696"
+strLine = "  store %struct.lpos_T* %arraydecay, %struct.lpos_T** getelementptr inbounds (%struct.regexec_T, %struct.regexec_T* @rex, i32 0, i32 4), align 8, !dbg !357900"
+#strLine = "  %2 = load %struct.regmatch_T*, %struct.regmatch_T** getelementptr inbounds (%struct.regexec_T, %struct.regexec_T* @rex, i32 0, i32 0), align 8, !dbg !357887"
 #strLine = "  call void (i8*, i32, i32, i32, i32, %struct.conn_rec*, i8*, ...) @ap_log_cerror_(i8* getelementptr inbounds ([14 x i8], [14 x i8]* @.str.200, i32 0, i32 0), i32 404, i32 0, i32 3, i32 0, %struct.conn_rec* %cond, i8* getelementptr inbounds ([45 x i8], [45 x i8]* @.str.3.201, i32 0, i32 0), i8* %45), !dbg !514441"
 #strLine = "  %call27 = call i8* (%struct.apr_pool_t*, ...) @apr_pstrcat(%struct.apr_pool_t* %21, i8* %23, i8* getelementptr inbounds ([2 x i8], [2 x i8]* @.str.51.2521, i32 0, i32 0), i8* null), !dbg !514441"
 #strLine ="  call void @apr_table_addn(%struct.apr_table_t* %73, i8* getelementptr inbounds ([5 x i8], [5 x i8]* @.str.10.1625, i32 0, i32 0), i8* %call78), !dbg !514441"
@@ -310,3 +317,13 @@ with open(filename,'r') as f:
         print(line)
         print(res)
 '''
+str1 = "retval.addr"
+str2 = "retval1"
+if '.addr' in str1:
+    tmpSta_rightVal = str1.replace(".addr", "")
+    print("tmpSta_rightVal is ", tmpSta_rightVal)
+    tmpSta_leftVal = str2.replace(tmpSta_rightVal, "")
+    print("tmpSta_leftVal is ", tmpSta_leftVal)
+    if tmpSta_leftVal.isdigit():
+        print("maybe this case: store i32 * % retval1, i32 ** % retval.addr, do nothing")
+
