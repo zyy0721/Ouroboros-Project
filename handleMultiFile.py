@@ -15,7 +15,8 @@ import time
 # fobj = open(newFilename, 'wb+')
 
 # 输出singleTon的结果txt文件
-singleTontxt = 'D:\Ouroboros\codes\Ouroboros-Project\\testfile\\httpd\debug\\res\singleTonResult.txt'
+singleTontxt = 'D:\Ouroboros\codes\Ouroboros-Project\\testfile\\vim\\res\singleTonResult.txt'
+#singleTontxt = 'D:\Ouroboros\codes\Ouroboros-Project\\testfile\\httpd\debug\\res\singleTonResult.txt'
 fsT = open(singleTontxt, 'a+')
 
 # 用来存操作符的栈
@@ -157,13 +158,22 @@ def analysisLine(line):
             tmpSta = Statement()
             tmpSta.Op = 'load'
             tmpSta.leftVal = res2[2]
-            tmpSta.firstType = res2[5]
-            if 'getelementptr' in res2:
-                tmpSta.rightVal = res2[13]
-                tmpSta.secondType = res2[19].replace(")","") #index
+            if len(res2) == 16 and 'volatile' in res2:
+                tmpSta.firstType = res2[6]
+                tmpSta.secondType = res2[8]
+                tmpSta.rightVal = res2[9]
             else:
-                tmpSta.secondType = res2[7]
-                tmpSta.rightVal = res2[8]
+                tmpSta.firstType = res2[5]
+                if 'getelementptr' in res2:
+                    if len(res2) == 30:
+                        tmpSta.rightVal = res2[17]
+                        tmpSta.secondType = res2[23].replace(")","")
+                    else:
+                        tmpSta.rightVal = res2[13]
+                        tmpSta.secondType = res2[19].replace(")","") #index
+                else:
+                    tmpSta.secondType = res2[7]
+                    tmpSta.rightVal = res2[8]
             if '!dbg' in res2:
                 tmpSta.linenumber = res2[-1]
             stackLV.append(tmpSta)
@@ -535,12 +545,18 @@ def analysisLine(line):
                         return tmpStr
                 else:
                     if (tmpStament.leftVal == tmpSta.leftVal):
-                        tmpStr = "assign:" + ' ' + tmpSta.rightVal + " = " + tmpStament.rightVal + tmpSta.linenumber+"\\l "
-
+                        if tmpStament.secondType.isdigit():
+                            tmpStr = "assign: " + tmpSta.rightVal + " = " + tmpStament.rightVal + "." + tmpStament.secondType + tmpSta.linenumber + "\\l "
+                            tmp1 = tmpStament.rightVal + "." + tmpStament.secondType
+                            if tmp1 not in allPointer:
+                                allPointer.append(tmp1)
+                        else:
+                            tmpStr = "assign:" + ' ' + tmpSta.rightVal + " = " + tmpStament.rightVal + tmpSta.linenumber+"\\l "
+                            if tmpStament.rightVal not in allPointer:
+                                allPointer.append(tmpStament.rightVal)
                         if tmpSta.rightVal not in allPointer:
                             allPointer.append(tmpSta.rightVal)
-                        if tmpStament.rightVal not in allPointer:
-                            allPointer.append(tmpStament.rightVal)
+
                         return tmpStr
                     # *pptr = &n 的例子
                     if tmpStament.leftVal == tmpSta.rightVal:
@@ -916,8 +932,8 @@ def analysisLine(line):
                             return tmpStr
 
 
-path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\httpd\debug\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\vim\llvm8"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\httpd\debug\llvm8"
+path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\vim\llvm8"
 files = os.listdir(path)
 count = 0
 for file in files:

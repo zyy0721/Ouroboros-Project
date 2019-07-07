@@ -256,7 +256,8 @@ print("Statement Op is: ", tmpSta.Op,", leftVal is: ",tmpSta.leftVal,", firstTyp
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~call instruction test ok
-strLine = "  store %struct.lpos_T* %arraydecay, %struct.lpos_T** getelementptr inbounds (%struct.regexec_T, %struct.regexec_T* @rex, i32 0, i32 4), align 8, !dbg !357900"
+#strLine = "  store %struct.lpos_T* %arraydecay, %struct.lpos_T** getelementptr inbounds (%struct.regexec_T, %struct.regexec_T* @rex, i32 0, i32 4), align 8, !dbg !357900"
+#strLine = "  %2 = load i8*, i8** getelementptr inbounds ([68 x i8*], [68 x i8*]* @term_strings, i64 0, i64 0), align 16, !dbg !451447"
 #strLine = "  %2 = load %struct.regmatch_T*, %struct.regmatch_T** getelementptr inbounds (%struct.regexec_T, %struct.regexec_T* @rex, i32 0, i32 0), align 8, !dbg !357887"
 #strLine = "  call void (i8*, i32, i32, i32, i32, %struct.conn_rec*, i8*, ...) @ap_log_cerror_(i8* getelementptr inbounds ([14 x i8], [14 x i8]* @.str.200, i32 0, i32 0), i32 404, i32 0, i32 3, i32 0, %struct.conn_rec* %cond, i8* getelementptr inbounds ([45 x i8], [45 x i8]* @.str.3.201, i32 0, i32 0), i8* %45), !dbg !514441"
 #strLine = "  %call27 = call i8* (%struct.apr_pool_t*, ...) @apr_pstrcat(%struct.apr_pool_t* %21, i8* %23, i8* getelementptr inbounds ([2 x i8], [2 x i8]* @.str.51.2521, i32 0, i32 0), i8* null), !dbg !514441"
@@ -271,9 +272,11 @@ strLine = "  store %struct.lpos_T* %arraydecay, %struct.lpos_T** getelementptr i
 #strLine = "  call void @ap_relieve_child_processes(void (i32, i32, i32)* @event_note_child_killed), !dbg !514441"
 #strLine = "  call void @apr_table_addn(%struct.apr_table_t* %73, i8* getelementptr inbounds ([5 x i8], [5 x i8]* @.str.10.1625, i32 0, i32 0), i8* %call78), !dbg !514441"
 #strLine = "  call void @apr_table_addn(%struct.apr_table_t* %73, i8* getelementptr inbounds ([5 x i8], [5 x i8]* @.str.10.1625, i32 0, i32 0), i8* %call78), !dbg !514441"
+
+strLine = "  %1 = load volatile i32, i32* @got_int, align 4, !dbg !187006"
 resZ = re.split(",| ",strLine)
 if '!dbg' in resZ:
-    print("resZ is : " ,resZ, "\nlinenumber of call instruction is: ",resZ[-1])
+    print("length is: ",len(resZ),"resZ is : " ,resZ, "\nlinenumber of call instruction is: ",resZ[-1])
 
 #ret instruction
 
