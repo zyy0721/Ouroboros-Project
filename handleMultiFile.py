@@ -168,6 +168,18 @@ def analysisLine(line):
                     if len(res2) == 30:
                         tmpSta.rightVal = res2[17]
                         tmpSta.secondType = res2[23].replace(")","")
+                    elif len(res2) == 32:
+                        tmpSta.rightVal = res2[17]
+                        tmpSta.secondType = res2[26].replace(")","")
+                    elif len(res2) == 33:
+                        tmpSta.rightVal = res2[17]
+                        tmpSta.secondType = res2[26].replace(")","")
+                    elif len(res2) == 36:
+                        tmpSta.rightVal = res2[17]
+                        tmpSta.secondType = res2[29].replace(")","")
+                    elif len(res2) == 42:
+                        tmpSta.rightVal = res2[17]
+                        tmpSta.secondType = res2[35].replace(")","")
                     else:
                         tmpSta.rightVal = res2[13]
                         tmpSta.secondType = res2[19].replace(")","") #index
@@ -454,8 +466,15 @@ def analysisLine(line):
             tmpSta.leftVal = res2[4]
             tmpSta.firstType = res2[3]
             if 'getelementptr' in res2:
-                tmpSta.rightVal = res2[12]
-                tmpSta.secondType = res2[18].replace(")","")#index
+                if len(res2) == 35:
+                    tmpSta.rightVal = res2[16]
+                    tmpSta.secondType = res2[28].replace(")","")
+                elif len(res2) == 41:
+                    tmpSta.rightVal = res2[16]
+                    tmpSta.secondType = res2[34].replace(")","")
+                else:
+                    tmpSta.rightVal = res2[12]
+                    tmpSta.secondType = res2[18].replace(")","")#index
             else:
                 tmpSta.rightVal = res2[7]
                 tmpSta.secondType = res2[6]
@@ -546,18 +565,31 @@ def analysisLine(line):
                 else:
                     if (tmpStament.leftVal == tmpSta.leftVal):
                         if tmpStament.secondType.isdigit():
-                            tmpStr = "assign: " + tmpSta.rightVal + " = " + tmpStament.rightVal + "." + tmpStament.secondType + tmpSta.linenumber + "\\l "
-                            tmp1 = tmpStament.rightVal + "." + tmpStament.secondType
-                            if tmp1 not in allPointer:
-                                allPointer.append(tmp1)
+                            if 'getelementptr' in res2:
+                                if tmpStament.rightVal != tmpSta.rightVal or tmpStament.secondType != tmpSta.secondType:
+                                    tmpStr = "assign: " + tmpSta.rightVal+"."+tmpSta.secondType + " = " + tmpStament.rightVal + "." + tmpStament.secondType + tmpSta.linenumber + "\\l "
+                                    tmp1 = tmpSta.rightVal + "." + tmpSta.secondType
+                                    tmp2 = tmpStament.rightVal + "." + tmpStament.secondType
+                                    if tmp1 not in allPointer:
+                                        allPointer.append(tmp1)
+                                    if tmp2 not in allPointer:
+                                        allPointer.append(tmp2)
+                                    return tmpStr
+                            else:
+                                tmpStr = "assign: " + tmpSta.rightVal + " = " + tmpStament.rightVal + "." + tmpStament.secondType + tmpSta.linenumber + "\\l "
+                                tmp1 = tmpStament.rightVal + "." + tmpStament.secondType
+                                if tmp1 not in allPointer:
+                                    allPointer.append(tmp1)
+                                if tmpSta.rightVal not in allPointer:
+                                    allPointer.append(tmpSta.rightVal)
+                                return tmpStr
                         else:
-                            tmpStr = "assign:" + ' ' + tmpSta.rightVal + " = " + tmpStament.rightVal + tmpSta.linenumber+"\\l "
+                            tmpStr = "assign: " + tmpSta.rightVal + " = " + tmpStament.rightVal + tmpSta.linenumber+"\\l "
                             if tmpStament.rightVal not in allPointer:
                                 allPointer.append(tmpStament.rightVal)
-                        if tmpSta.rightVal not in allPointer:
-                            allPointer.append(tmpSta.rightVal)
-
-                        return tmpStr
+                            if tmpSta.rightVal not in allPointer:
+                                allPointer.append(tmpSta.rightVal)
+                            return tmpStr
                     # *pptr = &n 的例子
                     if tmpStament.leftVal == tmpSta.rightVal:
                         if tmpSta.firstType != 'i8' and tmpSta.firstType != 'i32' and tmpSta.firstType != 'i64':

@@ -273,11 +273,24 @@ print("Statement Op is: ", tmpSta.Op,", leftVal is: ",tmpSta.leftVal,", firstTyp
 #strLine = "  call void @apr_table_addn(%struct.apr_table_t* %73, i8* getelementptr inbounds ([5 x i8], [5 x i8]* @.str.10.1625, i32 0, i32 0), i8* %call78), !dbg !514441"
 #strLine = "  call void @apr_table_addn(%struct.apr_table_t* %73, i8* getelementptr inbounds ([5 x i8], [5 x i8]* @.str.10.1625, i32 0, i32 0), i8* %call78), !dbg !514441"
 
-strLine = "  %1 = load volatile i32, i32* @got_int, align 4, !dbg !187006"
+#strLine = "  %1 = load volatile i32, i32* @got_int, align 4, !dbg !187006"
+#strLine = "  %7 = load i32, i32* getelementptr inbounds ([2 x %struct.spat], [2 x %struct.spat]* @spats, i64 0, i64 0, i32 3, i32 0), align 16, !dbg !386095"
+#strLine = "  %27 = load i8*, i8** getelementptr inbounds ([2 x %struct.spat], [2 x %struct.spat]* @spats, i64 0, i64 1, i32 0), align 8, !dbg !386174"
+#strLine = "  store i32 %8, i32* getelementptr inbounds ([2 x %struct.spat], [2 x %struct.spat]* @spats, i64 0, i64 0, i32 3, i32 0), align 16, !dbg !386100"
+#strLine = "  %144 = load i64, i64* getelementptr inbounds ([2 x %struct.spat], [2 x %struct.spat]* @spats, i64 0, i64 0, i32 3, i32 3), align 16, !dbg !386498"
+#strLine = "  %148 = load i64, i64* getelementptr inbounds ([2 x %struct.spat], [2 x %struct.spat]* @spats, i64 0, i64 0, i32 3, i32 3), align 16, !dbg !386526"
+#strLine = "  %26 = load i8*, i8** getelementptr inbounds ([2 x %struct.spat], [2 x %struct.spat]* @spats, i64 0, i64 0, i32 0), align 16, !dbg !386169"
+#strLine = "  %1 = load i8*, i8** getelementptr inbounds ([463 x %struct.vimoption], [463 x %struct.vimoption]* @options, i64 0, i64 0, i32 0), align 16, !dbg !306956"
+#strLine = "  %1 = load i64, i64* getelementptr inbounds ([81 x %struct.vimvar], [81 x %struct.vimvar]* @vimvars, i64 0, i64 0, i32 1, i32 0, i32 2, i32 0), align 8, !dbg !92990"
+#strLine = "  store i64 %2, i64* getelementptr inbounds ([81 x %struct.vimvar], [81 x %struct.vimvar]* @vimvars, i64 0, i64 0, i32 1, i32 0, i32 2, i32 0), align 8, !dbg !92994"
+strLine = "  store i64 %3, i64* getelementptr inbounds ([81 x %struct.vimvar], [81 x %struct.vimvar]* @vimvars, i64 0, i64 1, i32 1, i32 0, i32 2, i32 0), align 8, !dbg !92996"
 resZ = re.split(",| ",strLine)
 if '!dbg' in resZ:
     print("length is: ",len(resZ),"resZ is : " ,resZ, "\nlinenumber of call instruction is: ",resZ[-1])
-
+count11 = 0
+for item in resZ:
+    print("index ", count11, " is: ", item)
+    count11 += 1
 #ret instruction
 
 
