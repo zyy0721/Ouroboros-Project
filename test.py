@@ -283,7 +283,12 @@ print("Statement Op is: ", tmpSta.Op,", leftVal is: ",tmpSta.leftVal,", firstTyp
 #strLine = "  %1 = load i8*, i8** getelementptr inbounds ([463 x %struct.vimoption], [463 x %struct.vimoption]* @options, i64 0, i64 0, i32 0), align 16, !dbg !306956"
 #strLine = "  %1 = load i64, i64* getelementptr inbounds ([81 x %struct.vimvar], [81 x %struct.vimvar]* @vimvars, i64 0, i64 0, i32 1, i32 0, i32 2, i32 0), align 8, !dbg !92990"
 #strLine = "  store i64 %2, i64* getelementptr inbounds ([81 x %struct.vimvar], [81 x %struct.vimvar]* @vimvars, i64 0, i64 0, i32 1, i32 0, i32 2, i32 0), align 8, !dbg !92994"
-strLine = "  store i64 %3, i64* getelementptr inbounds ([81 x %struct.vimvar], [81 x %struct.vimvar]* @vimvars, i64 0, i64 1, i32 1, i32 0, i32 2, i32 0), align 8, !dbg !92996"
+#strLine = "  store i64 %3, i64* getelementptr inbounds ([81 x %struct.vimvar], [81 x %struct.vimvar]* @vimvars, i64 0, i64 1, i32 1, i32 0, i32 2, i32 0), align 8, !dbg !92996"
+#strLine ="  %next.gep = getelementptr [33 x i8], [33 x i8]* %buffer, i64 0, i64 %index"
+#strLine = "  %ind.end = getelementptr [33 x i8], [33 x i8]* %buffer, i64 0, i64 %n.vec, !dbg !979824"
+#strLine = "  %wide.load = load <16 x i8>, <16 x i8>* %32, align 16, !dbg !979824"
+#strLine = "  %114 = getelementptr inbounds [10 x [10 x i32*]], [10 x [10 x i32*]]* %14, i64 0, i64 %113"
+strLine = "  %114 = getelementptr inbounds [10 x [10 x i32*]], [10 x [10 x i32*]]* %14, i64 0, i64 %113, !dbg !979824"
 resZ = re.split(",| ",strLine)
 if '!dbg' in resZ:
     print("length is: ",len(resZ),"resZ is : " ,resZ, "\nlinenumber of call instruction is: ",resZ[-1])

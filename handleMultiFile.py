@@ -15,8 +15,9 @@ import time
 # fobj = open(newFilename, 'wb+')
 
 # 输出singleTon的结果txt文件
-singleTontxt = 'D:\Ouroboros\codes\Ouroboros-Project\\testfile\\vim\\res\singleTonResult.txt'
+#singleTontxt = 'D:\Ouroboros\codes\Ouroboros-Project\\testfile\\vim\\res\singleTonResult.txt'
 #singleTontxt = 'D:\Ouroboros\codes\Ouroboros-Project\\testfile\\httpd\debug\\res\singleTonResult.txt'
+singleTontxt = 'D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\toolkit\\res\singleTonResult.txt'
 fsT = open(singleTontxt, 'a+')
 
 # 用来存操作符的栈
@@ -184,8 +185,12 @@ def analysisLine(line):
                         tmpSta.rightVal = res2[13]
                         tmpSta.secondType = res2[19].replace(")","") #index
                 else:
-                    tmpSta.secondType = res2[7]
-                    tmpSta.rightVal = res2[8]
+                    if len(res2) == 19 and 'x' in res2:
+                        tmpSta.firstType = ""
+                        tmpSta.rightVal = res2[12]
+                    else:
+                        tmpSta.secondType = res2[7]
+                        tmpSta.rightVal = res2[8]
             if '!dbg' in res2:
                 tmpSta.linenumber = res2[-1]
             stackLV.append(tmpSta)
@@ -213,15 +218,26 @@ def analysisLine(line):
                     if len(res2) == 13:
                         tmpSta.secondType = res2[12]  # it means the index of a pointer variable in the struct object
             else:  # it means an array type
-                if len(res2) == 24:  # it means a two-dimensional array
-                    tmpSta.firstType = res2[10].replace(']', '')
-                    tmpSta.rightVal = res2[17]
-                    tmpSta.secondType = res2[23]
+                print('contains an array type: ',res2)
+                if '!dbg' in res2:
+                    if len(res2) == 22:
+                        tmpSta.rightVal = res2[12]
+                        tmpSta.secondType = res2[18]
+                        tmpSta.firstType = res2[7].replace(']','')
+                    if len(res2) == 27:
+                        tmpSta.rightVal = res2[17]
+                        tmpSta.secondType = res2[23]
+                        tmpSta.firstType = res2[10].replace(']','')
                 else:
-                    tmpSta.firstType = res2[8].replace(']',
-                                                       '')  # a key word to judge whether should go further calculation, only pointer type needed
-                    tmpSta.rightVal = res2[13]
-                    tmpSta.secondType = res2[19]
+                    if len(res2) == 19:
+                        tmpSta.rightVal = res2[12]
+                        tmpSta.secondType = res2[18]
+                        tmpSta.firstType = res2[7].replace(']','')
+                    if len(res2) == 24:  # it means a two-dimensional array
+                        tmpSta.firstType = res2[10].replace(']', '')
+                        tmpSta.rightVal = res2[17]
+                        tmpSta.secondType = res2[23]
+
             stackLV.append(tmpSta)
 
         # if a call function has return value
@@ -965,7 +981,8 @@ def analysisLine(line):
 
 
 #path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\httpd\debug\llvm8"
-path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\vim\llvm8"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\vim\llvm8"
+path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\toolkit\llvm8"
 files = os.listdir(path)
 count = 0
 for file in files:
