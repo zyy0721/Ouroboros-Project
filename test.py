@@ -48,7 +48,8 @@ print(stack[-1].Op)
 #strLine = "  call void @apr_table_addn(%struct.apr_table_t* %73, i8* getelementptr inbounds ([5 x i8], [5 x i8]* @.str.10.1625, i32 0, i32 0), i8* %call78)"
 #strLine = "  call void (i8*, i32, i32, i32, i32, %struct.request_rec.1168*, i8*, ...) bitcast (void (i8*, i32, i32, i32, i32, %struct.request_rec*, i8*, ...)* @ap_log_rerror_ to void (i8*, i32, i32, i32, i32, %struct.request_rec.1168*, i8*, ...)*)(i8* getelementptr inbounds ([19 x i8], [19 x i8]* @.str.7.2598, i32 0, i32 0), i32 539, i32 %cond89, i32 3, i32 %115, %struct.request_rec.1168* %116, i8* getelementptr inbounds ([51 x i8], [51 x i8]* @.str.8.2599, i32 0, i32 0), i64 %117, i64 %118, i64 %119), !dbg !91696"
 #strLine = "  call void bitcast (void (%struct.ap_filter_t*)* @ap_remove_output_filter to void (%struct.ap_filter_t.1169*)*)(%struct.ap_filter_t.1169* %46), !dbg !91557"
-strLine = "  %call = call i32 bitcast (i32 (%struct.ap_filter_t*, %struct.apr_bucket_brigade*)* @ap_pass_brigade to i32 (%struct.ap_filter_t.1169*, %struct.apr_bucket_brigade*)*)(%struct.ap_filter_t.1169* %48, %struct.apr_bucket_brigade* %49), !dbg !91561"
+#strLine = "  %call = call i32 bitcast (i32 (%struct.ap_filter_t*, %struct.apr_bucket_brigade*)* @ap_pass_brigade to i32 (%struct.ap_filter_t.1169*, %struct.apr_bucket_brigade*)*)(%struct.ap_filter_t.1169* %48, %struct.apr_bucket_brigade* %49), !dbg !91561"
+strLine = "  %call = call i32 @apr_file_open_stdout(%struct.apr_file_t** %out, %struct.apr_pool_t* %0), !dbg !60008"
     #for i in range(len(res2)):
     #    print(count4,res2[i])
 

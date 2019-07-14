@@ -17,7 +17,9 @@ import time
 # 输出singleTon的结果txt文件
 #singleTontxt = 'D:\Ouroboros\codes\Ouroboros-Project\\testfile\\vim\\res\singleTonResult.txt'
 #singleTontxt = 'D:\Ouroboros\codes\Ouroboros-Project\\testfile\\httpd\debug\\res\singleTonResult.txt'
-singleTontxt = 'D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\toolkit\\res\singleTonResult.txt'
+#singleTontxt = 'D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\toolkit\\res\singleTonResult.txt'
+singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\certs\\res\singleTonResult.txt"
+
 fsT = open(singleTontxt, 'a+')
 
 # 用来存操作符的栈
@@ -365,11 +367,16 @@ def analysisLine(line):
                                     print("here size is 111111111111111111111111111")
                                     break  # 写完最后一个实参 要break掉
                         else:
-                            tmpStr += actualParaToWrite + ")" +tmpSta.linenumber+ "\\l "
-                            print("the whole tmpStr3333 is ", tmpStr)
-                            print(tmpStr)
-                            print("here size is 111111111111111111111111111")
-                            break  # 写完最后一个实参 要break掉
+                            if sizeOfFunctionPara == 1:
+                                tmpStr += actualParaToWrite + ")" +tmpSta.linenumber+ "\\l "
+                                print("the whole tmpStr3333 is ", tmpStr)
+                                print(tmpStr)
+                                print("here size is 111111111111111111111111111")
+                                break  # 写完最后一个实参 要break掉
+                            else:
+                                tmpStr += actualParaToWrite + ","
+                                sizeOfFunctionPara = sizeOfFunctionPara - 1 #这条好像没用
+                                break
                     else:
                         if len(stackLV) != 0:
                             stackLV.pop()
@@ -982,7 +989,8 @@ def analysisLine(line):
 
 #path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\httpd\debug\llvm8"
 #path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\vim\llvm8"
-path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\toolkit\llvm8"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\toolkit\llvm8"
+path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\certs\llvm8"
 files = os.listdir(path)
 count = 0
 for file in files:
