@@ -289,7 +289,8 @@ print("Statement Op is: ", tmpSta.Op,", leftVal is: ",tmpSta.leftVal,", firstTyp
 #strLine = "  %ind.end = getelementptr [33 x i8], [33 x i8]* %buffer, i64 0, i64 %n.vec, !dbg !979824"
 #strLine = "  %wide.load = load <16 x i8>, <16 x i8>* %32, align 16, !dbg !979824"
 #strLine = "  %114 = getelementptr inbounds [10 x [10 x i32*]], [10 x [10 x i32*]]* %14, i64 0, i64 %113"
-strLine = "  %114 = getelementptr inbounds [10 x [10 x i32*]], [10 x [10 x i32*]]* %14, i64 0, i64 %113, !dbg !979824"
+#strLine = "  %114 = getelementptr inbounds [10 x [10 x i32*]], [10 x [10 x i32*]]* %14, i64 0, i64 %113, !dbg !979824"
+strLine = "  store i8** %call, i8*** %note, align 8, !dbg !47439"
 resZ = re.split(",| ",strLine)
 if '!dbg' in resZ:
     print("length is: ",len(resZ),"resZ is : " ,resZ, "\nlinenumber of call instruction is: ",resZ[-1])
@@ -349,3 +350,6 @@ if '.addr' in str1:
     if tmpSta_leftVal.isdigit():
         print("maybe this case: store i32 * % retval1, i32 ** % retval.addr, do nothing")
 
+left = "%struct.walk_cache_t*"
+if '*' in left:
+    print("oh yes")

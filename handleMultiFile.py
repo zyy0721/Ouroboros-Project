@@ -16,9 +16,9 @@ import time
 
 # 输出singleTon的结果txt文件
 #singleTontxt = 'D:\Ouroboros\codes\Ouroboros-Project\\testfile\\vim\\res\singleTonResult.txt'
-#singleTontxt = 'D:\Ouroboros\codes\Ouroboros-Project\\testfile\\httpd\debug\\res\singleTonResult.txt'
+singleTontxt = 'D:\Ouroboros\codes\Ouroboros-Project\\testfile\\httpd\debug\\res\singleTonResult.txt'
 #singleTontxt = 'D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\toolkit\\res\singleTonResult.txt'
-singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\certs\\res\singleTonResult.txt"
+#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\certs\\res\singleTonResult.txt"
 
 fsT = open(singleTontxt, 'a+')
 
@@ -261,6 +261,7 @@ def analysisLine(line):
             # 获取函数的形参列表
             funformalPara.clear()
             getFunctionPara(line)
+            arrayIndex = -1 #数组或者是struct的下标，初始化为-1，且在每一次写完actualParaToWrite之后都应该赋值为-1
             print("after getFunctionPara~~~~~~~~~~~~~~")
             if '...' in line:
                 print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
@@ -321,25 +322,38 @@ def analysisLine(line):
                                 continue
 
                         if sizeOfFunctionPara == 1:
-                            tmpStr += actualParaToWrite + ")" +tmpSta.linenumber+ "\\l "
-                            print("the whole tmpStr1111 is ", tmpStr)
-                            print("here size is 111111111111111111111111111")
-                            break  # 写完最后一个实参 要break掉
+                            if arrayIndex == -1:
+                                tmpStr += actualParaToWrite + ")" +tmpSta.linenumber+ "\\l "
+                                break  # 写完最后一个实参 要break掉
+                            else:
+                                tmpStr += actualParaToWrite+"."+arrayIndex + ")" +tmpSta.linenumber+ "\\l "
+                                arrayIndex = -1
+                                break  # 写完最后一个实参 要break掉
                         else:
-                            tmpStr += actualParaToWrite + ","
-                            print("in call inst tmp tmpStr is ", tmpStr)
-                            sizeOfFunctionPara = sizeOfFunctionPara - 1
-                            actualParaToWrite = ""
-                            continue
+                            if arrayIndex == -1:
+                                tmpStr += actualParaToWrite + ","
+                                sizeOfFunctionPara = sizeOfFunctionPara - 1
+                                actualParaToWrite = ""
+                                continue
+                            else:
+                                tmpStr += actualParaToWrite+"."+arrayIndex + ","
+                                sizeOfFunctionPara = sizeOfFunctionPara - 1
+                                actualParaToWrite = ""
+                                arrayIndex = -1
+                                continue
 
                     elif len(actualParaToWrite) != 0 and actualParaToWrite == tmpStament1.leftVal:
                         # 如果代写的实参不空但是为当前指令的左操作数，需要把代写实参重新赋值
                         actualParaToWrite = tmpStament1.rightVal
-                        print("actToDW not null ,and is ", actualParaToWrite)
+                        if tmpStament1.Op == 'getelementptr':
+                            arrayIndex = tmpStament1.secondType
                         if len(stackLV) == 1:
                             # 如果只剩当前的这个条语句了，也是要写
-                            tmpStr += actualParaToWrite + ")" +tmpSta.linenumber+ "\\l "
-                            print("here size is 11222222NULL", tmpStr)
+                            if arrayIndex == -1:
+                                tmpStr += actualParaToWrite + ")" +tmpSta.linenumber+ "\\l "
+                            else:
+                                tmpStr += actualParaToWrite+"."+arrayIndex + ")" + tmpSta.linenumber + "\\l "
+                                arrayIndex = -1
                         stackLV.pop()
                         continue
 
@@ -347,7 +361,8 @@ def analysisLine(line):
                         # 如果当前指令的左操作数在形参列表中出现
                         # 就把当前指令的右操作数 用作实参
                         actualParaToWrite = tmpStament1.rightVal
-                        print("leftval in funformalPara and the actParaToW is ", actualParaToWrite)
+                        if tmpStament1.Op == 'getelementptr':
+                            arrayIndex = tmpStament1.secondType
                         #删去已经匹配上的形参
                         funformalPara.remove(tmpStament1.leftVal)
                         # 并且pop掉当前的指令
@@ -357,26 +372,36 @@ def analysisLine(line):
                             tmpStament2 = stackLV[-1]
                             if tmpStament2.leftVal == actualParaToWrite:
                                 # 相等，说明还可以回溯
-                                print("should be continue")
                                 continue
                             else:
                                 if sizeOfFunctionPara == 1:
-                                    tmpStr += actualParaToWrite + ")" +tmpSta.linenumber+ "\\l "
-                                    print("the whole tmpStr22222 is ", tmpStr)
-                                    print(tmpStr)
-                                    print("here size is 111111111111111111111111111")
-                                    break  # 写完最后一个实参 要break掉
+                                    if arrayIndex == -1:
+                                        tmpStr += actualParaToWrite + ")" +tmpSta.linenumber+ "\\l "
+                                        break  # 写完最后一个实参 要break掉
+                                    else:
+                                        tmpStr += actualParaToWrite+"."+arrayIndex + ")" + tmpSta.linenumber + "\\l "
+                                        arrayIndex = -1
+                                        break  # 写完最后一个实参 要break掉
                         else:
                             if sizeOfFunctionPara == 1:
-                                tmpStr += actualParaToWrite + ")" +tmpSta.linenumber+ "\\l "
-                                print("the whole tmpStr3333 is ", tmpStr)
-                                print(tmpStr)
-                                print("here size is 111111111111111111111111111")
-                                break  # 写完最后一个实参 要break掉
+                                if arrayIndex == -1:
+                                    tmpStr += actualParaToWrite + ")" +tmpSta.linenumber+ "\\l "
+                                    break  # 写完最后一个实参 要break掉
+                                else:
+                                    tmpStr += actualParaToWrite+"."+arrayIndex + ")" + tmpSta.linenumber + "\\l "
+                                    arrayIndex = -1
+                                    break  # 写完最后一个实参 要break掉
                             else:
-                                tmpStr += actualParaToWrite + ","
-                                sizeOfFunctionPara = sizeOfFunctionPara - 1 #这条好像没用
-                                break
+                                if arrayIndex == -1:
+                                    tmpStr += actualParaToWrite + ","
+                                    sizeOfFunctionPara = sizeOfFunctionPara - 1 #这条好像没用
+                                    break
+                                else:
+                                    tmpStr += actualParaToWrite+"."+arrayIndex + ","
+                                    sizeOfFunctionPara = sizeOfFunctionPara - 1 #这条好像没用
+                                    arrayIndex = -1
+                                    break
+
                     else:
                         if len(stackLV) != 0:
                             stackLV.pop()
@@ -462,11 +487,39 @@ def analysisLine(line):
                     if len(stackLV) >= 1:
                         tmpStament1 = stackLV.pop()
                         if tmpStament1.leftVal == tmpSta.leftVal:
-                            if tmpStament1.secondType.isdigit():
-                                tmpStr = "cmp: "+ tmpStament1.rightVal+ "."+ tmpStament1.secondType + tmpSta.linenumber+"\\l "
+                            if len(stackLV) >= 1:
+                                '''
+                                会存在这种例子
+                                    %8 = load %struct.ap_directive_t**, %struct.ap_directive_t*** %last_ptr, align 8, !dbg !59334
+                                    %9 = load %struct.ap_directive_t*, %struct.ap_directive_t** %8, align 8, !dbg !59335
+                                    %tobool3 = icmp ne %struct.ap_directive_t* %9, null, !dbg !59335
+                                '''
+                                tmpStament2 = stackLV.pop()
+                                if tmpStament2.leftVal == tmpStament1.rightVal :
+                                    if len(stackLV) >= 1:
+                                        '''
+                                        会存在这种情况
+                                            %12 = load %struct.ap_directive_t*, %struct.ap_directive_t** %current, align 8, !dbg !59343
+                                            %next = getelementptr inbounds %struct.ap_directive_t, %struct.ap_directive_t* %12, i32 0, i32 2, !dbg !59344
+                                            %13 = load %struct.ap_directive_t*, %struct.ap_directive_t** %next, align 8, !dbg !59344
+                                            %tobool6 = icmp ne %struct.ap_directive_t* %13, null, !dbg !59342
+                                        '''
+                                        tmpStament3 = stackLV.pop()
+                                        if tmpStament3.leftVal == tmpStament2.rightVal :
+                                            if tmpStament2.secondType.isdigit():
+                                                tmpStr = "cmp: " + tmpStament3.rightVal + "." + tmpStament2.secondType + tmpSta.linenumber + "\\l "
+                                            else:
+                                                tmpStr = "cmp: " + tmpStament3.rightVal + tmpSta.linenumber + "\\l "
+                                            return tmpStr
+                                    else:
+                                            tmpStr = "cmp: " + "*" + tmpStament2.rightVal + tmpSta.linenumber + "\\l "
+                                            return tmpStr
                             else:
-                                tmpStr = "cmp: " + tmpStament1.rightVal + tmpSta.linenumber + "\\l "
-                            return tmpStr
+                                if tmpStament1.secondType.isdigit():
+                                    tmpStr = "cmp: "+ tmpStament1.rightVal+ "."+ tmpStament1.secondType + tmpSta.linenumber+"\\l "
+                                else:
+                                    tmpStr = "cmp: " + tmpStament1.rightVal + tmpSta.linenumber + "\\l "
+                                return tmpStr
 
         #bitcast instruction
         if (len(res2) >=5 and res2[4] == 'bitcast'):
@@ -507,7 +560,7 @@ def analysisLine(line):
             # if there is no 'load' keyword
             if (len(stackLV) == 0):
                 # judge whether it is an alloca statement or not
-                if (tmpSta.firstType == 'i32*' or tmpSta.firstType == 'i32**'):
+                if ( '*' in tmpSta.firstType): #说明是跟pointer相关
                     tmpLeftVal = tmpSta.leftVal + ".addr"
 
                     if '.addr' in tmpSta.rightVal:
@@ -653,6 +706,16 @@ def analysisLine(line):
                                 if tmpPointer1 not in allPointer:
                                     allPointer.append(tmpPointer1)
                                 return tmpStr
+                        #last_ptr = &(current->last);
+                        if tmpStament1.leftVal == tmpStament2.rightVal and tmpStament2.leftVal == tmpSta.leftVal:
+                            tmpStr = "alloca: " + tmpSta.rightVal + " = " + tmpStament1.rightVal + "." + tmpStament2.secondType + tmpSta.linenumber + "\\l "
+                            tmp1 = tmpSta.rightVal
+                            tmp2 = tmpStament1.rightVal + "." + tmpStament2.secondType
+                            if tmp1 not in allPointer:
+                                allPointer.append(tmp1)
+                            if tmp2 not in addressTaken:
+                                addressTaken.append(tmp2)
+                            return tmpStr
                 elif tmpStament1.Op == 'getelementptr':
                     if tmpStament1.firstType != 'i32':
                         if (tmpStament1.leftVal == tmpStament2.rightVal and tmpStament2.leftVal == tmpSta.leftVal):
@@ -815,6 +878,7 @@ def analysisLine(line):
             # 获取函数的形参列表
             getFunctionPara(line)
             actualParaToWrite = ""  # 待写的实参
+            arrayIndex = -1 #struct或者数组的下标，初始化为-1，写完一个actualParaToWrite，也同时要将其设置为-1
             if '...' in line:
                 line1 = line.split("...")[-1].replace(") ", "")
                 print(line1)
@@ -854,7 +918,6 @@ def analysisLine(line):
                     # 在调用该函数处时，输出 传入该函数的实参 实现：
                     while (len(stackLV) != 0):
                         tmpStament1 = stackLV[-1]
-                        print("in void call leftval is ", tmpStament1.leftVal, " actTodoWrite is ", actualParaToWrite)
                         # 如果每次进来 代写实参不是空的且不是当前指令的左操作数
                         if len(actualParaToWrite) != 0 and actualParaToWrite != tmpStament1.leftVal:
                             if len(stackLV) >= 2:
@@ -870,24 +933,41 @@ def analysisLine(line):
                                     stackLV.pop()
                                     continue
 
-
                             if sizeOfFunctionPara == 1:
-                                tmpStr += actualParaToWrite + ")" + tmpSta.linenumber+"\\l "
-                                print(tmpStr)
-                                print("here size is 111111111111111111111111111NULL")
-                                break  # 写完最后一个实参 要break掉
+                                if arrayIndex == -1:
+                                    tmpStr += actualParaToWrite + ")" + tmpSta.linenumber+"\\l "
+                                    print(tmpStr)
+                                    break  # 写完最后一个实参 要break掉
+                                else:
+                                    tmpStr += actualParaToWrite+"."+arrayIndex + ")" + tmpSta.linenumber+"\\l "
+                                    arrayIndex = -1
+                                    break
                             else:
-                                tmpStr += actualParaToWrite + ","
-                                sizeOfFunctionPara = sizeOfFunctionPara - 1
-                                actualParaToWrite = ""
-                                continue
+                                if arrayIndex == -1:
+                                    tmpStr += actualParaToWrite + ","
+                                    sizeOfFunctionPara = sizeOfFunctionPara - 1
+                                    actualParaToWrite = ""
+                                    continue
+                                else:
+                                    tmpStr += actualParaToWrite+"."+arrayIndex + ","
+                                    sizeOfFunctionPara = sizeOfFunctionPara - 1
+                                    actualParaToWrite = ""
+                                    arrayIndex = -1
+                                    continue
+
                         elif len(actualParaToWrite) != 0 and actualParaToWrite == tmpStament1.leftVal:
                             # 如果代写的实参不空但是为当前指令的左操作数，需要把代写实参重新赋值
                             actualParaToWrite = tmpStament1.rightVal
+                            if tmpStament1.Op == 'getelementptr' :
+                                arrayIndex = tmpStament1.secondType
+
                             if len(stackLV) == 1:
                                 #如果只剩当前的这个条语句了，也是要写
-                                tmpStr += actualParaToWrite + ")" + tmpSta.linenumber+"\\l "
-                                print("here size is 11222222NULL",tmpStr)
+                                if arrayIndex == -1:
+                                    tmpStr += actualParaToWrite + ")" + tmpSta.linenumber+"\\l "
+                                else:
+                                    tmpStr += actualParaToWrite+"."+arrayIndex + ")" + tmpSta.linenumber+"\\l "
+                                    arrayIndex = -1
                             stackLV.pop()
                             continue
 
@@ -895,6 +975,8 @@ def analysisLine(line):
                             # 如果当前指令的左操作数在形参列表中出现
                             # 就把当前指令的右操作数 用作实参
                             actualParaToWrite = tmpStament1.rightVal
+                            if tmpStament1.Op == 'getelementptr':
+                                arrayIndex = tmpStament1.secondType
                             #删除掉已经匹配上的形参
                             funformalPara.remove(tmpStament1.leftVal)
                             # 并且pop掉当前的指令
@@ -905,17 +987,28 @@ def analysisLine(line):
                                     continue
                                 else:
                                     if sizeOfFunctionPara == 1:
-                                        tmpStr += actualParaToWrite + ")" + tmpSta.linenumber+"\\l "
-                                        print("here size is 111111333NULL",tmpStr)
-                                        break
+                                        if arrayIndex == -1:
+                                            tmpStr += actualParaToWrite + ")" + tmpSta.linenumber+"\\l "
+                                            break
+                                        else:
+                                            tmpStr += actualParaToWrite+"."+arrayIndex + ")" + tmpSta.linenumber+"\\l "
+                                            arrayIndex = -1
+                                            break
                             else:
                                 if sizeOfFunctionPara != 1:#如果已经把最后的一条load 指令pop掉，且只剩一个实际要写的实参，但是由于存在形参里有%call的变量存在，
                                     #所以需要额外判断一下是不是只剩一个形参要写，如果不是
-                                    tmpStr += actualParaToWrite + ","
+                                    if arrayIndex == -1:
+                                        tmpStr += actualParaToWrite + ","
+                                    else:
+                                        tmpStr += actualParaToWrite + "." + arrayIndex+","
+                                        arrayIndex = -1
                                 else:#如果是
-                                    tmpStr += actualParaToWrite + ")" + tmpSta.linenumber+"\\l "
-                                print(tmpStr)
-                                print("here size is 111111111111111111111111111NULL2")
+                                    if arrayIndex == -1:
+                                        tmpStr += actualParaToWrite + ")" + tmpSta.linenumber+"\\l "
+                                    else:
+                                        tmpStr += actualParaToWrite+"."+arrayIndex + ")" + tmpSta.linenumber + "\\l "
+                                        arrayIndex = -1
+
                                 break  # 写完最后一个实参 要break掉
                         else:
                             if len(stackLV) != 0:
@@ -987,10 +1080,10 @@ def analysisLine(line):
                             return tmpStr
 
 
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\httpd\debug\llvm8"
+path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\httpd\debug\llvm8"
 #path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\vim\llvm8"
 #path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\toolkit\llvm8"
-path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\certs\llvm8"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\certs\llvm8"
 files = os.listdir(path)
 count = 0
 for file in files:
