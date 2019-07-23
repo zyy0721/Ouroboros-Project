@@ -1,85 +1,24 @@
+#！/usr/bin/env python
+#!-*-coding:utf-8 -*-
+#!@Create :2019/7/18 15:03
+#!@Author : zyy
+#!@File   : handleMultiFileForHttpd&Vim.py
+'''
 # ！/usr/bin/env python
 # !-*-coding:utf-8 -*-
 # !@Create :2019/6/17 21:00
 # !@Author : zyy
 # !@File   : handleMultiFile.py
+'''
 import os
 import re
 import time
 
-# 输入的dot文件
-# filename = 'llvm8/testEx1fun3.dot'
-
-# 输出想要的dot文件
-# newFilename = 'llvm8/testEx1fun3test.dot'
-# fobj = open(newFilename, 'wb+')
-
 # 输出singleTon的结果txt文件
-singleTontxt = 'D:\Ouroboros\codes\Ouroboros-Project\\testfile\\vim\\res\singleTonResult.txt'
-#singleTontxt = 'D:\Ouroboros\codes\Ouroboros-Project\\testfile\\httpd\debug\\res\singleTonResult.txt'
-
-#linux
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\arch\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\block\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\certs\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\crypto\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\fs\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\init\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\ipc\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\kernel\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\lib\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\mm\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\net\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\security\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\sound\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\virt\\res\singleTonResult.txt"
-
-#drivers
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\acpi\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\ata\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\atm\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\auxdisplay\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\base\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\bcma\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\block\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\bluetooth\\res\singleTonResult.txt"
+#singleTontxt = 'D:\Ouroboros\codes\Ouroboros-Project\\testfile\\vim\\res\singleTonResult.txt'
+singleTontxt = 'D:\Ouroboros\codes\Ouroboros-Project\\testfile\\httpd\debug\\res\singleTonResult.txt'
 #singleTontxt = 'D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\toolkit\\res\singleTonResult.txt'
-
-
-#####firefox
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\accessiable\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\browser\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\buildunix\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\config\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\db_xpfe_hal\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\devtools\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\docshell\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\dom\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\editor\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\firefox\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\gfx\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\image\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\intl\\res\singleTonResult.txt"
-singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\ipc\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\js\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\layout\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\media\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\memory\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\mfbt\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\modules\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\mozglue\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\network\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\oth_license\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\parser\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\security\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\startupcache_chrome\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\storage\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\third_party\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\toolkit\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\uri_caps\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\widget\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\x86_64_unknown\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\xpcom\\res\singleTonResult.txt"
+#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\certs\\res\singleTonResult.txt"
 
 fsT = open(singleTontxt, 'a+')
 
@@ -131,7 +70,7 @@ def getFunctionPara(line):
             resz = re.split(" ", item2)
             print("~~~~resz is ", resz)
             if len(resz) == 2:
-                if ('%' in resz[1] or '@' in resz[1]) and '*' not in resz[1]:
+                if ('%' in resz[1] or '@' in resz[1]):
                     print("1111", resz[1])
                     if '%cond' not in resz[1] and '%conv' not in resz[1]:
                         funformalPara.append(resz[1])
@@ -142,7 +81,7 @@ def getFunctionPara(line):
                         funformalPara.append(resz[2])
                         print("~~~~~~~~~~~~~~the formalPara is ", resz[2])
             if len(resz) == 4:
-                if resz[2] == 'zeroext' or resz[2] == 'signext' or resz[2] == 'nonnull':
+                if resz[2] == 'zeroext' or resz[2] == 'signext':
                     if '%cond' not in resz[3] and '%conv' not in resz[3]:
                         funformalPara.append(resz[3])
     '''
@@ -167,7 +106,6 @@ def getFunctionPara(line):
                 else:
                     print(res2[2])
                     funformalPara.append(res2[2])
-
     '''
     print("funciton formalPara is :")
     for item in funformalPara:
@@ -195,23 +133,17 @@ def analysisLine(line):
             tmpSta.Op = 'alloca'
             # 把所有的alloca变量加入singleTon中
             singleTon.append(tmpSta.leftVal)
-            if 'i32]' in res2 or 'i32*]' in res2 or 'i32**]' in res2 or 'i8]' in res2 or 'i8*]' in res2 or 'i8**]' in res2 or 'i64]' in res2 or 'i64*]' in res2 or 'i64**]' in res2 or 'i16**]' in res2 or 'i16*]' in res2 or 'i16]' in res2 or (len(res2) >=8 and']' in res2[7]):
-                if '}>' in res2 and 'x' in res2:
-                    tmpSta.firstType = res2[10].replace(']','')
-                else:
-                    tmpSta.firstType = res2[7].replace(']', '')
+            if 'i32]' in res2 or 'i32*]' in res2 or 'i32**]' in res2 or 'i8]' in res2:
+                tmpSta.firstType = res2[7].replace(']', '')
             else:
-                if '}>' in res2 or '<{' in res2:
-                    tmpSta.firstType = res2[6]
-                else:
-                    tmpSta.firstType = res2[5]
+                tmpSta.firstType = res2[5]
             # 如果有addr属性 说明是形参
             if 'addr' in tmpSta.leftVal:
                 if tmpSta.leftVal not in FormalParameter:
                     FormalParameter.append(tmpSta.leftVal)
 
             # skip int type variable 跳过int类型的变量
-            if tmpSta.firstType != 'i32' and tmpSta.firstType != 'i8' and tmpSta.firstType != 'i64' and tmpSta.firstType != 'i16':
+            if tmpSta.firstType != 'i32' and tmpSta.firstType != 'i8':
                 tmpStr = "alloca:" + tmpSta.firstType + " " + tmpSta.leftVal + "\\l "
                 allPointer.append(tmpSta.leftVal)
                 return tmpStr
@@ -241,28 +173,18 @@ def analysisLine(line):
                     elif len(res2) == 32:
                         tmpSta.rightVal = res2[17]
                         tmpSta.secondType = res2[26].replace(")","")
-                        if len(tmpSta.rightVal) == 0 and len(tmpSta.secondType) == 0:
-                            tmpSta.rightVal = res2[13]
-                            tmpSta.secondType = res2[25].replace(")","")
                     elif len(res2) == 33:
                         tmpSta.rightVal = res2[17]
                         tmpSta.secondType = res2[26].replace(")","")
                     elif len(res2) == 36:
                         tmpSta.rightVal = res2[17]
                         tmpSta.secondType = res2[29].replace(")","")
-                    elif len(res2) == 37:
-                        tmpSta.rightVal = res2[21]
-                        tmpSta.secondType = res2[30].replace(")","")
                     elif len(res2) == 42:
                         tmpSta.rightVal = res2[17]
                         tmpSta.secondType = res2[35].replace(")","")
                     else:
                         tmpSta.rightVal = res2[13]
                         tmpSta.secondType = res2[19].replace(")","") #index
-                elif 'bitcast' in res2:
-                    if len(res2) == 19:
-                        tmpSta.rightVal = res2[10]
-                        tmpSta.secondType = res2[7]
                 else:
                     if len(res2) == 19 and 'x' in res2:
                         tmpSta.firstType = ""
@@ -285,49 +207,12 @@ def analysisLine(line):
                 tmpSta.rightVal = res2[9]
                 tmpSta.firstType = res2[6]
                 if '!dbg' in res2:
-                    if len(res2) == 15:
-                        tmpSta.secondType = res2[11]
-                        tmpSta.linenumber = res2[-1]
-                        tmpSta.rightVal = res2[8]
-                        tmpSta.firstType = res2[5]
-                    if len(res2) == 18:#需要注意下，其实是有没有inbounds这个关键字的区别，如果后续遇到相同长度的情况的话，可以加以区分
-                        tmpSta.rightVal = res2[8]
-                        tmpSta.firstType = res2[5]
-                        tmpSta.secondType = res2[14]
-                        tmpSta.linenumber = res2[-1]
                     if len(res2) == 19:
                         tmpSta.secondType = res2[15]  # it means the index of a pointer variable in the struct object
                         tmpSta.linenumber = res2[-1]
                     if len(res2) == 16:
                         tmpSta.secondType = res2[12]  # it means the index of a pointer variable in the struct object
                         tmpSta.linenumber = res2[-1]
-                    if len(res2) == 21:
-                        tmpSta.rightVal = res2[8]
-                        tmpSta.firstType = res2[5]
-                        if tmpSta.firstType == 'inbounds':
-                            tmpSta.firstType = res2[6]
-                            tmpSta.rightVal = res2[11]
-                        tmpSta.secondType = res2[17]
-                        tmpSta.linenumber = res2[-1]
-                    if len(res2) == 22:
-                        tmpSta.secondType = res2[18]
-                        tmpSta.linenumber = res2[-1]
-                    if len(res2) == 25:
-                        tmpSta.secondType = res2[21]
-                        tmpSta.linenumber = res2[-1]
-                    if len(res2) ==27:
-                        tmpSta.rightVal = res2[11]
-                        tmpSta.secondType = res2[23]
-                        tmpSta.linenumber = res2[-1]
-                    if len(res2) == 28:
-                        tmpSta.secondType = res2[24]
-                        tmpSta.linenumber = res2[-1]
-                    if len(res2) == 31:
-                        if '<{' in res2:
-                            tmpSta.rightVal = res2[21]
-                            tmpSta.firstType = res2[7]
-                            tmpSta.secondType = res2[27]
-                            tmpSta.linenumber = res2[-1]
                 else:
                     if len(res2) == 16:
                         tmpSta.secondType = res2[15]  # it means the index of a pointer variable in the struct object
@@ -340,32 +225,10 @@ def analysisLine(line):
                         tmpSta.rightVal = res2[12]
                         tmpSta.secondType = res2[18]
                         tmpSta.firstType = res2[7].replace(']','')
-                    if len(res2) == 23:
-                        tmpSta.rightVal = res2[13]
-                        tmpSta.secondType = res2[19]
-                        tmpSta.firstType = res2[8].replace(']','')
-                    if len(res2) == 25:
-                        tmpSta.rightVal = res2[12]
-                        tmpSta.secondType = res2[18]
-                        tmpSta.firstType = res2[7].replace(']','')
                     if len(res2) == 27:
                         tmpSta.rightVal = res2[17]
                         tmpSta.secondType = res2[23]
                         tmpSta.firstType = res2[10].replace(']','')
-                    if len(res2) == 29:
-                        tmpSta.rightVal = res2[16]
-                        tmpSta.secondType = res2[22]
-                        tmpSta.firstType = res2[9].replace(']','')
-                    if len(res2) == 30:
-                        tmpSta.rightVal = res2[17]
-                        tmpSta.secondType = res2[26]
-                        tmpSta.firstType = res2[10].replace(']','')
-                    if len(res2) == 42:
-                        if 'bitcast' in res2:
-                            tmpSta.rightVal = res2[27]
-                            tmpSta.secondType = res2[38]
-                            tmpSta.firstType = res2[8]
-
                 else:
                     if len(res2) == 19:
                         tmpSta.rightVal = res2[12]
@@ -375,11 +238,6 @@ def analysisLine(line):
                         tmpSta.firstType = res2[10].replace(']', '')
                         tmpSta.rightVal = res2[17]
                         tmpSta.secondType = res2[23]
-                    if len(res2) == 28:
-                        if '<{' in res2 or '}>' in res2:
-                            tmpSta.rightVal = res2[21]
-                            tmpSta.secondType = res2[27]
-                            tmpSta.firstType = res2[7]
 
             stackLV.append(tmpSta)
 
@@ -392,30 +250,12 @@ def analysisLine(line):
                 tmpSta.firstType = res2[6]
                 funcName = res2[7].split('(')
                 tmpSta.secondType = funcName[0]
-            elif res2[5] == 'noalias':
-                tmpSta.firstType = res2[6]
-                funcName = res2[7].split('(')
-                tmpSta.secondType = funcName[0]
-            elif '[' in res2[5]:
-                tmpSta.firstType = res2[7].replace(']','')
-                funcName = res2[8].split('(')
-                tmpSta.secondType = funcName[0]
             else:
                 tmpSta.firstType = res2[5]  # return type of function
                 funcName = res2[6].split('(')
                 tmpSta.secondType = funcName[0]  # functionName
             if '!dbg' in res2:
                 tmpSta.linenumber = res2[-1]
-
-            #如果asm在call函数中，不处理
-            if 'asm' in res2:
-                tmpStr = ""
-                return tmpStr
-
-            #如果一些奇怪的llvm的内在函数出现的话，直接无视掉
-            if '@llvm.umul.with.overflow' in line:
-                tmpStr = ""
-                return tmpStr
             pppfunctionName=""
             # 获取函数的形参列表
             funformalPara.clear()
@@ -453,7 +293,6 @@ def analysisLine(line):
             print("~~~~~funciton formalPara is :")
             for item in funformalPara:
                 print("in call block~", item)
-
 
             if sizeOfFunctionPara == 0:
                 tmpStr += ")" +tmpSta.linenumber+ "\\l "
@@ -505,7 +344,7 @@ def analysisLine(line):
                     elif len(actualParaToWrite) != 0 and actualParaToWrite == tmpStament1.leftVal:
                         # 如果代写的实参不空但是为当前指令的左操作数，需要把代写实参重新赋值
                         actualParaToWrite = tmpStament1.rightVal
-                        if tmpStament1.Op == 'getelementptr' or (tmpStament1.Op == 'load' and tmpStament1.secondType.isdigit()):
+                        if tmpStament1.Op == 'getelementptr':
                             arrayIndex = tmpStament1.secondType
                         if len(stackLV) == 1:
                             # 如果只剩当前的这个条语句了，也是要写
@@ -521,7 +360,7 @@ def analysisLine(line):
                         # 如果当前指令的左操作数在形参列表中出现
                         # 就把当前指令的右操作数 用作实参
                         actualParaToWrite = tmpStament1.rightVal
-                        if tmpStament1.Op == 'getelementptr' or (tmpStament1.Op == 'load' and tmpStament1.secondType.isdigit()):
+                        if tmpStament1.Op == 'getelementptr':
                             arrayIndex = tmpStament1.secondType
                         #删去已经匹配上的形参
                         funformalPara.remove(tmpStament1.leftVal)
@@ -591,14 +430,12 @@ def analysisLine(line):
                                     tmpStr += "*"+stackLV[i].rightVal+", "
                                     flag = 1
                                     break
-
                             if flag == 0:#只对非特例处理
                                 if i == 0:#刚开始要写
                                     tmpStr += stackLV[i].rightVal + ", "
                                 if i >= 1:#0之后，把中间过程的语句省略掉
                                     if stackLV[i].rightVal != stackLV[i-1].leftVal:
                                         tmpStr += stackLV[i].rightVal + ", "
-
                 #remove all load statement
                 for i in range(len(stackLV)):
                     stackLV.pop()
@@ -607,8 +444,7 @@ def analysisLine(line):
             # 用来区分是否是malloc或者new类型，如果是则不把call语句加入stackLV，需要进行特殊的单独处理
             #
             if 'malloc' in line or 'Znam' in line:
-                if tmpSta.secondType != '@__kmalloc' and tmpSta.secondType != '@kmalloc_order_trace' and tmpSta.secondType != '@kvmalloc_node' and tmpSta.secondType != '@kmalloc_caches':
-                    tmpStr = ""
+                tmpStr = ""
             else:
                 print("ddddddddddddddddddd", tmpSta.leftVal)
                 # 2019.6.26 尝试不要将call 语句加入stackLV
@@ -690,11 +526,6 @@ def analysisLine(line):
             tmpSta.firstType = res2[5]
             tmpSta.rightVal = res2[6]
             tmpSta.secondType = res2[8]
-            if '<{' in res2 or '}>' in res2:
-                tmpSta.firstType = res2[6]
-                if len(res2[7])==0 and len(res2[9]) == 0:
-                    tmpSta.rightVal = res2[12]
-                    tmpSta.secondType = res2[14]
             if len(stackLV) >= 1:
                 tmpStament1 = stackLV[-1]
                 if tmpStament1.leftVal == tmpSta.rightVal:
@@ -749,30 +580,24 @@ def analysisLine(line):
                                 allPointer.append(tmpSta.leftVal)
                             return tmpStr
                         else:
-                            if tmpSta.firstType != 'i8' and tmpSta.firstType != 'i16' and tmpSta.firstType != 'i32' and tmpSta.firstType != 'i64':
-                                if 'inttoptr' not in res2:
-                                    if tmpSta.leftVal == 'null':
-                                        tmpStr = "assign: " + tmpSta.rightVal + " = " + tmpSta.leftVal + tmpSta.linenumber + "\\l "
-                                        if tmpSta.rightVal not in allPointer:
-                                            allPointer.append(tmpSta.rightVal)
-                                    else:
-                                        tmpStr = "alloca:" + ' ' + tmpSta.rightVal + " = " + tmpSta.leftVal + tmpSta.linenumber+"\\l "
-                                        if tmpSta.leftVal not in addressTaken:
-                                            addressTaken.append(tmpSta.leftVal)
-                                        if tmpSta.rightVal not in allPointer:
-                                            allPointer.append(tmpSta.rightVal)
-                                    # 在这里判断是否为 非singleton
-                                    # 需要区分 &n 和真正new、malloc的类型
-                                    # &n 的类型 语句的左值 是% + 变量名（非数字）
-                                    # new、malloc的类型 语句的左值是% + 数字
-                                    # 先去除%号，得到原始内容
-                                    tmpleftValStr = tmpSta.leftVal.replace('%', '')
-                                    if tmpleftValStr.isdigit():
-                                        # 如果全是数字，则是new、malloc类型
-                                        notSingleTon.append(tmpSta.rightVal)
 
+                            tmpStr = "alloca:" + ' ' + tmpSta.rightVal + " = " + tmpSta.leftVal + tmpSta.linenumber+"\\l "
+                            print("stackLv =0 " + tmpStr)
+                            # 在这里判断是否为 非singleton
+                            # 需要区分 &n 和真正new、malloc的类型
+                            # &n 的类型 语句的左值 是% + 变量名（非数字）
+                            # new、malloc的类型 语句的左值是% + 数字
+                            # 先去除%号，得到原始内容
+                            tmpleftValStr = tmpSta.leftVal.replace('%', '')
+                            if tmpleftValStr.isdigit():
+                                # 如果全是数字，则是new、malloc类型
+                                notSingleTon.append(tmpSta.rightVal)
 
-                                    return tmpStr
+                            if tmpSta.leftVal not in addressTaken:
+                                addressTaken.append(tmpSta.leftVal)
+                            if tmpSta.rightVal not in allPointer:
+                                allPointer.append(tmpSta.rightVal)
+                            return tmpStr
 
             # if there is only one 'load' keyword in the stack
             # or if there is a 'call' instruction in the stack
@@ -781,7 +606,7 @@ def analysisLine(line):
                 tmpStament = stackLV.pop()
                 if tmpStament.Op == 'getelementptr':
                     if tmpStament.firstType != 'i32':
-                        if tmpSta.firstType != 'i32' and tmpSta.firstType != 'i8' and tmpSta.firstType != 'i64' and tmpSta.firstType != 'i16':  # 同时要求store语句的前半句，不能为int类型
+                        if tmpSta.firstType != 'i32':  # 同时要求store语句的前半句，不能为int类型
                             if tmpStament.leftVal == tmpSta.rightVal:
                                 if tmpSta.leftVal == 'null':
                                     tmpStr = "assign: " + tmpStament.rightVal + "." + tmpStament.secondType + " = " + "NULL" + tmpSta.linenumber + "\\l "
@@ -803,7 +628,7 @@ def analysisLine(line):
                                     allPointer.append(tmpPointer)
                                 return tmpStr
                 elif tmpStament.Op == 'call':#这种情况不会再出现，而且很奇怪，为什么我之前写的时候，明明是assign语句把tmpSta.leftVal给加入到了addressTaken里面去，感觉是不是弄错了，晕
-                    if tmpSta.firstType != 'i32' and tmpSta.firstType != 'i8' and tmpSta.firstType != 'i64' and tmpSta.firstType != 'i16':  # 过滤掉int类型
+                    if tmpSta.firstType != 'i32':  # 过滤掉int类型
                         tmpStr = "assign: " + tmpSta.rightVal + " = " + tmpSta.leftVal + tmpSta.linenumber+"\\l "
                         print(",,,,,,," + tmpStr)
                         addressTaken.append(tmpSta.leftVal)
@@ -840,7 +665,7 @@ def analysisLine(line):
                             return tmpStr
                     # *pptr = &n 的例子
                     if tmpStament.leftVal == tmpSta.rightVal:
-                        if tmpSta.firstType != 'i8' and tmpSta.firstType != 'i32' and tmpSta.firstType != 'i64' and tmpSta.firstType != 'i16':
+                        if tmpSta.firstType != 'i8' and tmpSta.firstType != 'i32' and tmpSta.firstType != 'i64':
                             tmpVal = "T" + int(time.time()).__str__()
                             tmpStr = "alloca: " + tmpVal + " = " + tmpSta.leftVal + tmpSta.linenumber+"\\l " + "store: " + "*" + tmpStament.rightVal + " = " + tmpVal + tmpSta.linenumber+"\\l "
                             if tmpSta.leftVal not in addressTaken:
@@ -857,7 +682,7 @@ def analysisLine(line):
                 tmpStament2 = stackLV.pop()
                 tmpStament1 = stackLV.pop()
                 if tmpStament2.Op == 'getelementptr':
-                    if tmpStament2.firstType != 'i32' and tmpStament2.firstType != 'i8' and tmpStament2.firstType != 'i64' and tmpSta.firstType != 'i16':
+                    if tmpStament2.firstType != 'i32':
                         if (tmpStament1.leftVal == tmpSta.leftVal and tmpStament2.leftVal == tmpSta.rightVal):
                             tmpStr = "assign: " + tmpStament2.rightVal + "." + tmpStament2.secondType + " = " + tmpStament1.rightVal + tmpSta.linenumber+"\\l "
                             tmpPointer = tmpStament2.rightVal + "." + tmpStament2.secondType
@@ -889,7 +714,7 @@ def analysisLine(line):
                                 addressTaken.append(tmp2)
                             return tmpStr
                 elif tmpStament1.Op == 'getelementptr':
-                    if tmpStament1.firstType != 'i32' and tmpStament1.firstType != 'i8' and tmpStament1.firstType != 'i64' and tmpSta.firstType != 'i16':
+                    if tmpStament1.firstType != 'i32':
                         if (tmpStament1.leftVal == tmpStament2.rightVal and tmpStament2.leftVal == tmpSta.leftVal):
                             tmpStr = "assign: " + tmpSta.rightVal + " = " + tmpStament1.rightVal + "." + tmpStament1.secondType + tmpSta.linenumber+"\\l "
                             tmpPointer = tmpStament1.rightVal + "." + tmpStament1.secondType
@@ -925,24 +750,15 @@ def analysisLine(line):
                 tmpStament1 = stackLV.pop()
                 tmpStr = ""
                 if tmpStament2.Op == 'getelementptr':
-                    if tmpStament2.firstType != 'i32' and tmpStament2.firstType != 'i8' and tmpStament2.firstType != 'i64' and tmpSta.firstType != 'i16':
-                        if (tmpStament1.leftVal == tmpSta.leftVal and tmpStament2.leftVal == tmpStament3.rightVal and tmpStament3.leftVal == tmpSta.rightVal):
-                            if tmpStament1.Op == 'getelementptr':
-                                tmpStr = "store: " + "*" + tmpStament2.rightVal + "." + tmpStament2.secondType + " = " + tmpStament1.rightVal + "." + tmpStament1.secondType + tmpSta.linenumber + "\\l "
-                                tmpPointer = tmpStament2.rightVal + "." + tmpStament2.secondType
-                                tmpPointer2 = tmpStament1.rightVal + "." + tmpStament1.secondType
-                                if tmpPointer not in allPointer:
-                                    allPointer.append(tmpPointer)
-                                if tmpPointer2 not in allPointer:
-                                    allPointer.append(tmpPointer2)
-                            else:
-                                tmpStr = "store: " + "*" + tmpStament2.rightVal + "." + tmpStament2.secondType + " = " + tmpStament1.rightVal + tmpSta.linenumber+"\\l "
-                                tmpPointer = tmpStament2.rightVal + "." + tmpStament2.secondType
-                                tmpPointer2 = tmpStament1.rightVal
-                                if tmpPointer not in allPointer:
-                                    allPointer.append(tmpPointer)
-                                if tmpPointer2 not in allPointer:
-                                    allPointer.append(tmpPointer2)
+                    if tmpStament2.firstType != 'i32':
+                        if (
+                                tmpStament1.leftVal == tmpSta.leftVal and tmpStament2.leftVal == tmpStament3.rightVal and tmpStament3.leftVal == tmpSta.rightVal):
+                            tmpStr = "store: " + "*" + tmpStament2.rightVal + "." + tmpStament2.secondType + " = " + tmpStament1.rightVal + tmpSta.linenumber+"\\l "
+                            tmpPointer = tmpStament2.rightVal + "." + tmpStament2.secondType
+                            if tmpPointer not in allPointer:
+                                allPointer.append(tmpPointer)
+                            if tmpStament1.rightVal not in allPointer:
+                                allPointer.append(tmpStament1.rightVal)
 
                         if (tmpStament2.leftVal == tmpStament3.rightVal and tmpStament3.leftVal == tmpSta.leftVal):
                             if tmpStament3.Op == 'getelementptr' and tmpStament1.secondType.isdigit():
@@ -963,7 +779,7 @@ def analysisLine(line):
                                     allPointer.append(tmpPointer)
 
                 elif tmpStament1.Op == 'getelementptr':
-                    if tmpStament1.firstType != 'i32' and tmpStament1.firstType != 'i8' and tmpStament1.firstType != 'i64' and tmpSta.firstType != 'i16':
+                    if tmpStament1.firstType != 'i32':
                         if (
                                 tmpStament1.leftVal == tmpStament2.rightVal and tmpStament2.leftVal == tmpSta.leftVal and tmpStament3.leftVal == tmpSta.rightVal):
                             tmpStr = "store: " + "*" + tmpStament3.rightVal + " = " + tmpStament1.rightVal + "." + tmpStament1.secondType + tmpSta.linenumber+"\\l "
@@ -992,7 +808,7 @@ def analysisLine(line):
                                     allPointer.append(tmpPointer2)
                                 return tmpStr
                 elif tmpStament3.Op == 'getelementptr':
-                    if tmpStament3.firstType != 'i32' and tmpStament3.firstType != 'i8' and tmpStament3.firstType != 'i64' and tmpSta.firstType != 'i16':
+                    if tmpStament3.firstType != 'i32':
                         if (
                                 tmpStament1.leftVal == tmpStament2.rightVal and tmpStament2.leftVal == tmpSta.leftVal and tmpStament3.leftVal == tmpSta.rightVal):
                             tmpStr = "load: " + tmpStament3.rightVal + "." + tmpStament3.secondType + " = " + "*" + tmpStament1.rightVal + tmpSta.linenumber+"\\l "
@@ -1048,20 +864,13 @@ def analysisLine(line):
         if (len(res2) >= 3 and res2[2] == 'call'):
             tmpSta = Statement()
             tmpSta.Op = 'call'
-            if 'fastcc' in res2:
-                tmpSta.firstType = res2[4]  # return type of function
-                funcName = res2[5].split('(')
-                tmpSta.secondType = funcName[0]  # functionName
-            else:
-                tmpSta.firstType = res2[3]  # return type of function
-                funcName = res2[4].split('(')
-                tmpSta.secondType = funcName[0]  # functionName
-
+            tmpSta.firstType = res2[3]  # return type of function
+            funcName = res2[4].split('(')
+            tmpSta.secondType = funcName[0]  # functionName
+            # if there is one formal parameter not two more parameters
             if '!dbg' in res2:
                 tmpSta.linenumber = res2[-1]
-            if 'asm' in res2:
-                tmpStr = ""
-                return tmpStr
+
             pppfunctionName=""
             # 获取函数的形参列表
             getFunctionPara(line)
@@ -1091,20 +900,6 @@ def analysisLine(line):
                 tmpSta.secondType = pppfunctionName
             tmpStr = "call: " + "NULL" + " = " + tmpSta.firstType + " " + tmpSta.secondType + "("
             if '@llvm.dbg' in tmpSta.secondType:#过滤掉 含有llvm.dbg的语句
-                if "@llvm.dbg.value" in tmpSta.secondType and "inttoptr" not in res2:
-                    para = ""
-                    if len(res2) == 16:
-                        para = res2[6]
-                    if len(res2) == 23:
-                        para = res2[13]
-
-                    paratmp = para.replace('-','').replace('%','')
-                    paraaddr = para + ".addr"
-                    if paratmp.isdigit() or 'call' in paratmp or 'conv' in paratmp or '.' in paratmp or paraaddr in FormalParameter or para in singleTon:
-                        print("it should not be a formalParameter", para)
-                    else:
-                        if para not in FormalParameter and len(para) >=1 and '%' in para:
-                            FormalParameter.append(para)
                 tmpStr = ""
                 funformalPara.clear()
                 return tmpStr
@@ -1160,7 +955,7 @@ def analysisLine(line):
                         elif len(actualParaToWrite) != 0 and actualParaToWrite == tmpStament1.leftVal:
                             # 如果代写的实参不空但是为当前指令的左操作数，需要把代写实参重新赋值
                             actualParaToWrite = tmpStament1.rightVal
-                            if tmpStament1.Op == 'getelementptr' or (tmpStament1.Op == 'load' and tmpStament1.secondType.isdigit()):
+                            if tmpStament1.Op == 'getelementptr' :
                                 arrayIndex = tmpStament1.secondType
 
                             if len(stackLV) == 1:
@@ -1177,7 +972,7 @@ def analysisLine(line):
                             # 如果当前指令的左操作数在形参列表中出现
                             # 就把当前指令的右操作数 用作实参
                             actualParaToWrite = tmpStament1.rightVal
-                            if tmpStament1.Op == 'getelementptr' or (tmpStament1.Op == 'load' and tmpStament1.secondType.isdigit()):
+                            if tmpStament1.Op == 'getelementptr':
                                 arrayIndex = tmpStament1.secondType
                             #删除掉已经匹配上的形参
                             funformalPara.remove(tmpStament1.leftVal)
@@ -1221,7 +1016,6 @@ def analysisLine(line):
             if len(tmpSta.secondType) == 0:
                 tmpStr = ""
                 return tmpStr
-
             #判断调用的函数 是否有传参数
             if len(stackLV) == 0:
                 tmpStr += ")" + "\\l "
@@ -1260,98 +1054,32 @@ def analysisLine(line):
             tmpSta.firstType = res2[3]  # return value's type
             if tmpSta.firstType != 'void':
                 tmpSta.leftVal = res2[4]
-            if tmpSta.firstType != 'void' and tmpSta.firstType != 'i32' and tmpSta.firstType != 'i8' and tmpSta.firstType != 'i64' and tmpSta.firstType != 'i16':
+            if tmpSta.firstType != 'void' and tmpSta.firstType != 'i32':
                 if len(stackLV) == 1:
                     tmpStament1 = stackLV.pop()
                     if tmpSta.leftVal == tmpStament1.leftVal:
-                        if tmpStament1.Op == 'getelementptr':
-                            tmpStr = 'ret ' + tmpStament1.rightVal + "." + tmpStament1.secondType + tmpSta.linenumber + "\\l "
-                        else:
-                            tmpStr = 'ret ' + tmpStament1.rightVal + tmpSta.linenumber+"\\l "
+                        tmpStr = 'ret ' + tmpStament1.rightVal + tmpSta.linenumber+"\\l "
                         return tmpStr
                 if len(stackLV) == 2:
                     tmpStament2 = stackLV.pop()
                     tmpStament1 = stackLV.pop()
+                    print("cccccccccccccccccccccc")
                     if tmpStament1.leftVal == tmpStament2.rightVal and tmpStament2.leftVal == tmpSta.leftVal:
-                        if tmpStament1.Op == 'getelementptr':
-                            tmpStr = "ret " + tmpStament1.rightVal + "." + tmpStament1.secondType + tmpSta.linenumber + "\\l "
-                        else:
-                            tmpStr = 'ret ' + tmpStament1.rightVal + tmpSta.linenumber+"\\l "
+                        tmpStr = 'ret ' + tmpStament1.rightVal + tmpSta.linenumber+"\\l "
                         return tmpStr
                     # 排除call 函数后，直接ret，没有ret语句的bug
                     if tmpStament1.Op == 'call':
+                        print("aaaaaaaaaaaaaaaaaaaaa")
                         if tmpStament2.leftVal == tmpSta.leftVal:
+                            print("bbbbbbbbbbbbbbbbb")
                             tmpStr = 'ret ' + tmpStament2.rightVal + tmpSta.linenumber+"\\l "
                             return tmpStr
 
 
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\httpd\debug\llvm8"
-path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\vim\llvm8"
-
-#linux
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\arch\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\block\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\certs\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\crypto\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\fs\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\init\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\ipc\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\kernel\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\lib\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\mm\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\net\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\security\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\sound\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\virt\llvm8"
-
-
-#drivers
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\acpi\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\ata\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\atm\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\auxdisplay\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\base\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\bcma\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\block\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\bluetooth\llvm8"
-
-
-#####firefox
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\accessiable\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\browser\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\buildunix\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\config\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\db_xpfe_hal\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\devtools\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\docshell\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\dom\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\editor\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\firefox\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\gfx\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\image\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\intl\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\ipc\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\js\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\layout\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\media\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\memory\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\mfbt\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\modules\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\mozglue\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\network\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\oth_license\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\parser\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\security\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\startupcache_chrome\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\storage\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\third_party\llvm8"
+path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\httpd\debug\llvm8"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\vim\llvm8"
 #path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\toolkit\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\uri_caps\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\widget\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\x86_64_unknown\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\xpcom\llvm8"
-
-
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\certs\llvm8"
 files = os.listdir(path)
 count = 0
 for file in files:
@@ -1373,14 +1101,10 @@ for file in files:
             # 以label为关键字,判断是否为一个block
             if 'label' in line:
                 # 如果label在，则可能是一个block
-                if ' function' in line :
+                if 'function' in line:
                     # 如果有function关键字在，说明仍不是一个block，则直接写入
                     input1 = bytes(line, encoding="utf8")
                     fobj.write(input1)
-                elif '->' in line:
-                    # 如果有label关键字在，且有->在，说明仍不是一个block，则直接写入
-                    input11 = bytes(line, encoding="utf8")
-                    fobj.write(input11)
                 else:
                     # 说明是一个block，则需要进一步处理（但不排除，有其他case没有考虑到
                     line = line.replace('\l...', '')
