@@ -52,7 +52,8 @@ print(stack[-1].Op)
 #strLine = "  %call = call i32 @apr_file_open_stdout(%struct.apr_file_t** %out, %struct.apr_pool_t* %0), !dbg !60008"
 #strLine = "  %call.i.i245.i = call i8** @_ZN13nsCOMPtr_base16begin_assignmentEv(%class.nsCOMPtr_base* nonnull %79) #21, !dbg !7044245"
 #strLine = "  %call = call [1 x %struct.__jmp_buf_tag]* @MOZ_PNG_set_longjmp_fn(%struct.png_struct_def* nonnull %1, void (%struct.__jmp_buf_tag*, i32)* nonnull @__longjmp_chk, i64 200) #17, !dbg !301182"
-strLine = "  call void bitcast (void (%'class.mozilla::binding_danger::TErrorResult.1'*, %struct.JSContext*)* @_ZN7mozilla14binding_danger12TErrorResultINS0_30AssertAndSuppressCleanupPolicyEE27StealExceptionFromJSContextEP9JSContext to void (%'class.mozilla::binding_danger::TErrorResult'*, %struct.JSContext*)*)(%'class.mozilla::binding_danger::TErrorResult'* %72, %struct.JSContext* nonnull %aCx) #21, !dbg !13266065"
+#strLine = "  call void bitcast (void (%'class.mozilla::binding_danger::TErrorResult.1'*, %struct.JSContext*)* @_ZN7mozilla14binding_danger12TErrorResultINS0_30AssertAndSuppressCleanupPolicyEE27StealExceptionFromJSContextEP9JSContext to void (%'class.mozilla::binding_danger::TErrorResult'*, %struct.JSContext*)*)(%'class.mozilla::binding_danger::TErrorResult'* %72, %struct.JSContext* nonnull %aCx) #21, !dbg !13266065"
+strLine = "  call void @_ZN21nsTDependentSubstringIDsE6RebindERK12nsTSubstringIDsEjj(%class.nsTString* nonnull %ref.tmp, %class.nsTSubstring* nonnull dereferenceable(16) %aOldText, i32 %aSkipStart, i32 %sub25) #14, !dbg !190329"
     #for i in range(len(res2)):
     #    print(count4,res2[i])
 
@@ -342,7 +343,18 @@ print("Statement Op is: ", tmpSta.Op,", leftVal is: ",tmpSta.leftVal,", firstTyp
 #strLine = "  %call.i.i245.i = call i8** @_ZN13nsCOMPtr_base16begin_assignmentEv(%class.nsCOMPtr_base* nonnull %79) #21, !dbg !7044245"
 #strLine = "  %mMetadataFile.i = getelementptr inbounds %'class.mozilla::dom::asmjscache::(anonymous namespace)::ParentRunnable', %'class.mozilla::dom::asmjscache::(anonymous namespace)::ParentRunnable'* %this, i64 0, i32 14, !dbg !7044240"
 #strLine = "  %call = call [1 x %struct.__jmp_buf_tag]* @MOZ_PNG_set_longjmp_fn(%struct.png_struct_def* nonnull %1, void (%struct.__jmp_buf_tag*, i32)* nonnull @__longjmp_chk, i64 200) #17, !dbg !301182"
-strLine = "  call void bitcast (void (%'class.mozilla::binding_danger::TErrorResult.1'*, %struct.JSContext*)* @_ZN7mozilla14binding_danger12TErrorResultINS0_30AssertAndSuppressCleanupPolicyEE27StealExceptionFromJSContextEP9JSContext to void (%'class.mozilla::binding_danger::TErrorResult'*, %struct.JSContext*)*)(%'class.mozilla::binding_danger::TErrorResult'* %72, %struct.JSContext* nonnull %aCx) #21, !dbg !13266065"
+#strLine = "  call void bitcast (void (%'class.mozilla::binding_danger::TErrorResult.1'*, %struct.JSContext*)* @_ZN7mozilla14binding_danger12TErrorResultINS0_30AssertAndSuppressCleanupPolicyEE27StealExceptionFromJSContextEP9JSContext to void (%'class.mozilla::binding_danger::TErrorResult'*, %struct.JSContext*)*)(%'class.mozilla::binding_danger::TErrorResult'* %72, %struct.JSContext* nonnull %aCx) #21, !dbg !13266065"
+#strLine = "  store i64 %24, i64* %25, align 8, !dbg !190325, !alias.scope !190316"
+#strLine = "  %24 = load i64, i64* bitcast (i16** @_ZN12nsCharTraitsIDsE12sEmptyBufferE to i64*), align 8, !dbg !190315, !noalias !190316"
+#strLine = "  call void @_ZN21nsTDependentSubstringIDsE6RebindERK12nsTSubstringIDsEjj(%class.nsTString* nonnull %ref.tmp, %class.nsTSubstring* nonnull dereferenceable(16) %aOldText, i32 %aSkipStart, i32 %sub25) #14, !dbg !190329"
+#strLine = "  %cmp8.i.i.i = icmp eq %'struct.std::_Rb_tree_node'* %3, null, !dbg !2816703"
+#strLine = "  %3 = load %'struct.std::_Rb_tree_node'*, %'struct.std::_Rb_tree_node'** bitcast (%'struct.std::_Rb_tree_node_base'** getelementptr inbounds (%'class.std::map', %'class.std::map'* @_ZZN7mozilla3domL32ContentPermissionRequestChildMapEvE26sPermissionRequestChildMap, i64 0, i32 0, i32 0, i32 1, i32 1) to %'struct.std::_Rb_tree_node'**), align 8, !dbg !2816698"
+#strLine = "  %offset = getelementptr inbounds [1 x %'struct.graphite2::TtfUtil::Sfnt::NameRecord'], [1 x %'struct.graphite2::TtfUtil::Sfnt::NameRecord']* %8, i64 0, i64 %indvars.iv238, i32 5, !dbg !2632143"
+#strLine = "  %14 = load volatile i32, i32* bitcast ([4096 x i8]* @hvclock_page to i32*), align 16, !dbg !368"
+#strLine = "  %18 = load volatile i32, i32* bitcast ([4096 x i8]* @hvclock_page to i32*), align 16, !dbg !396"
+#strLine = "  %type = getelementptr %struct.e820_table, %struct.e820_table* %5, i64 0, i32 1, i64 %idxprom, i32 2, !dbg !171"
+#strLine = "  %arrayidx.i.i.i77 = getelementptr %struct.kvm_memory_slot, %struct.kvm_memory_slot* %memslot.0104, i64 0, i32 3, i32 0, i64 0, !dbg !9311"
+strLine = "  %arrayidx4 = getelementptr inbounds [4 x i8*], [4 x i8*]* getelementptr inbounds (%struct.prt_ps_font_S, %struct.prt_ps_font_S* @prt_ps_mb_font, i32 0, i32 5), i64 0, i64 %idxprom3, !dbg !213085"
 if 'function' in strLine:
     print("now ! actually function is really in line!!!!!!!!")
 resZ = re.split(",| ",strLine)

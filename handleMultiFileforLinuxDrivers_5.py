@@ -1,66 +1,36 @@
-# ！/usr/bin/env python
-# !-*-coding:utf-8 -*-
-# !@Create :2019/6/17 21:00
-# !@Author : zyy
-# !@File   : handleMultiFile.py
+#！/usr/bin/env python
+#!-*-coding:utf-8 -*-
+#!@Create :2019/7/23 14:23
+#!@Author : zyy
+#!@File   : handleMultiFileforLinuxDrivers_5.py
 import os
 import re
 import time
 
 # 输出singleTon的结果txt文件
-#singleTontxt = 'D:\Ouroboros\codes\Ouroboros-Project\\testfile\\vim\\res\singleTonResult.txt'
-#singleTontxt = 'D:\Ouroboros\codes\Ouroboros-Project\\testfile\\httpd\debug\\res\singleTonResult.txt'
+#drivers
+#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\sfi\\res\singleTonResult.txt"
+#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\spi\\res\singleTonResult.txt"
+#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\spmi\\res\singleTonResult.txt"
+#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\ssb\\res\singleTonResult.txt"
+#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\staging\\res\singleTonResult.txt"
+#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\target\\res\singleTonResult.txt"
+#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\thermal\\res\singleTonResult.txt"
+#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\thunderbolt\\res\singleTonResult.txt"
+#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\tty\\res\singleTonResult.txt"
+#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\uio\\res\singleTonResult.txt"
+#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\usb\\res\singleTonResult.txt"
+#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\uwb\\res\singleTonResult.txt"
+#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\vfio\\res\singleTonResult.txt"
+#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\vhost\\res\singleTonResult.txt"
+#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\video\\res\singleTonResult.txt"
+#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\virtio\\res\singleTonResult.txt"
+#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\visorbus\\res\singleTonResult.txt"
+#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\vme\\res\singleTonResult.txt"
+#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\w1\\res\singleTonResult.txt"
+#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\watchdog\\res\singleTonResult.txt"
+singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\xen\\res\singleTonResult.txt"
 
-#linux
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\arch\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\block\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\certs\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\crypto\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\fs\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\init\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\ipc\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\kernel\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\lib\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\mm\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\net\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\security\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\sound\\res\singleTonResult.txt"
-singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\virt\\res\singleTonResult.txt"
-
-#####firefox
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\accessiable\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\browser\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\buildunix\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\config\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\db_xpfe_hal\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\devtools\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\docshell\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\dom\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\editor\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\firefox\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\gfx\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\image\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\intl\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\ipc\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\js\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\layout\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\media\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\memory\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\mfbt\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\modules\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\mozglue\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\network\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\oth_license\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\parser\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\security\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\startupcache_chrome\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\storage\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\third_party\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\toolkit\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\uri_caps\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\widget\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\x86_64_unknown\\res\singleTonResult.txt"
-#singleTontxt = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\xpcom\\res\singleTonResult.txt"
 
 fsT = open(singleTontxt, 'a+')
 
@@ -362,11 +332,6 @@ def analysisLine(line):
                         tmpSta.rightVal = res2[17]
                         tmpSta.secondType = res2[26]
                         tmpSta.firstType = res2[10].replace(']','')
-
-                    if len(res2) == 34:
-                        tmpSta.rightVal = res2[18]
-                        tmpSta.secondType = res2[30]
-                        tmpSta.firstType = res2[8].replace(']','')
                     if len(res2) == 42:
                         if 'bitcast' in res2:
                             tmpSta.rightVal = res2[27]
@@ -1308,63 +1273,29 @@ def analysisLine(line):
                             return tmpStr
 
 
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\httpd\debug\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\vim\llvm8"
+#drivers
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\sfi\llvm8"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\spi\llvm8"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\spmi\llvm8"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\ssb\llvm8"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\staging\llvm8"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\target\llvm8"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\thermal\llvm8"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\thunderbolt\llvm8"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\tty\llvm8"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\uio\llvm8"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\usb\llvm8"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\uwb\llvm8"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\vfio\llvm8"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\vhost\llvm8"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\video\llvm8"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\virtio\llvm8"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\visorbus\llvm8"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\vme\llvm8"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\w1\llvm8"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\watchdog\llvm8"
+path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\xen\llvm8"
 
-
-#linux
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\arch\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\block\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\certs\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\crypto\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\fs\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\init\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\ipc\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\kernel\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\lib\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\mm\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\net\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\security\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\sound\llvm8"
-path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\virt\llvm8"
-
-
-
-#####firefox
-
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\accessiable\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\browser\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\buildunix\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\config\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\db_xpfe_hal\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\devtools\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\docshell\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\dom\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\editor\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\firefox\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\gfx\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\image\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\intl\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\ipc\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\js\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\layout\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\media\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\memory\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\mfbt\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\modules\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\mozglue\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\network\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\oth_license\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\parser\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\security\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\startupcache_chrome\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\storage\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\third_party\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\toolkit\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\uri_caps\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\widget\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\x86_64_unknown\llvm8"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\xpcom\llvm8"
 
 
 files = os.listdir(path)
