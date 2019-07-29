@@ -152,11 +152,15 @@ def analysisLine(line):
                     tmpSta.firstType = res2[10].replace(']','')
                 else:
                     tmpSta.firstType = res2[7].replace(']', '')
+                    if len(tmpSta.firstType) == 0:
+                        tmpSta.firstType == res2[6]
             else:
                 if '}>' in res2 or '<{' in res2:
                     tmpSta.firstType = res2[6]
                 else:
                     tmpSta.firstType = res2[5]
+                    if len(tmpSta.firstType) == '{':
+                        tmpSta.firstType = res2[6]
             # 如果有addr属性 说明是形参
             if 'addr' in tmpSta.leftVal:
                 if tmpSta.leftVal not in FormalParameter:
@@ -164,9 +168,10 @@ def analysisLine(line):
 
             # skip int type variable 跳过int类型的变量
             if tmpSta.firstType != 'i32' and tmpSta.firstType != 'i8' and tmpSta.firstType != 'i64' and tmpSta.firstType != 'i16':
-                tmpStr = "alloca:" + tmpSta.firstType + " " + tmpSta.leftVal + "\\l "
-                allPointer.append(tmpSta.leftVal)
-                return tmpStr
+                if len(tmpSta.firstType) != 0:
+                    tmpStr = "alloca:" + tmpSta.firstType + " " + tmpSta.leftVal + "\\l "
+                    allPointer.append(tmpSta.leftVal)
+                    return tmpStr
 
         # skip return 0 case
         if (len(res2) >= 3 and res2[2] == 'store' and res2[4] == 0):
@@ -212,12 +217,24 @@ def analysisLine(line):
                     elif len(res2) == 42:
                         tmpSta.rightVal = res2[17]
                         tmpSta.secondType = res2[35].replace(")","")
+                    elif len(res2) == 51:
+                        tmpSta.rightVal = res2[29]
+                        tmpSta.secondType = res2[44].replace(")","")
+                    elif len(res2) == 819:
+                        tmpSta.rightVal = res2[803]
+                        tmpSta.secondType = res2[812].replace(")","")
                     else:
                         tmpSta.rightVal = res2[13]
                         tmpSta.secondType = res2[19].replace(")","") #index
                 elif 'bitcast' in res2:
                     if len(res2) == 19:
                         tmpSta.rightVal = res2[10]
+                        tmpSta.secondType = res2[7]
+                    if len(res2) == 20:
+                        tmpSta.rightVal = res2[11]
+                        tmpSta.secondType = res2[7]
+                    if len(res2) == 21:
+                        tmpSta.rightVal = res2[12]
                         tmpSta.secondType = res2[7]
                     if len(res2) == 22:
                         if '!noalias' in res2:
@@ -232,8 +249,11 @@ def analysisLine(line):
                         tmpSta.firstType = ""
                         tmpSta.rightVal = res2[12]
                     else:
-                        tmpSta.secondType = res2[7]
-                        tmpSta.rightVal = res2[8]
+                        if len(res2) == 25:
+                            tmpSta.rightVal = res2[18]
+                        else:
+                            tmpSta.secondType = res2[7]
+                            tmpSta.rightVal = res2[8]
             if '!dbg' in res2:
                 tmpSta.linenumber = res2[-1]
             stackLV.append(tmpSta)
@@ -281,15 +301,33 @@ def analysisLine(line):
                         tmpSta.rightVal = res2[8]
                         tmpSta.secondType = res2[20]
                         tmpSta.linenumber = res2[-1]
+                        if len(tmpSta.rightVal) == 0:
+                            tmpSta.firstType = res2[6]
+                            tmpSta.rightVal = res2[11]
+                        if '%' not in tmpSta.rightVal:
+                            tmpSta.rightVal = res2[17]
+                            tmpSta.firstType = res2[6]
+
                     if len(res2) == 25:
                         tmpSta.secondType = res2[21]
                         tmpSta.linenumber = res2[-1]
                     if len(res2) ==27:
                         tmpSta.rightVal = res2[11]
+                        if len(tmpSta.rightVal) == 0:
+                            tmpSta.rightVal = res2[17]
                         tmpSta.secondType = res2[23]
                         tmpSta.linenumber = res2[-1]
                     if len(res2) == 28:
                         tmpSta.secondType = res2[24]
+                        tmpSta.linenumber = res2[-1]
+                    if len(res2) == 29:
+                        tmpSta.rightVal = res2[19]
+                        tmpSta.secondType = res2[25]
+                        tmpSta.linenumber = res2[-1]
+                    if len(res2) == 30:
+                        tmpSta.firstType = res2[5]
+                        tmpSta.rightVal = res2[8]
+                        tmpSta.secondType = res2[26]
                         tmpSta.linenumber = res2[-1]
                     if len(res2) == 31:
                         if '<{' in res2:
@@ -297,11 +335,35 @@ def analysisLine(line):
                             tmpSta.firstType = res2[7]
                             tmpSta.secondType = res2[27]
                             tmpSta.linenumber = res2[-1]
+                        else:
+                            tmpSta.secondType = res2[27]
+                            tmpSta.linenumber = res2[-1]
+                    if len(res2) == 33:
+                        tmpSta.rightVal = res2[8]
+                        tmpSta.secondType = res2[29]
+                        tmpSta.linenumber = res2[-1]
+                        if len(tmpSta.firstType) == 0:
+                            tmpSta.firstType = res2[5]
+                    if len(res2) == 36:
+                        tmpSta.rightVal = res2[8]
+                        tmpSta.secondType = res2[32]
+                        tmpSta.linenumber = res2[-1]
+                        if len(tmpSta.firstType) == 0:
+                            tmpSta.firstType = res2[5]
+                    if len(res2) == 39:
+                        tmpSta.rightVal = res2[22]
+                        tmpSta.firstType = res2[35]
+                        tmpSta.firstType = res2[7].replace(']','')
+                        tmpSta.linenumber = res2[-1]
                 else:
                     if len(res2) == 16:
                         tmpSta.secondType = res2[15]  # it means the index of a pointer variable in the struct object
                     if len(res2) == 13:
                         tmpSta.secondType = res2[12]  # it means the index of a pointer variable in the struct object
+                    if len(res2) == 24:
+                        tmpSta.rightVal = res2[8]
+                        tmpSta.secondType = res2[23]
+
             else:  # it means an array type
                 print('contains an array type: ',res2)
                 if '!dbg' in res2:
@@ -325,25 +387,66 @@ def analysisLine(line):
                         tmpSta.rightVal = res2[17]
                         tmpSta.secondType = res2[23]
                         tmpSta.firstType = res2[10].replace(']','')
+                    if len(res2) == 28:
+                        tmpSta.rightVal = res2[12]
+                        tmpSta.secondType = res2[24]
+                        tmpSta.firstType = res2[7].replace(']','')
                     if len(res2) == 29:
                         tmpSta.rightVal = res2[16]
                         tmpSta.secondType = res2[22]
                         tmpSta.firstType = res2[9].replace(']','')
+                        if tmpSta.rightVal.isdigit():
+                            tmpSta.rightVal = res2[13]
+                            tmpSta.secondType = res2[25]
+                            tmpSta.firstType = res2[8].replace(']','')
                     if len(res2) == 30:
                         tmpSta.rightVal = res2[17]
                         tmpSta.secondType = res2[26]
                         tmpSta.firstType = res2[10].replace(']','')
+                    if len(res2) == 32:
+                        tmpSta.rightVal = res2[13]
+                        tmpSta.secondType = res2[28]
+                        tmpSta.firstType = res2[8].replace(']','')
+                    if len(res2) == 34:
+                        tmpSta.rightVal = res2[18]
+                        tmpSta.secondType = res2[30]
+                        tmpSta.firstType = res2[8].replace(']','')
+                    if len(res2) ==35:
+                        tmpSta.rightVal = res2[13]
+                        tmpSta.secondType = res2[31]
+                        tmpSta.firstType = res2[8].replace(']','')
+                    if len(res2) == 37:
+                        tmpSta.rightVal = res2[21]
+                        tmpSta.secondType = res2[33]
+                        tmpSta.firstType = res2[12].replace(']','')
+                    if len(res2) == 38:
+                        tmpSta.rightVal = res2[13]
+                        tmpSta.secondType = res2[34]
+                        tmpSta.firstType = res2[8].replace(']','')
                     if len(res2) == 42:
                         if 'bitcast' in res2:
                             tmpSta.rightVal = res2[27]
                             tmpSta.secondType = res2[38]
                             tmpSta.firstType = res2[8]
+                    if len(res2) == 59:
+                        if 'bitcast' in res2:
+                            tmpSta.rightVal = res2[40]
+                            tmpSta.secondType = res2[55]
+                            tmpSta.firstType = res2[9].replace(']','')
+                    if len(res2) == 166:
+                        tmpSta.firstType = res2[7].replace(']','')
+                        tmpSta.rightVal = res2[146]
+                        tmpSta.secondType = res2[162]
 
                 else:
                     if len(res2) == 19:
                         tmpSta.rightVal = res2[12]
                         tmpSta.secondType = res2[18]
                         tmpSta.firstType = res2[7].replace(']','')
+                    if len(res2) == 20:
+                        tmpSta.rightVal = res2[13]
+                        tmpSta.secondType = res2[19]
+                        tmpSta.firstType = res2[8].replace(']','')
                     if len(res2) == 24:  # it means a two-dimensional array
                         tmpSta.firstType = res2[10].replace(']', '')
                         tmpSta.rightVal = res2[17]
@@ -353,6 +456,7 @@ def analysisLine(line):
                             tmpSta.rightVal = res2[21]
                             tmpSta.secondType = res2[27]
                             tmpSta.firstType = res2[7]
+
 
             stackLV.append(tmpSta)
 
@@ -366,6 +470,10 @@ def analysisLine(line):
                 funcName = res2[7].split('(')
                 tmpSta.secondType = funcName[0]
             elif res2[5] == 'noalias':
+                tmpSta.firstType = res2[6]
+                funcName = res2[7].split('(')
+                tmpSta.secondType = funcName[0]
+            elif res2[5] == 'fastcc':
                 tmpSta.firstType = res2[6]
                 funcName = res2[7].split('(')
                 tmpSta.secondType = funcName[0]
@@ -580,7 +688,7 @@ def analysisLine(line):
             # 用来区分是否是malloc或者new类型，如果是则不把call语句加入stackLV，需要进行特殊的单独处理
             #
             if 'malloc' in line or 'Znam' in line:
-                if tmpSta.secondType != '@__kmalloc' and tmpSta.secondType != '@kmalloc_order_trace' and tmpSta.secondType != '@kvmalloc_node' and tmpSta.secondType != '@kmalloc_caches':
+                if tmpSta.secondType != '@__kmalloc' and tmpSta.secondType != '@kmalloc_order_trace' and tmpSta.secondType != '@kvmalloc_node' and tmpSta.secondType != '@kmalloc_caches' and tmpSta.secondType != '@devm_kmalloc':
                     tmpStr = ""
             else:
                 print("ddddddddddddddddddd", tmpSta.leftVal)
@@ -660,6 +768,11 @@ def analysisLine(line):
                                 else:
                                     tmpStr = "cmp: " + tmpStament1.rightVal + tmpSta.linenumber + "\\l "
                                 return tmpStr
+                    else:
+                        tmpStr = "cmp: " + tmpSta.leftVal + tmpSta.linenumber + "\\l "
+                        return tmpStr
+
+
 
         #bitcast instruction
         if (len(res2) >=5 and res2[4] == 'bitcast'):
@@ -674,6 +787,9 @@ def analysisLine(line):
                 if len(res2[7])==0 and len(res2[9]) == 0:
                     tmpSta.rightVal = res2[12]
                     tmpSta.secondType = res2[14]
+            if len(res2) == 19 and res2[14] == 'to':
+                tmpSta.rightVal = res2[13]
+                tmpSta.secondType = res2[15]
             if len(stackLV) >= 1:
                 tmpStament1 = stackLV[-1]
                 if tmpStament1.leftVal == tmpSta.rightVal:
@@ -687,6 +803,11 @@ def analysisLine(line):
             tmpSta.leftVal = res2[4]
             tmpSta.firstType = res2[3]
             if 'getelementptr' in res2:
+                if len(res2) == 29:
+                    if res2[5] == 'inbounds':
+                        tmpSta.leftVal = res2[13]
+                        tmpSta.rightVal = res2[22]
+                        tmpSta.secondType = res2[19].replace(")","")
                 if len(res2) == 35:
                     tmpSta.rightVal = res2[16]
                     tmpSta.secondType = res2[28].replace(")","")
@@ -842,18 +963,8 @@ def analysisLine(line):
                 if tmpStament2.Op == 'getelementptr':
                     if tmpSta.firstType != 'i32' and tmpSta.firstType != 'i8' and tmpSta.firstType != 'i64' and tmpSta.firstType != 'i16':
                         if (tmpStament1.leftVal == tmpSta.leftVal and tmpStament2.leftVal == tmpSta.rightVal):
-                            tmpStr = "assign: " + tmpStament2.rightVal + "." + tmpStament2.secondType + " = " + tmpStament1.rightVal + tmpSta.linenumber+"\\l "
-                            tmpPointer = tmpStament2.rightVal + "." + tmpStament2.secondType
-                            if tmpPointer not in allPointer:
-                                allPointer.append(tmpPointer)
-                            if tmpStament1.rightVal not in allPointer:
-                                allPointer.append(tmpStament1.rightVal)
-                            return tmpStr
-
-                        # like pointerCase.d = &PointerArray[5];
-                        if tmpStament1.Op == 'getelementptr':
-                            if tmpSta.leftVal == tmpStament1.leftVal and tmpSta.rightVal == tmpStament2.leftVal:
-                                tmpStr = "alloca: " + tmpStament2.rightVal + "." + tmpStament2.secondType + " = " + tmpStament1.rightVal + "." + tmpStament1.secondType + tmpSta.linenumber+"\\l "
+                            if tmpStament1.Op == 'getelementptr':# like pointerCase.d = &PointerArray[5];
+                                tmpStr = "alloca: " + tmpStament2.rightVal + "." + tmpStament2.secondType + " = " + tmpStament1.rightVal + "." + tmpStament1.secondType + tmpSta.linenumber + "\\l "
                                 tmpPointer1 = tmpStament2.rightVal + "." + tmpStament2.secondType
                                 tmpPointer2 = tmpStament1.rightVal + "." + tmpStament1.secondType
                                 if tmpPointer2 not in addressTaken:
@@ -861,6 +972,17 @@ def analysisLine(line):
                                 if tmpPointer1 not in allPointer:
                                     allPointer.append(tmpPointer1)
                                 return tmpStr
+                            else:
+                                tmpStr = "assign: " + tmpStament2.rightVal + "." + tmpStament2.secondType + " = " + tmpStament1.rightVal + tmpSta.linenumber+"\\l "
+                                tmpPointer = tmpStament2.rightVal + "." + tmpStament2.secondType
+                                if tmpPointer not in allPointer:
+                                    allPointer.append(tmpPointer)
+                                if tmpStament1.rightVal not in allPointer:
+                                    allPointer.append(tmpStament1.rightVal)
+                                return tmpStr
+
+
+
                         #last_ptr = &(current->last);
                         if tmpStament1.leftVal == tmpStament2.rightVal and tmpStament2.leftVal == tmpSta.leftVal:
                             tmpStr = "alloca: " + tmpSta.rightVal + " = " + tmpStament1.rightVal + "." + tmpStament2.secondType + tmpSta.linenumber + "\\l "
