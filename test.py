@@ -67,7 +67,11 @@ print(em.get(sta1.Op,""))
 #strLine = "  %call = call [1 x %struct.__jmp_buf_tag]* @MOZ_PNG_set_longjmp_fn(%struct.png_struct_def* nonnull %1, void (%struct.__jmp_buf_tag*, i32)* nonnull @__longjmp_chk, i64 200) #17, !dbg !301182"
 #strLine = "  call void bitcast (void (%'class.mozilla::binding_danger::TErrorResult.1'*, %struct.JSContext*)* @_ZN7mozilla14binding_danger12TErrorResultINS0_30AssertAndSuppressCleanupPolicyEE27StealExceptionFromJSContextEP9JSContext to void (%'class.mozilla::binding_danger::TErrorResult'*, %struct.JSContext*)*)(%'class.mozilla::binding_danger::TErrorResult'* %72, %struct.JSContext* nonnull %aCx) #21, !dbg !13266065"
 #strLine = "  call void @_ZN21nsTDependentSubstringIDsE6RebindERK12nsTSubstringIDsEjj(%class.nsTString* nonnull %ref.tmp, %class.nsTSubstring* nonnull dereferenceable(16) %aOldText, i32 %aSkipStart, i32 %sub25) #14, !dbg !190329"
-strLine = "  %call.i = call fastcc i32 @set_addr(%struct.sk_buff* %skb, i32 %protoff, i8** %data, i32 0, i32 %11, i32 %12, i16 zeroext %10) #9, !dbg !11719"
+#strLine = "  %call.i = call fastcc i32 @set_addr(%struct.sk_buff* %skb, i32 %protoff, i8** %data, i32 0, i32 %11, i32 %12, i16 zeroext %10) #9, !dbg !11719"
+#strLine = " call: NULL = void @argstr_to_table(%call2,%6)!15073"
+#strLine = " call: NULL = void @ap_abort_on_oom()!14747"
+#strLine = " call: %call27 = i32 @apr_socket_create(%sd,&%40,%42)!14851"
+strLine = " call: NULL = void @_ZN24nsJSScriptTimeoutHandlerC2EP9JSContextP19nsGlobalWindowInnerPN7mozilla3dom12LoadedScriptERK12nsTSubstringIDsEPbRNS4_11ErrorResultE(%0,%aCx,%aWindow,%call,&%aExpression,%allowEval,&%aError)!102923"
     #for i in range(len(res2)):
     #    print(count4,res2[i])
 
@@ -97,26 +101,10 @@ def getFunctionPara(line):
         for item2 in spitem:
             resz = re.split(" ",item2)
             if len(resz) == 1:
-                if '@' in resz[0]:
-                    ppp.append(resz[0])
-                    print("PPP function Name is ",resz[0])
+                if '%' in resz[0]:
+                    funformalPara.append(resz[0])
             print("~~~~resz is ",resz)
-            if len(resz) ==2:
-                if ('%' in resz[1] or '@' in resz[1]) and '*' not in resz[1]:
-                    print("1111",resz[1])
-                    funformalPara.append(resz[1])
-            if len(resz) ==3:
-                if '@.str' not in resz[2] and  'inbounds' not in resz[2]  and ']' not in resz[2] and ('%' in resz[2] or '@' in resz[2]):
-                    funformalPara.append(resz[2])
-                    print("~~~~~~~~~~~~~~the formalPara is ",resz[2])
-            if len(resz) ==4:
-                if resz[2] == 'zeroext':
-                    funformalPara.append(resz[3])
-                if resz[2] == 'nonnull':
-                    funformalPara.append(resz[3])
-            if len(resz) == 5:
-                if '@' in resz[1]:
-                    print("function name could be ",resz[1])
+
     print("~~~~~~~~~~~~funciton formalPara is :")
 
     for item in funformalPara:
@@ -276,10 +264,22 @@ print("Statement Op is: ", tmpSta.Op,", leftVal is: ",tmpSta.leftVal,", firstTyp
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~call instruction test ok
-strLine = "  %arrayidx = getelementptr [16 x %struct.snd_kcontrol_new], [16 x\l... %struct.snd_kcontrol_new]* bitcast (\<\{ \{ i32, i32, i32, i8*, i32, i32, i32,\l... i32 (%struct.snd_kcontrol*, %struct.snd_ctl_elem_info*)*, i32\l... (%struct.snd_kcontrol*, %struct.snd_ctl_elem_value*)*, i32\l... (%struct.snd_kcontrol*, %struct.snd_ctl_elem_value*)*, \{ i32* \}, i64 \}, \{\l... i32, i32, i32, i8*, i32, i32, i32, i32 (%struct.snd_kcontrol*,\l... %struct.snd_ctl_elem_info*)*, i32 (%struct.snd_kcontrol*,\l... %struct.snd_ctl_elem_value*)*, i32 (%struct.snd_kcontrol*,\l... %struct.snd_ctl_elem_value*)*, \{ i32* \}, i64 \}, \{ i32, i32, i32, i8*, i32,\l... i32, i32, i32 (%struct.snd_kcontrol*, %struct.snd_ctl_elem_info*)*, i32\l... (%struct.snd_kcontrol*, %struct.snd_ctl_elem_value*)*, i32\l... (%struct.snd_kcontrol*, %struct.snd_ctl_elem_value*)*, \{ i32* \}, i64 \}, \{\l... i32, i32, i32, i8*, i32, i32, i32, i32 (%struct.snd_kcontrol*,\l... %struct.snd_ctl_elem_info*)*, i32 (%struct.snd_kcontrol*,\l... %struct.snd_ctl_elem_value*)*, i32 (%struct.snd_kcontrol*,\l... %struct.snd_ctl_elem_value*)*, \{ i32* \}, i64 \}, \{ i32, i32, i32, i8*, i32,\l... i32, i32, i32 (%struct.snd_kcontrol*, %struct.snd_ctl_elem_info*)*, i32\l... (%struct.snd_kcontrol*, %struct.snd_ctl_elem_value*)*, i32\l... (%struct.snd_kcontrol*, %struct.snd_ctl_elem_value*)*, \{ i32* \}, i64 \}, \{\l... i32, i32, i32, i8*, i32, i32, i32, i32 (%struct.snd_kcontrol*,\l... %struct.snd_ctl_elem_info*)*, i32 (%struct.snd_kcontrol*,\l... %struct.snd_ctl_elem_value*)*, i32 (%struct.snd_kcontrol*,\l... %struct.snd_ctl_elem_value*)*, \{ i32* \}, i64 \}, \{ i32, i32, i32, i8*, i32,\l... i32, i32, i32 (%struct.snd_kcontrol*, %struct.snd_ctl_elem_info*)*, i32\l... (%struct.snd_kcontrol*, %struct.snd_ctl_elem_value*)*, i32\l... (%struct.snd_kcontrol*, %struct.snd_ctl_elem_value*)*, \{ i32* \}, i64 \}, \{\l... i32, i32, i32, i8*, i32, i32, i32, i32 (%struct.snd_kcontrol*,\l... %struct.snd_ctl_elem_info*)*, i32 (%struct.snd_kcontrol*,\l... %struct.snd_ctl_elem_value*)*, i32 (%struct.snd_kcontrol*,\l... %struct.snd_ctl_elem_value*)*, \{ i32* \}, i64 \}, \{ i32, i32, i32, i8*, i32,\l... i32, i32, i32 (%struct.snd_kcontrol*, %struct.snd_ctl_elem_info*)*, i32\l... (%struct.snd_kcontrol*, %struct.snd_ctl_elem_value*)*, i32\l... (%struct.snd_kcontrol*, %struct.snd_ctl_elem_value*)*, \{ i32* \}, i64 \}, \{\l... i32, i32, i32, i8*, i32, i32, i32, i32 (%struct.snd_kcontrol*,\l... %struct.snd_ctl_elem_info*)*, i32 (%struct.snd_kcontrol*,\l... %struct.snd_ctl_elem_value*)*, i32 (%struct.snd_kcontrol*,\l... %struct.snd_ctl_elem_value*)*, \{ i32* \}, i64 \}, \{ i32, i32, i32, i8*, i32,\l... i32, i32, i32 (%struct.snd_kcontrol*, %struct.snd_ctl_elem_info*)*, i32\l... (%struct.snd_kcontrol*, %struct.snd_ctl_elem_value*)*, i32\l... (%struct.snd_kcontrol*, %struct.snd_ctl_elem_value*)*, \{ i32* \}, i64 \}, \{\l... i32, i32, i32, i8*, i32, i32, i32, i32 (%struct.snd_kcontrol*,\l... %struct.snd_ctl_elem_info*)*, i32 (%struct.snd_kcontrol*,\l... %struct.snd_ctl_elem_value*)*, i32 (%struct.snd_kcontrol*,\l... %struct.snd_ctl_elem_value*)*, \{ i32* \}, i64 \}, \{ i32, i32, i32, i8*, i32,\l... i32, i32, i32 (%struct.snd_kcontrol*, %struct.snd_ctl_elem_info*)*, i32\l... (%struct.snd_kcontrol*, %struct.snd_ctl_elem_value*)*, i32\l... (%struct.snd_kcontrol*, %struct.snd_ctl_elem_value*)*, \{ i32* \}, i64 \},\l... %struct.snd_kcontrol_new, %struct.snd_kcontrol_new, %struct.snd_kcontrol_new\l... \}\>* @snd_ymfpci_controls to [16 x %struct.snd_kcontrol_new]*), i64 0, i64\l... %indvars.iv206, !dbg !6121"
+#strLine = "  %arrayidx = getelementptr [16 x %struct.snd_kcontrol_new], [16 x\l... %struct.snd_kcontrol_new]* bitcast (\<\{ \{ i32, i32, i32, i8*, i32, i32, i32,\l... i32 (%struct.snd_kcontrol*, %struct.snd_ctl_elem_info*)*, i32\l... (%struct.snd_kcontrol*, %struct.snd_ctl_elem_value*)*, i32\l... (%struct.snd_kcontrol*, %struct.snd_ctl_elem_value*)*, \{ i32* \}, i64 \}, \{\l... i32, i32, i32, i8*, i32, i32, i32, i32 (%struct.snd_kcontrol*,\l... %struct.snd_ctl_elem_info*)*, i32 (%struct.snd_kcontrol*,\l... %struct.snd_ctl_elem_value*)*, i32 (%struct.snd_kcontrol*,\l... %struct.snd_ctl_elem_value*)*, \{ i32* \}, i64 \}, \{ i32, i32, i32, i8*, i32,\l... i32, i32, i32 (%struct.snd_kcontrol*, %struct.snd_ctl_elem_info*)*, i32\l... (%struct.snd_kcontrol*, %struct.snd_ctl_elem_value*)*, i32\l... (%struct.snd_kcontrol*, %struct.snd_ctl_elem_value*)*, \{ i32* \}, i64 \}, \{\l... i32, i32, i32, i8*, i32, i32, i32, i32 (%struct.snd_kcontrol*,\l... %struct.snd_ctl_elem_info*)*, i32 (%struct.snd_kcontrol*,\l... %struct.snd_ctl_elem_value*)*, i32 (%struct.snd_kcontrol*,\l... %struct.snd_ctl_elem_value*)*, \{ i32* \}, i64 \}, \{ i32, i32, i32, i8*, i32,\l... i32, i32, i32 (%struct.snd_kcontrol*, %struct.snd_ctl_elem_info*)*, i32\l... (%struct.snd_kcontrol*, %struct.snd_ctl_elem_value*)*, i32\l... (%struct.snd_kcontrol*, %struct.snd_ctl_elem_value*)*, \{ i32* \}, i64 \}, \{\l... i32, i32, i32, i8*, i32, i32, i32, i32 (%struct.snd_kcontrol*,\l... %struct.snd_ctl_elem_info*)*, i32 (%struct.snd_kcontrol*,\l... %struct.snd_ctl_elem_value*)*, i32 (%struct.snd_kcontrol*,\l... %struct.snd_ctl_elem_value*)*, \{ i32* \}, i64 \}, \{ i32, i32, i32, i8*, i32,\l... i32, i32, i32 (%struct.snd_kcontrol*, %struct.snd_ctl_elem_info*)*, i32\l... (%struct.snd_kcontrol*, %struct.snd_ctl_elem_value*)*, i32\l... (%struct.snd_kcontrol*, %struct.snd_ctl_elem_value*)*, \{ i32* \}, i64 \}, \{\l... i32, i32, i32, i8*, i32, i32, i32, i32 (%struct.snd_kcontrol*,\l... %struct.snd_ctl_elem_info*)*, i32 (%struct.snd_kcontrol*,\l... %struct.snd_ctl_elem_value*)*, i32 (%struct.snd_kcontrol*,\l... %struct.snd_ctl_elem_value*)*, \{ i32* \}, i64 \}, \{ i32, i32, i32, i8*, i32,\l... i32, i32, i32 (%struct.snd_kcontrol*, %struct.snd_ctl_elem_info*)*, i32\l... (%struct.snd_kcontrol*, %struct.snd_ctl_elem_value*)*, i32\l... (%struct.snd_kcontrol*, %struct.snd_ctl_elem_value*)*, \{ i32* \}, i64 \}, \{\l... i32, i32, i32, i8*, i32, i32, i32, i32 (%struct.snd_kcontrol*,\l... %struct.snd_ctl_elem_info*)*, i32 (%struct.snd_kcontrol*,\l... %struct.snd_ctl_elem_value*)*, i32 (%struct.snd_kcontrol*,\l... %struct.snd_ctl_elem_value*)*, \{ i32* \}, i64 \}, \{ i32, i32, i32, i8*, i32,\l... i32, i32, i32 (%struct.snd_kcontrol*, %struct.snd_ctl_elem_info*)*, i32\l... (%struct.snd_kcontrol*, %struct.snd_ctl_elem_value*)*, i32\l... (%struct.snd_kcontrol*, %struct.snd_ctl_elem_value*)*, \{ i32* \}, i64 \}, \{\l... i32, i32, i32, i8*, i32, i32, i32, i32 (%struct.snd_kcontrol*,\l... %struct.snd_ctl_elem_info*)*, i32 (%struct.snd_kcontrol*,\l... %struct.snd_ctl_elem_value*)*, i32 (%struct.snd_kcontrol*,\l... %struct.snd_ctl_elem_value*)*, \{ i32* \}, i64 \}, \{ i32, i32, i32, i8*, i32,\l... i32, i32, i32 (%struct.snd_kcontrol*, %struct.snd_ctl_elem_info*)*, i32\l... (%struct.snd_kcontrol*, %struct.snd_ctl_elem_value*)*, i32\l... (%struct.snd_kcontrol*, %struct.snd_ctl_elem_value*)*, \{ i32* \}, i64 \},\l... %struct.snd_kcontrol_new, %struct.snd_kcontrol_new, %struct.snd_kcontrol_new\l... \}\>* @snd_ymfpci_controls to [16 x %struct.snd_kcontrol_new]*), i64 0, i64\l... %indvars.iv206, !dbg !6121"
+#strLine = " assign: %2 = %table.addr!14758"
+#~~~~~~~~~~~~~assign Op = res2[1].replace(":",""), leftVal = res2[2], rightVal = res2[4], linenumber = res2[-1]
+#strLine = " alloca:%struct.apr_table_t* %table.addr"
+#~~~~~~~~~~~~~alloca len = 3: if 'alloca' in res2[1] then
+#strLine = " load: %input_filters6 = *%9!14767"
+#strLine = " store: *%nc = %names!14767"
+#strLine = " call: NULL = void @argstr_to_table(%call2,%6)!15073"
+#strLine = " call: %call1 = i32 @apr_os_sock_get(%osd,%1)!14768"
+#strLine = " alloca: %n = &%incdec.ptr!14850"
+#strLine = " cmp: *%outf!14846"
+#strLine = " ret %111!14953"
+strLine = " call: NULL = void @_ZN24nsJSScriptTimeoutHandlerC2EP9JSContextP19nsGlobalWindowInnerPN7mozilla3dom12LoadedScriptERK12nsTSubstringIDsEPbRNS4_11ErrorResultE(%0,%aCx,%aWindow,%call,&%aExpression,%allowEval,&%aError)!102923"
 if 'function' in strLine:
     print("now ! actually function is really in line!!!!!!!!")
-resZ = re.split(",| ",strLine)
+resZ = re.split(",| |!",strLine)
 if '!dbg' in resZ:
     print("length is: ",len(resZ),"resZ is : " ,resZ, "\nlinenumber of call instruction is: ",resZ[-1])
 count11 = 0
