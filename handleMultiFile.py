@@ -1022,6 +1022,9 @@ def analysisLine(line):
                             if tmp2 not in addressTaken:
                                 addressTaken.append(tmp2)
                             return tmpStr
+
+
+
                 elif tmpStament1.Op == 'getelementptr':
                     if tmpSta.firstType != 'i32' and tmpSta.firstType != 'i8' and tmpSta.firstType != 'i64' and tmpSta.firstType != 'i16':
                         if (tmpStament1.leftVal == tmpStament2.rightVal and tmpStament2.leftVal == tmpSta.leftVal):
@@ -1180,6 +1183,10 @@ def analysisLine(line):
                             if tmpPointer2 not in allPointer:
                                 allPointer.append(tmpPointer2)
                             return tmpStr
+
+                    #iphash_table_tail[i] = & iphash_table[i];
+                    fdsfds
+
 
         # if is a call key word
         if (len(res2) >= 3 and res2[2] == 'call'):

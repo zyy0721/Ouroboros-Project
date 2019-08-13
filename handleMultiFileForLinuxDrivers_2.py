@@ -54,7 +54,8 @@ singleTon = []
 notSingleTon = []
 # 每个函数的形参列表
 funformalPara = []
-
+# 用来存每个dot文件，即每个函数文件中的alloca变量，这些都是memory类型
+memoryvar_for_each_fun = []
 
 
 
@@ -148,6 +149,8 @@ def analysisLine(line):
             tmpSta.Op = 'alloca'
             # 把所有的alloca变量加入singleTon中
             singleTon.append(tmpSta.leftVal)
+            # 把所有的alloca变量都加入memoryvar_for_each_fun中, 需要在离开每个file的时候清空
+            memoryvar_for_each_fun.append(tmpSta.leftVal)
             if 'i32]' in res2 or 'i32*]' in res2 or 'i32**]' in res2 or 'i8]' in res2 or 'i8*]' in res2 or 'i8**]' in res2 or 'i64]' in res2 or 'i64*]' in res2 or 'i64**]' in res2 or 'i16**]' in res2 or 'i16*]' in res2 or 'i16]' in res2 or (len(res2) >=8 and']' in res2[7]):
                 if '}>' in res2 and 'x' in res2:
                     tmpSta.firstType = res2[10].replace(']','')
@@ -174,12 +177,6 @@ def analysisLine(line):
                     allPointer.append(tmpSta.leftVal)
                     return tmpStr
 
-        # skip return 0 case
-        if (len(res2) >= 3 and res2[2] == 'store' and res2[4] == 0):
-            # continue
-            # print("alloca statement2")
-            return "zero" + "\\l "
-
         # every time when we meet 'load' instruction, we add this line to a stack called 'stackLV'
         if (len(res2) >= 5 and res2[4] == 'load'):
             stackOp.append('load')
@@ -193,9 +190,21 @@ def analysisLine(line):
             else:
                 tmpSta.firstType = res2[5]
                 if 'getelementptr' in res2:
-                    if len(res2) == 30:
+                    if len(res2) == 28:
+                        tmpSta.rightVal = res2[15]
+                        tmpSta.secondType = res2[21].replace(")","")
+                    elif len(res2) == 30:
                         tmpSta.rightVal = res2[17]
                         tmpSta.secondType = res2[23].replace(")","")
+                    elif len(res2) == 31:
+                        if res2[11] == 'inbounds':
+                            tmpSta.rightVal = res2[15]
+                            tmpSta.secondType = res2[24].replace(")","")
+                        if res2[12] == 'inbounds':
+                            tmpSta.rightVal = res2[16]
+                            tmpSta.secondType = res2[24].replace(")","")
+                        else:
+                            tmpSta.rightVal = res2[16]
                     elif len(res2) == 32:
                         tmpSta.rightVal = res2[17]
                         tmpSta.secondType = res2[26].replace(")","")
@@ -215,9 +224,26 @@ def analysisLine(line):
                         if 'bitcast' in res2:
                             tmpSta.rightVal = res2[15]
                             tmpSta.secondType = res2[30].replace(")","")
+                        elif res2[19] == 'inbounds':
+                            tmpSta.rightVal = res2[23]
+                            tmpSta.secondType = res2[32].replace(")","")
+                        elif res2[15] == 'inbounds':
+                            tmpSta.rightVal = res2[23]
+                            tmpSta.secondType = res2[32].replace(")","")
+                    elif len(res2) == 40:
+                        tmpSta.rightVal = res2[27]
+                        tmpSta.secondType = res2[33].replace(")","")
                     elif len(res2) == 42:
                         tmpSta.rightVal = res2[17]
                         tmpSta.secondType = res2[35].replace(")","")
+                    elif len(res2) == 43:
+                        tmpSta.rightVal = res2[27]
+                        tmpSta.secondType = res2[36].replace(")","")
+                    elif len(res2) == 44:
+                        tmpSta.rightVal = res2[31]
+                        tmpSta.secondType = res2[37].replace(")","")
+                    elif len(res2) == 48:
+                        tmpSta.rightVal = res2[35]
                     elif len(res2) == 51:
                         tmpSta.rightVal = res2[29]
                         tmpSta.secondType = res2[44].replace(")","")
@@ -245,13 +271,24 @@ def analysisLine(line):
                             tmpSta.firstType = res2[6]
                             tmpSta.rightVal = res2[13]
                             tmpSta.secondType = res2[8]
+                    if len(res2) == 26:
+                        tmpSta.rightVal = res2[17]
+                        tmpSta.secondType = res2[7]
                 else:
                     if len(res2) == 19 and 'x' in res2:
                         tmpSta.firstType = ""
                         tmpSta.rightVal = res2[12]
                     else:
-                        if len(res2) == 25:
+                        if len(res2) == 17:
+                            tmpSta.rightVal = res2[10]
+                        elif len(res2) == 25:
                             tmpSta.rightVal = res2[18]
+                        elif len(res2) == 23:
+                            tmpSta.rightVal = res2[16]
+                        elif len(res2) == 29:
+                            tmpSta.rightVal = res2[22]
+                        elif len(res2) == 33:
+                            tmpSta.rightVal = res2[26]
                         else:
                             tmpSta.secondType = res2[7]
                             tmpSta.rightVal = res2[8]
@@ -272,20 +309,20 @@ def analysisLine(line):
                 if '!dbg' in res2:
                     if len(res2) == 15:
                         tmpSta.secondType = res2[11]
-                        tmpSta.linenumber = res2[-1]
                         tmpSta.rightVal = res2[8]
                         tmpSta.firstType = res2[5]
                     if len(res2) == 18:#需要注意下，其实是有没有inbounds这个关键字的区别，如果后续遇到相同长度的情况的话，可以加以区分
                         tmpSta.rightVal = res2[8]
                         tmpSta.firstType = res2[5]
                         tmpSta.secondType = res2[14]
-                        tmpSta.linenumber = res2[-1]
+                        if tmpSta.firstType == 'inbounds':
+                            tmpSta.firstType = res2[6]
+                            tmpSta.rightVal = res2[11]
+                            tmpSta.secondType = res2[14]
                     if len(res2) == 19:
                         tmpSta.secondType = res2[15]  # it means the index of a pointer variable in the struct object
-                        tmpSta.linenumber = res2[-1]
                     if len(res2) == 16:
                         tmpSta.secondType = res2[12]  # it means the index of a pointer variable in the struct object
-                        tmpSta.linenumber = res2[-1]
                     if len(res2) == 21:
                         tmpSta.rightVal = res2[8]
                         tmpSta.firstType = res2[5]
@@ -293,69 +330,71 @@ def analysisLine(line):
                             tmpSta.firstType = res2[6]
                             tmpSta.rightVal = res2[11]
                         tmpSta.secondType = res2[17]
-                        tmpSta.linenumber = res2[-1]
                     if len(res2) == 22:
                         tmpSta.secondType = res2[18]
-                        tmpSta.linenumber = res2[-1]
                     if len(res2) == 24:
                         tmpSta.firstType = res2[5]
                         tmpSta.rightVal = res2[8]
                         tmpSta.secondType = res2[20]
-                        tmpSta.linenumber = res2[-1]
                         if len(tmpSta.rightVal) == 0:
                             tmpSta.firstType = res2[6]
                             tmpSta.rightVal = res2[11]
                         if '%' not in tmpSta.rightVal:
                             tmpSta.rightVal = res2[17]
                             tmpSta.firstType = res2[6]
-
                     if len(res2) == 25:
                         tmpSta.secondType = res2[21]
-                        tmpSta.linenumber = res2[-1]
                     if len(res2) ==27:
                         tmpSta.rightVal = res2[11]
                         if len(tmpSta.rightVal) == 0:
                             tmpSta.rightVal = res2[17]
                         tmpSta.secondType = res2[23]
-                        tmpSta.linenumber = res2[-1]
                     if len(res2) == 28:
                         tmpSta.secondType = res2[24]
-                        tmpSta.linenumber = res2[-1]
                     if len(res2) == 29:
                         tmpSta.rightVal = res2[19]
                         tmpSta.secondType = res2[25]
-                        tmpSta.linenumber = res2[-1]
                     if len(res2) == 30:
                         tmpSta.firstType = res2[5]
                         tmpSta.rightVal = res2[8]
                         tmpSta.secondType = res2[26]
-                        tmpSta.linenumber = res2[-1]
+                        if tmpSta.firstType == 'inbounds':
+                            tmpSta.rightVal =res2[23]
+                            tmpSta.firstType = res2[6]
                     if len(res2) == 31:
                         if '<{' in res2:
                             tmpSta.rightVal = res2[21]
                             tmpSta.firstType = res2[7]
                             tmpSta.secondType = res2[27]
-                            tmpSta.linenumber = res2[-1]
                         else:
                             tmpSta.secondType = res2[27]
-                            tmpSta.linenumber = res2[-1]
                     if len(res2) == 33:
                         tmpSta.rightVal = res2[8]
                         tmpSta.secondType = res2[29]
-                        tmpSta.linenumber = res2[-1]
                         if len(tmpSta.firstType) == 0:
                             tmpSta.firstType = res2[5]
                     if len(res2) == 36:
                         tmpSta.rightVal = res2[8]
                         tmpSta.secondType = res2[32]
-                        tmpSta.linenumber = res2[-1]
                         if len(tmpSta.firstType) == 0:
                             tmpSta.firstType = res2[5]
+                        if '%' not in res2[8] and '@' not in res2[8]:
+                            tmpSta.rightVal = res2[17]
+                    if len(res2) == 38:
+                        tmpSta.rightVal = res2[8]
+                        tmpSta.firstType = res2[5]
                     if len(res2) == 39:
                         tmpSta.rightVal = res2[22]
-                        tmpSta.firstType = res2[35]
+                        tmpSta.secondType = res2[35]
                         tmpSta.firstType = res2[7].replace(']','')
-                        tmpSta.linenumber = res2[-1]
+                    if len(res2) == 42:
+                        tmpSta.rightVal = res2[8]
+                    if len(res2) == 45:
+                        tmpSta.firstType = res2[5]
+                        tmpSta.rightVal = res2[8]
+                        tmpSta.secondType = res2[41]
+                    if len(res2) == 63:
+                        tmpSta.rightVal = res2[19]
                 else:
                     if len(res2) == 16:
                         tmpSta.secondType = res2[15]  # it means the index of a pointer variable in the struct object
@@ -364,10 +403,21 @@ def analysisLine(line):
                     if len(res2) == 24:
                         tmpSta.rightVal = res2[8]
                         tmpSta.secondType = res2[23]
+                        if len(tmpSta.rightVal) == 0:
+                            tmpSta.rightVal = res2[17]
 
             else:  # it means an array type
                 print('contains an array type: ',res2)
                 if '!dbg' in res2:
+                    if len(res2) == 20:
+                        tmpSta.rightVal = res2[13]
+                        tmpSta.secondType = res2[16]
+                        tmpSta.firstType = res2[8].replace(']','')
+                    if len(res2) == 21:
+                        if res2[8] == 'bitcast':
+                            tmpSta.rightVal = res2[12]
+                            tmpSta.secondType = res2[17]
+                            tmpSta.firstType = res2[5]
                     if len(res2) == 22:
                         tmpSta.rightVal = res2[12]
                         tmpSta.secondType = res2[18]
@@ -375,6 +425,10 @@ def analysisLine(line):
                     if len(res2) == 23:
                         tmpSta.rightVal = res2[13]
                         tmpSta.secondType = res2[19]
+                        tmpSta.firstType = res2[8].replace(']','')
+                    if len(res2) == 24:
+                        tmpSta.rightVal = res2[14]
+                        tmpSta.secondType = res2[20]
                         tmpSta.firstType = res2[8].replace(']','')
                     if len(res2) == 25:
                         tmpSta.rightVal = res2[12]
@@ -404,18 +458,40 @@ def analysisLine(line):
                         tmpSta.rightVal = res2[17]
                         tmpSta.secondType = res2[26]
                         tmpSta.firstType = res2[10].replace(']','')
+                    if len(res2) == 31:
+                        if res2[13] == "bitcast":
+                            tmpSta.rightVal = res2[17]
+                            tmpSta.secondType = res2[27]
+                            tmpSta.firstType = res2[8].replace(']','')
+                        elif ']' in res2[13]:
+                            tmpSta.rightVal = res2[18]
+                            tmpSta.secondType = res2[27]
+                            tmpSta.firstType = res2[8]
+                        else:
+                            tmpSta.rightVal = res2[12]
+                            tmpSta.firstType = res2[7].replace(']','')
+                            tmpSta.secondType = res2[27]
                     if len(res2) == 32:
                         tmpSta.rightVal = res2[13]
                         tmpSta.secondType = res2[28]
                         tmpSta.firstType = res2[8].replace(']','')
+                        if '%' not in res2[13] and '@' not in res2[13]:
+                            tmpSta.rightVal = res2[22]
                     if len(res2) == 34:
                         tmpSta.rightVal = res2[18]
                         tmpSta.secondType = res2[30]
                         tmpSta.firstType = res2[8].replace(']','')
-                    if len(res2) ==35:
+                    if len(res2) == 35:
                         tmpSta.rightVal = res2[13]
                         tmpSta.secondType = res2[31]
                         tmpSta.firstType = res2[8].replace(']','')
+                    if len(res2) == 36:
+                        tmpSta.rightVal = res2[22]
+                        tmpSta.secondType = res2[32]
+                        tmpSta.firstType = res2[7].replace(']','')
+                        if '%' not in res2[22] and '@' not in res2[22]:
+                            tmpSta.rightVal = res2[26]
+
                     if len(res2) == 37:
                         tmpSta.rightVal = res2[21]
                         tmpSta.secondType = res2[33]
@@ -424,21 +500,83 @@ def analysisLine(line):
                         tmpSta.rightVal = res2[13]
                         tmpSta.secondType = res2[34]
                         tmpSta.firstType = res2[8].replace(']','')
+                    if len(res2) == 39:
+                        tmpSta.rightVal = res2[22]
+                        tmpSta.firstType = res2[7].replace(']', '')
+                        tmpSta.secondType = res2[32]
+                    if len(res2) == 40:
+                        tmpSta.rightVal = res2[30]
+                        tmpSta.secondType = res2[36]
                     if len(res2) == 42:
                         if 'bitcast' in res2:
                             tmpSta.rightVal = res2[27]
                             tmpSta.secondType = res2[38]
                             tmpSta.firstType = res2[8]
+                        elif '<{' in res2:
+                            tmpSta.rightVal = res2[29]
+                    if len(res2) == 46:
+                        tmpSta.rightVal = res2[23]
+                    if len(res2) == 49:
+                        if res2[16] == 'bitcast':
+                            tmpSta.rightVal = res2[30]
+                    if len(res2) == 50:
+                        if res2[12] == 'bitcast':
+                            tmpSta.rightVal = res2[36]
+                    if len(res2) == 53:
+                        if res2[12] == 'bitcast':
+                            tmpSta.rightVal = res2[36]
+                    if len(res2) == 54:
+                        tmpSta.rightVal = res2[32]
+
                     if len(res2) == 59:
                         if 'bitcast' in res2:
                             tmpSta.rightVal = res2[40]
                             tmpSta.secondType = res2[55]
                             tmpSta.firstType = res2[9].replace(']','')
+                        else:
+                            tmpSta.rightVal = res2[49]
+                    if len(res2) == 73:
+                        tmpSta.rightVal = res2[59]
+                    if len(res2) == 95:
+                        tmpSta.rightVal = res2[78]
+                    if len(res2) >=96:
+                        for item in res2:
+                            if '@' in item:
+                                tmpSta.rightVal = item
+                                break
+                    '''
+                    if len(res2) == 114:
+                        tmpSta.rightVal = res2[100]
+                    if len(res2) == 116:
+                        tmpSta.rightVal = res2[102]
                     if len(res2) == 166:
                         tmpSta.firstType = res2[7].replace(']','')
                         tmpSta.rightVal = res2[146]
                         tmpSta.secondType = res2[162]
-
+                    if len(res2) == 225:
+                        tmpSta.rightVal = res2[211]
+                    if len(res2) == 262:
+                        tmpSta.rightVal = res2[248]
+                    if len(res2) == 264:
+                        tmpSta.rightVal = res2[250]
+                    if len(res2) == 362:
+                        tmpSta.rightVal = res2[346]
+                    if len(res2) == 363:
+                        tmpSta.rightVal = res2[346]
+                    if len(res2) == 366:
+                        tmpSta.rightVal = res2[346]
+                    if len(res2) == 373:
+                        tmpSta.rightVal =res2[359]
+                    if len(res2) == 460:
+                        tmpSta.rightVal = res2[446]
+                    if len(res2) == 515:
+                        tmpSta.rightVal = res2[501]
+                    if len(res2) == 553:
+                        tmpSta.rightVal = res2[534]
+                    if len(res2) >= 554:#太奇葩的情况了
+                        #不处理直接过滤掉
+                        return ""
+                    '''
                 else:
                     if len(res2) == 19:
                         tmpSta.rightVal = res2[12]
@@ -458,264 +596,9 @@ def analysisLine(line):
                             tmpSta.secondType = res2[27]
                             tmpSta.firstType = res2[7]
 
-
-            stackLV.append(tmpSta)
-
-        # if a call function has return value
-        if (len(res2) >= 5 and res2[4] == 'call'):
-            tmpSta = Statement()
-            tmpSta.Op = 'call'
-            tmpSta.leftVal = res2[2]
-            if res2[5] == 'zeroext':
-                tmpSta.firstType = res2[6]
-                funcName = res2[7].split('(')
-                tmpSta.secondType = funcName[0]
-            elif res2[5] == 'noalias':
-                tmpSta.firstType = res2[6]
-                funcName = res2[7].split('(')
-                tmpSta.secondType = funcName[0]
-            elif res2[5] == 'fastcc':
-                tmpSta.firstType = res2[6]
-                funcName = res2[7].split('(')
-                tmpSta.secondType = funcName[0]
-            elif '[' in res2[5]:
-                tmpSta.firstType = res2[7].replace(']','')
-                funcName = res2[8].split('(')
-                tmpSta.secondType = funcName[0]
-            else:
-                tmpSta.firstType = res2[5]  # return type of function
-                funcName = res2[6].split('(')
-                tmpSta.secondType = funcName[0]  # functionName
             if '!dbg' in res2:
                 tmpSta.linenumber = res2[-1]
-
-            #如果asm在call函数中，不处理
-            if 'asm' in res2:
-                tmpStr = ""
-                return tmpStr
-
-            #如果一些奇怪的llvm的内在函数出现的话，直接无视掉
-            if '@llvm.umul.with.overflow' in line:
-                tmpStr = ""
-                return tmpStr
-            pppfunctionName=""
-            # 获取函数的形参列表
-            funformalPara.clear()
-            getFunctionPara(line)
-            arrayIndex = -1 #数组或者是struct的下标，初始化为-1，且在每一次写完actualParaToWrite之后都应该赋值为-1
-            print("after getFunctionPara~~~~~~~~~~~~~~")
-            if '...' in line:
-                print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-                line1 = line.split("...")[-1].replace(") ", "")
-                print(line1)
-                res = re.split("\(|\)", line1)
-                for item in res:
-                    print("res item ", item)
-                    spitem = re.split(",", item)
-                    print("spitem is ", spitem)
-                    for item2 in spitem:
-                        resz = re.split(" ", item2)
-                        print("~~~~resz is ", resz)
-                        if len(resz) == 1:
-                            if '@' in resz[0]:
-                                print("add ppp")
-                                pppfunctionName = resz[0]
-                                tmpSta.secondType = pppfunctionName
-                                print("PPP function Name is ", resz[0])
-                        if len(resz) == 5:
-                            if '@' in resz[1]:
-                                pppfunctionName=resz[1]
-                                print("ppp function name could be ", resz[1])
-
-
-            tmpStr = "call: " + tmpSta.leftVal + " = " + tmpSta.firstType + " " + tmpSta.secondType + "("
-            actualParaToWrite = ""  # 待写的实参
-            sizeOfFunctionPara = len(funformalPara)  # 函数形参个数
-            print("line is ", line)
-            print("~~~~~funciton formalPara is :")
-            for item in funformalPara:
-                print("in call block~", item)
-
-
-            if sizeOfFunctionPara == 0:
-                tmpStr += ")" +tmpSta.linenumber+ "\\l "
-            else:
-
-                # 在调用该函数处时，输出 传入该函数的实参 实现：
-                print("size of stackLV is ", len(stackLV))
-                while (len(stackLV) != 0):
-                    # print("1212121212")
-                    tmpStament1 = stackLV[-1]
-                    # print("leftval is ",tmpStament1.leftVal,"  actualParaToWrite is ", actualParaToWrite)
-                    # 如果每次进来 代写实参不是空的且不是当前指令的左操作数
-
-                    if len(actualParaToWrite) != 0 and actualParaToWrite != tmpStament1.leftVal:
-                        if len(stackLV) >= 2:
-                            tmpStament3 = stackLV[-2]
-                            #额外考虑类似于下面的例子
-                            #  %20 = load i8**, i8*** %argv.addr, align 8
-                            #%21 = load i32, i32* %i, align 4
-                            #%idxprom = sext i32 %21 to i64
-                            #%arrayidx = getelementptr inbounds i8*, i8** %20, i64 %idxprom
-                            #%22 = load i8*, i8** %arrayidx, align 8
-
-                            if tmpStament3.leftVal == actualParaToWrite:
-                                stackLV.pop()
-                                continue
-
-                        if sizeOfFunctionPara == 1:
-                            if arrayIndex == -1:
-                                tmpStr += actualParaToWrite + ")" +tmpSta.linenumber+ "\\l "
-                                break  # 写完最后一个实参 要break掉
-                            else:
-                                tmpStr += actualParaToWrite+"."+arrayIndex + ")" +tmpSta.linenumber+ "\\l "
-                                arrayIndex = -1
-                                break  # 写完最后一个实参 要break掉
-                        else:
-                            if arrayIndex == -1:
-                                tmpStr += actualParaToWrite + ","
-                                sizeOfFunctionPara = sizeOfFunctionPara - 1
-                                actualParaToWrite = ""
-                                continue
-                            else:
-                                tmpStr += actualParaToWrite+"."+arrayIndex + ","
-                                sizeOfFunctionPara = sizeOfFunctionPara - 1
-                                actualParaToWrite = ""
-                                arrayIndex = -1
-                                continue
-
-                    elif len(actualParaToWrite) != 0 and actualParaToWrite == tmpStament1.leftVal:
-                        # 如果代写的实参不空但是为当前指令的左操作数，需要把代写实参重新赋值
-                        actualParaToWrite = tmpStament1.rightVal
-                        if tmpStament1.Op == 'getelementptr' or (tmpStament1.Op == 'load' and tmpStament1.secondType.isdigit()):
-                            arrayIndex = tmpStament1.secondType
-                        if len(stackLV) == 1:
-                            # 如果只剩当前的这个条语句了，也是要写
-                            if arrayIndex == -1:
-                                tmpStr += actualParaToWrite + ")" +tmpSta.linenumber+ "\\l "
-                            else:
-                                tmpStr += actualParaToWrite+"."+arrayIndex + ")" + tmpSta.linenumber + "\\l "
-                                arrayIndex = -1
-                        stackLV.pop()
-                        continue
-
-                    if tmpStament1.leftVal in funformalPara:
-                        # 如果当前指令的左操作数在形参列表中出现
-                        # 就把当前指令的右操作数 用作实参
-                        actualParaToWrite = tmpStament1.rightVal
-                        if tmpStament1.Op == 'getelementptr' or (tmpStament1.Op == 'load' and tmpStament1.secondType.isdigit()):
-                            arrayIndex = tmpStament1.secondType
-                        #删去已经匹配上的形参
-                        funformalPara.remove(tmpStament1.leftVal)
-                        # 并且pop掉当前的指令
-                        stackLV.pop()
-                        # 需要判断一下是否还能继续往上回溯
-                        if len(stackLV) != 0:
-                            tmpStament2 = stackLV[-1]
-                            if tmpStament2.leftVal == actualParaToWrite:
-                                # 相等，说明还可以回溯
-                                continue
-                            else:
-                                if sizeOfFunctionPara == 1:
-                                    if arrayIndex == -1:
-                                        tmpStr += actualParaToWrite + ")" +tmpSta.linenumber+ "\\l "
-                                        break  # 写完最后一个实参 要break掉
-                                    else:
-                                        tmpStr += actualParaToWrite+"."+arrayIndex + ")" + tmpSta.linenumber + "\\l "
-                                        arrayIndex = -1
-                                        break  # 写完最后一个实参 要break掉
-                        else:
-                            if sizeOfFunctionPara == 1:
-                                if arrayIndex == -1:
-                                    tmpStr += actualParaToWrite + ")" +tmpSta.linenumber+ "\\l "
-                                    break  # 写完最后一个实参 要break掉
-                                else:
-                                    tmpStr += actualParaToWrite+"."+arrayIndex + ")" + tmpSta.linenumber + "\\l "
-                                    arrayIndex = -1
-                                    break  # 写完最后一个实参 要break掉
-                            else:
-                                if arrayIndex == -1:
-                                    tmpStr += actualParaToWrite + ","
-                                    sizeOfFunctionPara = sizeOfFunctionPara - 1 #这条好像没用
-                                    break
-                                else:
-                                    tmpStr += actualParaToWrite+"."+arrayIndex + ","
-                                    sizeOfFunctionPara = sizeOfFunctionPara - 1 #这条好像没用
-                                    arrayIndex = -1
-                                    break
-
-                    else:
-                        if len(stackLV) != 0:
-                            stackLV.pop()
-
-                '''
-                for i in range(len(stackLV)):
-                    #为了防止出现连续多个call函数存在而导致出现多余逗号的错误，加入了statement Op的 判断
-                    if stackLV[i].Op != 'call':
-                        #如果是最后一行，需要特殊处理 加上括号 \\l 等
-                        if i == len(stackLV)-1:
-                            tmpleftVal = stackLV[i].leftVal#当前语句的左值
-                            flag = 0#标志，判断是否出现了特例
-                            for j in range(len(stackLV)):
-                                if tmpleftVal == stackLV[j].rightVal:
-                                    # 如果当前语句的左值等于某个语句的右值，说明是个特例
-                                    tmpStr += "*"+stackLV[i].rightVal + ")" + "\\l "
-                                    flag =1 #设置为1，说明出现了特例
-                                    break
-                            if flag == 0:#只对非特例进行处理
-                                tmpStr += stackLV[i].rightVal + ")" + "\\l "
-                        else:
-                            tmpleftVal = stackLV[i].leftVal
-                            flag = 0
-                            for j in range(len(stackLV)):
-                                if tmpleftVal == stackLV[j].rightVal:
-                                    #如果当前语句的左值等于某个语句的右值，说明是个特例
-                                    tmpStr += "*"+stackLV[i].rightVal+", "
-                                    flag = 1
-                                    break
-
-                            if flag == 0:#只对非特例处理
-                                if i == 0:#刚开始要写
-                                    tmpStr += stackLV[i].rightVal + ", "
-                                if i >= 1:#0之后，把中间过程的语句省略掉
-                                    if stackLV[i].rightVal != stackLV[i-1].leftVal:
-                                        tmpStr += stackLV[i].rightVal + ", "
-
-                #remove all load statement
-                for i in range(len(stackLV)):
-                    stackLV.pop()
-                '''
-
-            # 用来区分是否是malloc或者new类型，如果是则不把call语句加入stackLV，需要进行特殊的单独处理
-            #
-            if 'malloc' in line or 'Znam' in line:
-                if tmpSta.secondType != '@__kmalloc' and tmpSta.secondType != '@kmalloc_order_trace' and tmpSta.secondType != '@kvmalloc_node' and tmpSta.secondType != '@kmalloc_caches' and tmpSta.secondType != '@devm_kmalloc':
-                    tmpStr = ""
-            else:
-                print("ddddddddddddddddddd", tmpSta.leftVal)
-                # 2019.6.26 尝试不要将call 语句加入stackLV
-                # stackLV.append(tmpSta)
-
-            #在离开前需要检查一下tmpStr是否为完整的句子
-            #需要把形参中为%call等形式的参数放进去，6.29修改正，把剩余形参都加入进去
-            if ')!' not in tmpStr:
-                #说明是不完整的句子，然后把剩余的形参都输出
-                for i in range(len(funformalPara)):
-                    if i == len(funformalPara) -1:
-                        #if '%call' in funformalPara[i]:
-                        tmpStr += funformalPara[i] + ")"+tmpSta.linenumber+"\\l "
-                    else:
-                        if funformalPara[i] == 'dereferenceable':
-                            tmpStr += "&"
-                        else:
-                            tmpStr += funformalPara[i] + ","
-
-
-
-            # 离开前要清空形参列表
-            funformalPara.clear()
-            print("in call case before return tmpStr is", tmpStr)
-            return tmpStr
+            stackLV.append(tmpSta)
 
         #icmp instruction
         if (len(res2) >=5 and res2[4] == 'icmp'):
@@ -773,12 +656,10 @@ def analysisLine(line):
                         tmpStr = "cmp: " + tmpSta.leftVal + tmpSta.linenumber + "\\l "
                         return tmpStr
 
-
-
         #bitcast instruction
-        if (len(res2) >=5 and res2[4] == 'bitcast'):
+        if (len(res2) >=5 and (res2[4] == 'bitcast' or res2[4] == 'trunc' or res2[4] == 'zext' or res2[4] == 'sext' or res2[4] == 'fptrunc' or res2[4] == 'inttoptr' or res2[4] == 'ptrtoint' or res2[4] == 'sitofp' or res2[4] == 'uitofp' or res2[4] == 'fptosi' or res2[4] == 'fptoui' or res2[4] == 'fpext')):
             tmpSta = Statement()
-            tmpSta.Op = 'bitcast'
+            tmpSta.Op = res2[4]
             tmpSta.leftVal = res2[2]
             tmpSta.firstType = res2[5]
             tmpSta.rightVal = res2[6]
@@ -788,13 +669,34 @@ def analysisLine(line):
                 if len(res2[7])==0 and len(res2[9]) == 0:
                     tmpSta.rightVal = res2[12]
                     tmpSta.secondType = res2[14]
-            if len(res2) == 19 and res2[14] == 'to':
+            elif 'x' in res2 and len(res2) == 14 and res2[9] == 'to':
+                tmpSta.firstType = res2[7].replace(']','')
+                tmpSta.rightVal = res2[8]
+                tmpSta.secondType = res2[10]
+            elif len(res2) == 19 and res2[14] == 'to':
                 tmpSta.rightVal = res2[13]
                 tmpSta.secondType = res2[15]
+            elif len(res2) == 17:
+                if res2[8] == 'to':
+                    tmpSta.rightVal = res2[7]
+
+
+            if "!dbg" in res2:
+                tmpSta.linenumber = res2[-1]
+            #直接进行相应的变量转化
             if len(stackLV) >= 1:
                 tmpStament1 = stackLV[-1]
                 if tmpStament1.leftVal == tmpSta.rightVal:
                     stackLV[-1].leftVal = tmpSta.leftVal
+            else:
+                #如果前面没有stackLV，则把它看作是一条assign
+                tmpStr = "assign: " + tmpSta.leftVal + " = " + tmpSta.rightVal + tmpSta.linenumber + "\\l "
+                if tmpSta.leftVal not in allPointer:
+                    allPointer.append(tmpSta.leftVal)
+                if tmpSta.rightVal not in allPointer:
+                    allPointer.append(tmpSta.rightVal)
+                return tmpStr
+
         # when we meet the key word 'store', we should check the 'stackLV'. When the size of stackLV is 1, that is to say it's assignment .
         # When the size of stackLV is 2, we will go further to determine it's a deref statement or not.
         if (len(res2) >= 3 and res2[2] == 'store'):
@@ -804,354 +706,904 @@ def analysisLine(line):
             tmpSta.leftVal = res2[4]
             tmpSta.firstType = res2[3]
             if 'getelementptr' in res2:
-                if len(res2) == 29:
+                if len(res2) == 25:
+                    tmpSta.rightVal = res2[12]
+                elif len(res2) == 27:
+                    tmpSta.leftVal = res2[5]
+                    tmpSta.rightVal = res2[14]
+                    tmpSta.secondType = res2[20].replace(")","")
+                elif len(res2) == 29:
                     if res2[5] == 'inbounds':
                         tmpSta.leftVal = res2[13]
                         tmpSta.rightVal = res2[22]
                         tmpSta.secondType = res2[19].replace(")","")
-                if len(res2) == 35:
+                    elif res2[3] == 'volatile':
+                        tmpSta.leftVal = res2[5]
+                        tmpSta.firstType = res2[4]
+                        tmpSta.rightVal = res2[13]
+                    else:
+                        tmpSta.rightVal = res2[16]
+                        tmpSta.secondType = res2[22].replace(")","")
+                elif len(res2) == 30:
+                    tmpSta.leftVal = res2[5]
+                    tmpSta.rightVal = res2[14]
+                    tmpSta.secondType = res2[23].replace(")","")
+                elif len(res2) == 32:
+                    tmpSta.rightVal = res2[16]
+                    tmpSta.secondType = res2[25].replace(")","")
+                elif len(res2) == 33:
+                    tmpSta.leftVal = res2[5]
+                    tmpSta.rightVal = res2[14]
+
+                elif len(res2) == 34:
+                    tmpSta.rightVal = res2[12]
+
+                elif len(res2) == 35:
                     tmpSta.rightVal = res2[16]
                     tmpSta.secondType = res2[28].replace(")","")
+                elif len(res2) == 39:
+                    tmpSta.rightVal = res2[11]
+                    tmpSta.leftVal = res2[26]
+                    tmpSta.secondType = res2[32].replace(")","")
                 elif len(res2) == 41:
                     tmpSta.rightVal = res2[16]
                     tmpSta.secondType = res2[34].replace(")","")
+                    if '%' not in res2[16] and '@' not in res2[16]:
+                        tmpSta.leftVal = res2[5]
+                        tmpSta.rightVal = res2[22]
+                elif len(res2) == 42:
+                    tmpSta.leftVal = res2[11]
+                    tmpSta.rightVal = res2[26]
+                    tmpSta.secondType = res2[35].replace(")","")
+                elif len(res2) == 43:
+                    tmpSta.firstType = res2[4]
+                    tmpSta.leftVal = res2[16]
+                    tmpSta.rightVal = res2[34]
+                    if '%' not in res2[16] and '@' not in res2[16]:
+                        tmpSta.firstType = res2[3]
+                        tmpSta.leftVal = res2[4]
+                        tmpSta.rightVal = res2[12]
+                elif len(res2) == 59:
+                    tmpSta.firstType = res2[4]
+                    tmpSta.leftVal = res2[16]
+                    tmpSta.rightVal = res2[41]
+                    tmpSta.secondType = res2[50].replace(")","")
                 else:
                     tmpSta.rightVal = res2[12]
                     tmpSta.secondType = res2[18].replace(")","")#index
             else:
-                tmpSta.rightVal = res2[7]
-                tmpSta.secondType = res2[6]
+                if '(' in res2[4]:
+                    if len(res2) == 13:
+                        tmpSta.leftVal = res2[5]
+                        tmpSta.rightVal = res2[9]
+                        tmpSta.secondType = tmpSta.firstType + "*"
+                    if len(res2) == 16:
+                        if '!dbg' in res2:
+                            tmpSta.leftVal = res2[5]
+                            tmpSta.rightVal = res2[9]
+                            tmpSta.secondType = tmpSta.firstType + "*"
+                    if len(res2) == 17:
+                        tmpSta.leftVal = res2[7]
+                        tmpSta.rightVal = res2[13]
+                        tmpSta.secondType = tmpSta.firstType + "*"
+                    if len(res2) == 20:
+                        if '!dbg' in res2:
+                            tmpSta.leftVal = res2[7]
+                            tmpSta.rightVal = res2[13]
+                            tmpSta.secondType = tmpSta.firstType + "*"
+                    if len(res2) == 21:
+                        tmpSta.leftVal = res2[9]
+                        tmpSta.rightVal = res2[17]
+                        tmpSta.secondType = tmpSta.firstType + "*"
+                    if len(res2) == 22:
+                        tmpSta.leftVal = res2[8]
+                        tmpSta.rightVal = res2[15]
+                        tmpSta.secondType = tmpSta.firstType + "*"
+                    if len(res2) == 24:
+                        if '!dbg' in res2:
+                            tmpSta.leftVal = res2[9]
+                            tmpSta.rightVal = res2[17]
+                            tmpSta.secondType = tmpSta.firstType + "*"
+                    if len(res2) == 25:
+                        tmpSta.rightVal = res2[21]
+                        tmpSta.leftVal = res2[11]
+                    if len(res2) == 27:
+                        if res2[7] == 'inttoptr':
+                            tmpSta.firstType = res2[8].replace("(","")
+                            tmpSta.leftVal = res2[9]
+                            tmpSta.rightVal = res2[20]
+                    if len(res2) == 28:
+                        tmpSta.leftVal = res2[11]
+                        tmpSta.rightVal = res2[21]
+
+                    if len(res2) == 29:
+                        tmpSta.leftVal = res2[13]
+                        tmpSta.rightVal = res2[25]
+                        tmpSta.secondType = tmpSta.firstType + "*"
+                    if len(res2) == 32:
+                        tmpSta.leftVal = res2[13]
+                        tmpSta.rightVal = res2[25]
+                        tmpSta.secondType = tmpSta.firstType + "*"
+                    if len(res2) == 33:
+                        tmpSta.leftVal = res2[15]
+                        tmpSta.rightVal = res2[29]
+                        tmpSta.secondType = tmpSta.firstType + "*"
+                    if len(res2) == 37:
+                        tmpSta.leftVal = res2[17]
+                        tmpSta.rightVal = res2[30]
+                        tmpSta.secondType = tmpSta.firstType + "*"
+                    if len(res2) == 42:
+                        tmpSta.leftVal = res2[11]
+                        tmpSta.rightVal = res2[26]
+                        tmpSta.secondType = tmpSta.firstType + "*"
+                    if len(res2) == 52:
+                        tmpSta.leftVal = res2[23]
+                        tmpSta.rightVal = res2[45]
+                elif res2[4] == 'x':
+                    if len(res2) == 15:
+                        tmpSta.leftVal = res2[6]
+                        tmpSta.rightVal = res2[11]
+                    elif len(res2) == 18:
+                        tmpSta.leftVal = res2[6]
+                        tmpSta.rightVal = res2[11]
+                    elif len(res2) == 28:
+                        tmpSta.firstType = res2[9]
+                        tmpSta.leftVal = res2[7]
+                        tmpSta.rightVal = res2[21]
+                elif res2[4] == 'inttoptr':
+                    if len(res2) == 18:
+                        tmpSta.firstType = res2[5].replace("(","")
+                        tmpSta.leftVal = res2[6]
+                        tmpSta.rightVal = res2[11]
+                else:
+                    if len(res2) == 21:
+                        tmpSta.leftVal = res2[9]
+                        tmpSta.firstType = res2[4]
+                        tmpSta.rightVal = res2[14]
+                        tmpSta.secondType = tmpSta.firstType + "*"
+                    elif len(res2) == 27:
+                        tmpSta.leftVal = res2[9]
+                        tmpSta.rightVal = res2[18]
+                        tmpSta.firstType = res2[4]
+                        tmpSta.secondType = tmpSta.firstType + "*"
+                    else:
+                        tmpSta.rightVal = res2[7]
+                        tmpSta.secondType = res2[6]
             if '!dbg' in res2:
                 tmpSta.linenumber = res2[-1]
 
-            # if there is no 'load' keyword
-            if (len(stackLV) == 0):
-                # judge whether it is an alloca statement or not
-                if ( '*' in tmpSta.firstType): #说明是跟pointer相关
-                    tmpLeftVal = tmpSta.leftVal + ".addr"
 
-                    if '.addr' in tmpSta.rightVal:
-                        tmpSta_rightVal = tmpSta.rightVal.replace(".addr","")
-                        tmpSta_leftVal = tmpSta.leftVal.replace(tmpSta_rightVal,"")
+            relationmap = {} #用来存中间的映射关系
+            memvar = [] #用来存mem类型的变量
+            tmpStrStack = [] #用来存tmpStr返回的栈，使得它能够正确的顺序输出
+            #在这部分将stackLV中的内容都存在dict中,如果stackLV为空的话，直接输出处理的结果
+            #进行中间过程的处理
+            if len(stackLV) == 0:
+                #说明只有一条store语句
+                #先进行store x , y 中x 和 y 的判断， 是否为memory类型 还是 register类型
+                x = tmpSta.leftVal
+                y = tmpSta.rightVal
+                if tmpSta.firstType == "i8" or tmpSta.firstType == "i16" or tmpSta.firstType == "i32" or tmpSta.firstType == "i64" or tmpSta.firstType == "float" or tmpSta.firstType == "double":
+                    #直接略掉非pointer变量
+                    print("is not pointer type")
+                    return ""
+                else:
+                    if '.addr' in y:
+                        tmpSta_rightVal = y.replace(".addr", "")
+                        tmpSta_leftVal = x.replace(tmpSta_rightVal, "")
                         if tmpSta_leftVal.isdigit():
                             print("maybe this case: store i32 * % retval1, i32 ** % retval.addr, do nothing")
                             return ""
-                    #也有可能会存在这种例子，store i32 * % retval1, i32 ** % retval.addr, align 8
+                    tmpLeftVal = x + ".addr"
+                    if tmpLeftVal == y:
+                        #类似 store i32* %p, i32** %p.addr, align 8的情况
+                        #直接过滤掉
+                        return ""
 
-                    if tmpLeftVal == tmpSta.rightVal:
-                        print("........................")
-                    else:
-                        # 如果左操作数是个一个call函数的返回值的话，就是要记作assign
-                        if 'call' in tmpSta.leftVal:
-                            tmpStr = "assign: " + tmpSta.rightVal + " = " + tmpSta.leftVal + tmpSta.linenumber+"\\l "
-                            if tmpSta.rightVal not in allPointer:
-                                allPointer.append(tmpSta.rightVal)
-                            if tmpSta.leftVal not in allPointer:
-                                allPointer.append(tmpSta.leftVal)
-
-
-                            return tmpStr
-                        else:
-                            if tmpSta.firstType != 'i8' and tmpSta.firstType != 'i16' and tmpSta.firstType != 'i32' and tmpSta.firstType != 'i64':
-                                if 'inttoptr' not in res2:
-                                    if tmpSta.leftVal == 'null':
-                                        tmpStr = "assign: " + tmpSta.rightVal + " = " + tmpSta.leftVal + tmpSta.linenumber + "\\l "
-                                        if tmpSta.rightVal not in allPointer:
-                                            allPointer.append(tmpSta.rightVal)
-
-                                    else:
-                                        tmpStr = "alloca:" + ' ' + tmpSta.rightVal + " = " + tmpSta.leftVal + tmpSta.linenumber+"\\l "
-                                        if tmpSta.leftVal not in addressTaken:
-                                            addressTaken.append(tmpSta.leftVal)
-                                        if tmpSta.rightVal not in allPointer:
-                                            allPointer.append(tmpSta.rightVal)
-
-                                    # 在这里判断是否为 非singleton
-                                    # 需要区分 &n 和真正new、malloc的类型
-                                    # &n 的类型 语句的左值 是% + 变量名（非数字）
-                                    # new、malloc的类型 语句的左值是% + 数字
-                                    # 先去除%号，得到原始内容
-                                    tmpleftValStr = tmpSta.leftVal.replace('%', '')
-                                    if tmpleftValStr.isdigit():
-                                        # 如果全是数字，则是new、malloc类型
-                                        notSingleTon.append(tmpSta.rightVal)
-
-
-                                    return tmpStr
-
-            # if there is only one 'load' keyword in the stack
-            # or if there is a 'call' instruction in the stack
-            if (len(stackLV) == 1):
-                # fetch the top value of stack
-                tmpStament = stackLV.pop()
-                if tmpStament.Op == 'getelementptr':
-                    if tmpStament.firstType != 'i32':
-                        if tmpSta.firstType != 'i32' and tmpSta.firstType != 'i8' and tmpSta.firstType != 'i64' and tmpSta.firstType != 'i16':  # 同时要求store语句的前半句，不能为int类型
-                            if tmpStament.leftVal == tmpSta.rightVal:
-                                if tmpSta.leftVal == 'null':
-                                    tmpStr = "assign: " + tmpStament.rightVal + "." + tmpStament.secondType + " = " + "NULL" + tmpSta.linenumber + "\\l "
-                                else:
-                                    tmpStr = "alloca: " + tmpStament.rightVal + "." + tmpStament.secondType + " = " + tmpSta.leftVal + tmpSta.linenumber+"\\l "
-                                    if tmpSta.leftVal not in addressTaken:
-                                        addressTaken.append(tmpSta.leftVal)
-                                tmpPointer = tmpStament.rightVal + "." + tmpStament.secondType
-                                if tmpPointer not in allPointer:
-                                    allPointer.append(tmpPointer)
-                                return tmpStr
-                            if tmpStament.leftVal == tmpSta.leftVal:
-                                tmpStr = "alloca: " + tmpSta.rightVal + " = " + tmpStament.rightVal + "." + tmpStament.secondType + tmpSta.linenumber+"\\l "
-                                tmpPointer = tmpStament.rightVal + "." + tmpStament.secondType
-                                if tmpPointer not in addressTaken:
-                                    addressTaken.append(tmpPointer)
-                                tmpPointer = tmpStament.rightVal + "." + tmpStament.secondType
-                                if tmpPointer not in allPointer:
-                                    allPointer.append(tmpPointer)
-                                return tmpStr
-                elif tmpStament.Op == 'call':#这种情况不会再出现，而且很奇怪，为什么我之前写的时候，明明是assign语句把tmpSta.leftVal给加入到了addressTaken里面去，感觉是不是弄错了，晕
-                    if tmpSta.firstType != 'i32' and tmpSta.firstType != 'i8' and tmpSta.firstType != 'i64' and tmpSta.firstType != 'i16':  # 过滤掉int类型
-                        tmpStr = "assign: " + tmpSta.rightVal + " = " + tmpSta.leftVal + tmpSta.linenumber+"\\l "
-                        addressTaken.append(tmpSta.leftVal)
+                    if x == 'null':
+                        tmpStr = "assign: " + y + " = " + x + tmpSta.linenumber + "\\l "
                         if tmpSta.rightVal not in allPointer:
                             allPointer.append(tmpSta.rightVal)
                         return tmpStr
-                else:
-                    if tmpSta.firstType != 'i32' and tmpSta.firstType != 'i8' and tmpSta.firstType != 'i64' and tmpSta.firstType != 'i16':
-                        if (tmpStament.leftVal == tmpSta.leftVal):
-                            if tmpStament.secondType.isdigit():
-                                if 'getelementptr' in res2:
-                                    if tmpStament.rightVal != tmpSta.rightVal or tmpStament.secondType != tmpSta.secondType:
-                                        tmpStr = "assign: " + tmpSta.rightVal+"."+tmpSta.secondType + " = " + tmpStament.rightVal + "." + tmpStament.secondType + tmpSta.linenumber + "\\l "
-                                        tmp1 = tmpSta.rightVal + "." + tmpSta.secondType
-                                        tmp2 = tmpStament.rightVal + "." + tmpStament.secondType
-                                        if tmp1 not in allPointer:
-                                            allPointer.append(tmp1)
-                                        if tmp2 not in allPointer:
-                                            allPointer.append(tmp2)
-                                        return tmpStr
-                                else:
-                                    tmpStr = "assign: " + tmpSta.rightVal + " = " + tmpStament.rightVal + "." + tmpStament.secondType + tmpSta.linenumber + "\\l "
-                                    tmp1 = tmpStament.rightVal + "." + tmpStament.secondType
-                                    if tmp1 not in allPointer:
-                                        allPointer.append(tmp1)
-                                    if tmpSta.rightVal not in allPointer:
-                                        allPointer.append(tmpSta.rightVal)
-                                    return tmpStr
-                            else:
-                                tmpStr = "assign: " + tmpSta.rightVal + " = " + tmpStament.rightVal + tmpSta.linenumber+"\\l "
-                                if tmpStament.rightVal not in allPointer:
-                                    allPointer.append(tmpStament.rightVal)
-                                if tmpSta.rightVal not in allPointer:
-                                    allPointer.append(tmpSta.rightVal)
-                                return tmpStr
-                        # *pptr = &n 的例子
-                        if tmpStament.leftVal == tmpSta.rightVal:
-                            if tmpSta.firstType != 'i8' and tmpSta.firstType != 'i32' and tmpSta.firstType != 'i64' and tmpSta.firstType != 'i16':
-                                tmpVal = "T" + int(time.time()).__str__()
-                                tmpStr = "alloca: " + tmpVal + " = " + tmpSta.leftVal + tmpSta.linenumber+"\\l " + "store: " + "*" + tmpStament.rightVal + " = " + tmpVal + tmpSta.linenumber+"\\l "
-                                if tmpSta.leftVal not in addressTaken:
-                                    addressTaken.append(tmpSta.leftVal)
-                                if tmpStament.rightVal not in allPointer:
-                                    allPointer.append(tmpStament.rightVal)
-                                return tmpStr
-
-            # if there are two 'load' keywords in the stack
-            # or one load & one getelementptr
-            if (len(stackLV) == 2):
-                # fetch the top two values of stack
-                # the name of variable is for intuitively operating
-                tmpStament2 = stackLV.pop()
-                tmpStament1 = stackLV.pop()
-                if tmpStament2.Op == 'getelementptr':
-                    if tmpSta.firstType != 'i32' and tmpSta.firstType != 'i8' and tmpSta.firstType != 'i64' and tmpSta.firstType != 'i16':
-                        if (tmpStament1.leftVal == tmpSta.leftVal and tmpStament2.leftVal == tmpSta.rightVal):
-                            if tmpStament1.Op == 'getelementptr':# like pointerCase.d = &PointerArray[5];
-                                tmpStr = "alloca: " + tmpStament2.rightVal + "." + tmpStament2.secondType + " = " + tmpStament1.rightVal + "." + tmpStament1.secondType + tmpSta.linenumber + "\\l "
-                                tmpPointer1 = tmpStament2.rightVal + "." + tmpStament2.secondType
-                                tmpPointer2 = tmpStament1.rightVal + "." + tmpStament1.secondType
-                                if tmpPointer2 not in addressTaken:
-                                    addressTaken.append(tmpPointer2)
-                                if tmpPointer1 not in allPointer:
-                                    allPointer.append(tmpPointer1)
-                                return tmpStr
-                            else:
-                                tmpStr = "assign: " + tmpStament2.rightVal + "." + tmpStament2.secondType + " = " + tmpStament1.rightVal + tmpSta.linenumber+"\\l "
-                                tmpPointer = tmpStament2.rightVal + "." + tmpStament2.secondType
-                                if tmpPointer not in allPointer:
-                                    allPointer.append(tmpPointer)
-                                if tmpStament1.rightVal not in allPointer:
-                                    allPointer.append(tmpStament1.rightVal)
-                                return tmpStr
 
 
-
-                        #last_ptr = &(current->last);
-                        if tmpStament1.leftVal == tmpStament2.rightVal and tmpStament2.leftVal == tmpSta.leftVal:
-                            tmpStr = "alloca: " + tmpSta.rightVal + " = " + tmpStament1.rightVal + "." + tmpStament2.secondType + tmpSta.linenumber + "\\l "
-                            tmp1 = tmpSta.rightVal
-                            tmp2 = tmpStament1.rightVal + "." + tmpStament2.secondType
-                            if tmp1 not in allPointer:
-                                allPointer.append(tmp1)
-                            if tmp2 not in addressTaken:
-                                addressTaken.append(tmp2)
+                    if x in memoryvar_for_each_fun or x in memvar or '@' in x:
+                        #说明x是mem变量
+                        if y in memoryvar_for_each_fun or y in memvar or '@' in y:
+                            #说明y是mem变量
+                            tmpStr = "alloca: " + y + " = " + "&" + x + tmpSta.linenumber+"\\l "
+                            if x not in addressTaken:
+                                addressTaken.append(x)
+                            if y not in allPointer:
+                                allPointer.append(y)
                             return tmpStr
-                elif tmpStament1.Op == 'getelementptr':
-                    if tmpSta.firstType != 'i32' and tmpSta.firstType != 'i8' and tmpSta.firstType != 'i64' and tmpSta.firstType != 'i16':
-                        if (tmpStament1.leftVal == tmpStament2.rightVal and tmpStament2.leftVal == tmpSta.leftVal):
-                            tmpStr = "assign: " + tmpSta.rightVal + " = " + tmpStament1.rightVal + "." + tmpStament1.secondType + tmpSta.linenumber+"\\l "
-                            tmpPointer = tmpStament1.rightVal + "." + tmpStament1.secondType
-                            if tmpPointer not in allPointer:
-                                allPointer.append(tmpPointer)
-                            if tmpSta.rightVal not in allPointer:
-                                allPointer.append(tmpSta.rightVal)
+                        #不存在 x为mem 而y为reg的情况
+                    else:
+                        #说明x是register变量
+                        if y in memoryvar_for_each_fun or y in memvar or '@' in y:
+                            #说明y是mem变量
+                            tmpStr = "assign: " + y + " = " + x + tmpSta.linenumber + "\\l "
+                            if x not in allPointer:
+                                allPointer.append(x)
+                            if y not in allPointer:
+                                allPointer.append(y)
                             return tmpStr
-                else:
-                    if tmpSta.firstType != 'i32' and tmpSta.firstType != 'i8' and tmpSta.firstType != 'i64' and tmpSta.firstType != 'i16':
-                        if (tmpStament1.leftVal == tmpSta.leftVal and tmpStament2.leftVal == tmpSta.rightVal):
-                            tmpStr = "store: " + "*" + tmpStament2.rightVal + " = " + tmpStament1.rightVal + tmpSta.linenumber+"\\l "
-                            if tmpStament1.rightVal not in allPointer:
-                                allPointer.append(tmpStament1.rightVal)
-                            if tmpStament2.rightVal not in allPointer:
-                                allPointer.append(tmpStament2.rightVal)
+                        else:
+                            #说明y是reg变量
+                            tmpStr = "store: " + "*" + y + " = " + x + tmpSta.linenumber + "\\l "
+                            if x not in allPointer:
+                                allPointer.append(x)
+                            if y not in allPointer:
+                                allPointer.append(y)
                             return tmpStr
-                        if (tmpStament2.leftVal == tmpSta.leftVal and tmpStament1.leftVal == tmpStament2.rightVal):
-                            tmpStr = "load: " + tmpSta.rightVal + " = " + "*" + tmpStament1.rightVal + tmpSta.linenumber+"\\l "
-                            if tmpSta.rightVal not in allPointer:
-                                allPointer.append(tmpSta.rightVal)
-                            if tmpStament1.rightVal not in allPointer:
-                                allPointer.append(tmpStament1.rightVal)
-                            return tmpStr
+            else:
+                for i in range(len(stackLV)):
+                    if stackLV[i].Op == "load":
+                        x = stackLV[i].rightVal
+                        y = stackLV[i].leftVal
+                        if x in memoryvar_for_each_fun or x in memvar or '@' in x:
+                            #说明x是mem变量
+                            relationmap[y] = x  # y = x
+                        else:
+                            #说明x是reg变量
+                            relationmap[y] = "*" + x # y = *x
 
-            # if there are more than two 'load' keywords in the satck
-            # could be *x = *y case
-            # need to be handled like
-            # t = *y
-            # *x = t
-            if (len(stackLV) == 3):
-                tmpStament3 = stackLV.pop()
-                tmpStament2 = stackLV.pop()
-                tmpStament1 = stackLV.pop()
+
+                    elif stackLV[i].Op == "getelementptr":
+                        x = stackLV[i].rightVal
+                        y = stackLV[i].leftVal
+                        memvar.append(y) #把getelementptr的左值看成mem变量
+                        #relationmap[y] = "*" + x # y = *x  感觉这个关系映射是不是可以不用
+
+            #过滤掉非pointer类型的store语句
+            #进行实际的处理
+            if tmpSta.firstType =="i8" or tmpSta.firstType == "i16" or tmpSta.firstType == "i32" or tmpSta.firstType == "i64" or tmpSta.firstType == "float" or tmpSta.firstType == "double" :
+                #置空
                 tmpStr = ""
-                if tmpStament2.Op == 'getelementptr':
-                    if tmpSta.firstType != 'i32' and tmpSta.firstType != 'i8' and tmpSta.firstType != 'i64' and tmpSta.firstType != 'i16':
-                        if (tmpStament1.leftVal == tmpSta.leftVal and tmpStament2.leftVal == tmpStament3.rightVal and tmpStament3.leftVal == tmpSta.rightVal):
-                            if tmpStament1.Op == 'getelementptr':
-                                tmpStr = "store: " + "*" + tmpStament2.rightVal + "." + tmpStament2.secondType + " = " + tmpStament1.rightVal + "." + tmpStament1.secondType + tmpSta.linenumber + "\\l "
-                                tmpPointer = tmpStament2.rightVal + "." + tmpStament2.secondType
-                                tmpPointer2 = tmpStament1.rightVal + "." + tmpStament1.secondType
-                                if tmpPointer not in allPointer:
-                                    allPointer.append(tmpPointer)
-                                if tmpPointer2 not in allPointer:
-                                    allPointer.append(tmpPointer2)
-                            else:
-                                tmpStr = "store: " + "*" + tmpStament2.rightVal + "." + tmpStament2.secondType + " = " + tmpStament1.rightVal + tmpSta.linenumber+"\\l "
-                                tmpPointer = tmpStament2.rightVal + "." + tmpStament2.secondType
-                                tmpPointer2 = tmpStament1.rightVal
-                                if tmpPointer not in allPointer:
-                                    allPointer.append(tmpPointer)
-                                if tmpPointer2 not in allPointer:
-                                    allPointer.append(tmpPointer2)
-
-                        if (tmpStament2.leftVal == tmpStament3.rightVal and tmpStament3.leftVal == tmpSta.leftVal):
-                            if tmpStament3.Op == 'getelementptr' and tmpStament1.secondType.isdigit():
-                                if tmpStament1.leftVal == tmpStament2.rightVal:
-                                    tmpStr = "assign: " + tmpSta.rightVal + "." + tmpSta.secondType + " = " + tmpStament1.rightVal+ "." + tmpStament1.secondType+ "."+ tmpStament2.secondType+tmpSta.linenumber+"\\l "
-                                    tmp1 = tmpSta.rightVal + "." + tmpSta.secondType
-                                    tmp2 = tmpStament1.rightVal+ "." + tmpStament1.secondType+ "."+ tmpStament2.secondType
-                                    if tmp1 not in allPointer:
-                                        allPointer.append(tmp1)
-                                    if tmp2 not in allPointer:
-                                        allPointer.append(tmp2)
-                            else:
-                                tmpStr = "assign: " + tmpSta.rightVal + " = " + tmpStament2.rightVal + ".i" + tmpSta.linenumber+"\\l "
-                                tmpPointer = tmpStament2.rightVal + ".i"
-                                if tmpSta.rightVal not in allPointer:
-                                    allPointer.append(tmpSta.rightVal)
-                                if tmpPointer not in allPointer:
-                                    allPointer.append(tmpPointer)
-
-                elif tmpStament1.Op == 'getelementptr':
-                    if tmpSta.firstType != 'i32' and tmpSta.firstType != 'i8' and tmpSta.firstType != 'i64' and tmpSta.firstType != 'i16':
-                        if (
-                                tmpStament1.leftVal == tmpStament2.rightVal and tmpStament2.leftVal == tmpSta.leftVal and tmpStament3.leftVal == tmpSta.rightVal):
-                            tmpStr = "store: " + "*" + tmpStament3.rightVal + " = " + tmpStament1.rightVal + "." + tmpStament1.secondType + tmpSta.linenumber+"\\l "
-                            tmpPointer = tmpStament1.rightVal + "." + tmpStament1.secondType
-                            if tmpPointer not in allPointer:
-                                allPointer.append(tmpPointer)
-                            if tmpStament3.rightVal not in allPointer:
-                                allPointer.append(tmpStament3.rightVal)
-                        if (
-                                tmpStament1.leftVal == tmpStament2.rightVal and tmpStament2.leftVal == tmpStament3.rightVal and tmpStament3.leftVal == tmpSta.leftVal):
-                            tmpStr = "load: " + tmpSta.rightVal + " = " + "*" + tmpStament1.rightVal + "." + tmpStament1.secondType + tmpSta.linenumber+"\\l "
-                            tmpPointer = tmpStament1.rightVal + "." + tmpStament1.secondType
-                            if tmpPointer not in allPointer:
-                                allPointer.append(tmpPointer)
-                            if tmpSta.rightVal not in allPointer:
-                                allPointer.append(tmpSta.rightVal)
-
-                        if tmpStament3.Op == 'getelementptr':
-                            if tmpStament1.leftVal == tmpStament2.rightVal and tmpStament2.leftVal == tmpSta.leftVal and tmpStament3.leftVal == tmpSta.rightVal:
-                                tmpStr = "assign: " + tmpStament1.rightVal + "." + tmpStament1.secondType + " = " + tmpStament3.rightVal + "." + tmpStament3.secondType + tmpSta.linenumber+"\\l "
-                                tmpPointer1 = tmpStament1.rightVal + "." + tmpStament1.secondType
-                                tmpPointer2 = tmpStament3.rightVal + "." + tmpStament3.secondType
-                                if tmpPointer1 not in allPointer:
-                                    allPointer.append(tmpPointer1)
-                                if tmpPointer2 not in allPointer:
-                                    allPointer.append(tmpPointer2)
-                                return tmpStr
-                elif tmpStament3.Op == 'getelementptr':
-                    if tmpSta.firstType != 'i32' and tmpSta.firstType != 'i8' and tmpSta.firstType != 'i64' and tmpSta.firstType != 'i16':
-                        if (
-                                tmpStament1.leftVal == tmpStament2.rightVal and tmpStament2.leftVal == tmpSta.leftVal and tmpStament3.leftVal == tmpSta.rightVal):
-                            tmpStr = "load: " + tmpStament3.rightVal + "." + tmpStament3.secondType + " = " + "*" + tmpStament1.rightVal + tmpSta.linenumber+"\\l "
-                            tmpPointer = tmpStament3.rightVal + "." + tmpStament3.secondType
-                            if tmpPointer not in allPointer:
-                                allPointer.append(tmpPointer)
-                            if tmpStament1.rightVal not in allPointer:
-                                allPointer.append(tmpStament1.rightVal)
-
-
-                else:
-                    if tmpSta.firstType != 'i32' and tmpSta.firstType != 'i8' and tmpSta.firstType != 'i64' and tmpSta.firstType != 'i16':
-                        if tmpStament1.leftVal == tmpStament2.rightVal:
-                            tmpStr = "load: " + tmpStament2.leftVal + " = " + "*" + tmpStament1.rightVal + tmpSta.linenumber+"\\l "
-                            if tmpStament2.leftVal not in allPointer:
-                                allPointer.append(tmpStament2.leftVal)
-                            if tmpStament1.rightVal not in allPointer:
-                                allPointer.append(tmpStament1.rightVal)
-                        if tmpStament3.leftVal == tmpSta.rightVal and tmpSta.leftVal == tmpStament2.leftVal:
-                            tmpStr += "store: " + "*" + tmpStament3.rightVal + " = " + tmpStament2.leftVal + tmpSta.linenumber+"\\l "
-                            if tmpStament3.rightVal not in allPointer:
-                                allPointer.append(tmpStament3.rightVal)
-                            if tmpStament2.leftVal not in allPointer:
-                                allPointer.append(tmpStament2.leftVal)
+                #同时清空stackLV
+                stackLV.clear()
+                #清空map关系
+                relationmap.clear()
+                #清空memvar
+                memvar.clear()
                 return tmpStr
-            # *pointerCase.e = PointerArray[6];
-            if (len(stackLV) == 4):
-                tmpStament4 = stackLV.pop()
-                tmpStament3 = stackLV.pop()
-                tmpStament2 = stackLV.pop()
-                tmpStament1 = stackLV.pop()
-                if tmpSta.firstType != 'i32' and tmpSta.firstType != 'i8' and tmpSta.firstType != 'i64' and tmpSta.firstType != 'i16':
-                    if tmpStament1.Op == 'getelementptr' and tmpStament3.Op == 'getelementptr':
-                        if tmpStament1.leftVal == tmpStament2.rightVal and tmpStament2.leftVal == tmpSta.leftVal and tmpStament3.leftVal == tmpStament4.rightVal and tmpStament4.leftVal == tmpSta.rightVal:
-                            tmpStr = "store: " + "*" + tmpStament3.rightVal + "." + tmpStament3.secondType + " = " + tmpStament1.rightVal + "." + tmpStament1.secondType + tmpSta.linenumber+"\\l "
-                            tmpPointer1 = tmpStament3.rightVal + "." + tmpStament3.secondType
-                            tmpPointer2 = tmpStament1.rightVal + "." + tmpStament1.secondType
-                            if tmpPointer1 not in allPointer:
-                                allPointer.append(tmpPointer1)
-                            if tmpPointer2 not in allPointer:
-                                allPointer.append(tmpPointer2)
-                            return tmpStr
-                    if tmpStament1.Op == 'getelementptr' and tmpStament4.Op == 'getelementptr':
-                        if tmpStament1.leftVal == tmpStament2.rightVal and tmpStament2.leftVal == tmpStament3.rightVal and tmpStament3.leftVal == tmpSta.leftVal and tmpStament4.leftVal == tmpSta.rightVal:
-                            tmpStr = "load: " + tmpStament4.rightVal + "." + tmpStament4.secondType + " = " + "*" + tmpStament1.rightVal + "." + tmpStament1.secondType + tmpSta.linenumber+"\\l "
-                            tmpPointer1 = tmpStament4.rightVal + "." + tmpStament4.secondType
-                            tmpPointer2 = tmpStament1.rightVal + "." + tmpStament1.secondType
-                            if tmpPointer1 not in allPointer:
-                                allPointer.append(tmpPointer1)
-                            if tmpPointer2 not in allPointer:
-                                allPointer.append(tmpPointer2)
-                            return tmpStr
+            else:
+                #最重要的逻辑处理模块
+                x = tmpSta.leftVal
+                y = tmpSta.rightVal
+                #tmpStr = ""
+                if x in memoryvar_for_each_fun or x in memvar or '@' in x:
+                    #说明x是mem变量
+                    if y in memoryvar_for_each_fun or y in memvar or '@' in y:
+                        #说明y是mem变量
+                        tmpStr = "alloca: " + y + " = " + "&" + x + tmpSta.linenumber+"\\l "
+                        if x not in addressTaken:
+                            addressTaken.append(x)
+                        if y not in allPointer:
+                            addressTaken.append(y)
+                        tmpStrStack.append(tmpStr)
+                        index = 0
+                        while(len(stackLV) != 0):
+                            tmpStament = stackLV.pop()
+                            if tmpStament.Op == "getelementptr":
+                                if index == 0:
+                                # 说明是特殊情况
+                                    if tmpStament.leftVal == x:
+                                        tmpStr = "load: " + tmpStament.leftVal + " = " + "*" + tmpStament.rightVal + tmpStament.linenumber + "\\l "
+                                        if tmpStament.leftVal not in allPointer:
+                                            allPointer.append(tmpStament.leftVal)
+                                        if tmpStament.rightVal not in allPointer:
+                                            allPointer.append(tmpStament.rightVal)
+                                        tmpStrStack.append(tmpStr)
+                                    elif tmpStament.leftVal == y:
+                                        if len(tmpStrStack) != 0:
+                                            tmpStrtmp = tmpStrStack.pop()
+                                            tmpStr = "store: " + "*" + tmpStament.rightVal + " = " + tmpStament.leftVal + tmpStament.linenumber + "\\l "
+                                            if tmpStament.leftVal not in allPointer:
+                                                allPointer.append(tmpStament.leftVal)
+                                            if tmpStament.rightVal not in allPointer:
+                                                allPointer.append(tmpStament.rightVal)
+                                            tmpStrStack.append(tmpStr)
+                                            tmpStrStack.append(tmpStrtmp)
+
+                                else:
+                                    #如果不是特殊情况，而且也是getelementptr类型的话，那么直接输出
+                                    tmpStr = "load: " + tmpStament.leftVal + " = " + "*" + tmpStament.rightVal + tmpStament.linenumber + "\\l "
+                                    if tmpStament.leftVal not in allPointer:
+                                        allPointer.append(tmpStament.leftVal)
+                                    if tmpStament.rightVal not in allPointer:
+                                        allPointer.append(tmpStament.rightVal)
+                                    tmpStrStack.append(tmpStr)
+                            else:
+                                #说明是load语句，如果有多余的load语句直接当做assign的pattern输出给后端
+                                realx = relationmap.get(tmpStament.leftVal,"")
+                                if len(realx) != 0:
+                                    if "*" not in realx:
+                                        tmpStr = "assign: " + tmpStament.leftVal + " = " + tmpStament.rightVal + tmpStament.linenumber + "\\l "
+                                        if tmpStament.leftVal not in allPointer:
+                                            allPointer.append(tmpStament.leftVal)
+                                        if tmpStament.rightVal not in allPointer:
+                                            allPointer.append(tmpStament.rightVal)
+                                        tmpStrStack.append(tmpStr)
+                                    else:
+                                        realx = realx.replace("*","")
+                                        realxx = relationmap.get(realx,"")
+                                        if len(realxx) != 0:
+                                            if "*" not in realxx:
+                                                tmpStr = "load: " + tmpStament.leftVal + " = " + "*" + realxx + tmpStament.linenumber + "\\l "
+                                                if tmpStament.leftVal not in allPointer:
+                                                    allPointer.append(tmpStament.leftVal)
+                                                if realxx not in allPointer:
+                                                    allPointer.append(realxx)
+                                                relationmap.pop(realx,"")
+                                                tmpStrStack.append(tmpStr)
+                                            else:
+                                                tmpStr = "load: " + tmpStament.leftVal + " = " + "*" + realx + tmpStament.linenumber + "\\l "
+                                                if tmpStament.leftVal not in allPointer:
+                                                    allPointer.append(tmpStament.leftVal)
+                                                if realx not in allPointer:
+                                                    allPointer.append(realx)
+                                                tmpStrStack.append(tmpStr)
+                                        else:
+                                            #不太应该出现
+                                            print("zyy6")
+                                            tmpStr = "load: " + tmpStament.leftVal + " = " + "*" + realx + tmpStament.linenumber + "\\l "
+                                            if tmpStament.leftVal not in allPointer:
+                                                allPointer.append(tmpStament.leftVal)
+                                            if realx not in allPointer:
+                                                allPointer.append(realx)
+                                            tmpStrStack.append(tmpStr)
+
+
+                            index = index + 1
+
+                        toretStr = ""
+                        while(len(tmpStrStack) != 0):
+                            tmpStrtmp = tmpStrStack.pop()
+                            toretStr += tmpStrtmp
+                        # 清空map关系
+                        relationmap.clear()
+                        # 清空memvar
+                        memvar.clear()
+                        return toretStr
+
+                    #不存在 x为mem 而y为reg的情况
+                else:
+                    #说明x是register变量
+                    if y in memoryvar_for_each_fun or y in memvar or '@' in y:
+                        #说明y是mem变量
+                        index = 0
+                        while(len(stackLV) != 0):
+                            tmpStament = stackLV.pop()
+                            if index == 0:
+                                if tmpStament.Op == "getelementptr":
+                                    # 说明是特殊情况
+                                    if tmpStament.leftVal == y:
+                                        realright = relationmap.get(tmpStament.rightVal, "")
+                                        if len(realright) != 0:
+                                            if "*" in realright:
+                                                realleft = relationmap.get(x, "")
+                                                if len(realleft) != 0:
+                                                    if "*" in realleft:
+                                                        tmpStr = "store: " + "*" + tmpStament.rightVal + " = " + x + tmpSta.linenumber + "\\l "
+                                                        if tmpStament.rightVal not in allPointer:
+                                                            allPointer.append(tmpStament.rightVal)
+                                                        if x not in allPointer:
+                                                            allPointer.append(x)
+                                                        tmpStrStack.append(tmpStr)
+
+                                                    else:
+                                                        tmpStr = "store: " + "*" + tmpStament.rightVal + " = " + realleft + tmpSta.linenumber + "\\l "
+                                                        if tmpStament.rightVal not in allPointer:
+                                                            allPointer.append(tmpStament.rightVal)
+                                                        if realleft not in allPointer:
+                                                            allPointer.append(realleft)
+                                                        tmpStrStack.append(tmpStr)
+                                                        relationmap.pop(x,"")
+                                                else:
+                                                    tmpStr = "store: " + "*" + tmpStament.rightVal + " = " + x + tmpSta.linenumber + "\\l "
+                                                    if tmpStament.rightVal not in allPointer:
+                                                        allPointer.append(tmpStament.rightVal)
+                                                    if x not in allPointer:
+                                                        allPointer.append(x)
+                                                    tmpStrStack.append(tmpStr)
+                                            else:
+                                                realleft = relationmap.get(x, "")
+                                                if len(realleft) != 0:
+                                                    if "*" in realleft:
+                                                        tmpStr = "store: " + "*" + realright + " = " + x + tmpSta.linenumber + "\\l "
+                                                        if realright not in allPointer:
+                                                            allPointer.append(realright)
+                                                        if x not in allPointer:
+                                                            allPointer.append(x)
+                                                        tmpStrStack.append(tmpStr)
+
+                                                    else:
+                                                        tmpStr = "store: " + "*" + realright + " = " + realleft + tmpSta.linenumber + "\\l "
+                                                        if realright not in allPointer:
+                                                            allPointer.append(realright)
+                                                        if realleft not in allPointer:
+                                                            allPointer.append(realleft)
+                                                        tmpStrStack.append(tmpStr)
+                                                        relationmap.pop(x,"")
+                                                else:
+                                                    tmpStr = "store: " + "*" + realright + " = " + x + tmpSta.linenumber + "\\l "
+                                                    if realright not in allPointer:
+                                                        allPointer.append(realright)
+                                                    if x not in allPointer:
+                                                        allPointer.append(x)
+                                                    tmpStrStack.append(tmpStr)
+                                                relationmap.pop(tmpStament.rightVal,"")
+                                        else:
+                                            realleft = relationmap.get(x, "")
+                                            if len(realleft) != 0:
+                                                if "*" in realleft:
+                                                    tmpStr = "store: " + "*" + tmpStament.rightVal + " = " + x + tmpSta.linenumber + "\\l "
+                                                    if tmpStament.rightVal not in allPointer:
+                                                        allPointer.append(tmpStament.rightVal)
+                                                    if x not in allPointer:
+                                                        allPointer.append(x)
+                                                    tmpStrStack.append(tmpStr)
+
+                                                else:
+                                                    tmpStr = "store: " + "*" + tmpStament.rightVal + " = " + realleft + tmpSta.linenumber + "\\l "
+                                                    if tmpStament.rightVal not in allPointer:
+                                                        allPointer.append(tmpStament.rightVal)
+                                                    if realleft not in allPointer:
+                                                        allPointer.append(realleft)
+                                                    tmpStrStack.append(tmpStr)
+                                                    relationmap.pop(x, "")
+                                            else:
+                                                tmpStr = "store: " + "*" + tmpStament.rightVal + " = " + x + tmpSta.linenumber + "\\l "
+                                                if tmpStament.rightVal not in allPointer:
+                                                    allPointer.append(tmpStament.rightVal)
+                                                if x not in allPointer:
+                                                    allPointer.append(x)
+                                                tmpStrStack.append(tmpStr)
+
+
+                                else:
+                                    #第一条如果是load语句
+                                    realx = relationmap.get(tmpStament.leftVal,"") # realx = *%3
+                                    if "*" not in realx:
+                                        tmpStr = "assign: " + y + " = " + realx + tmpSta.linenumber + "\\l "
+                                        if y not in allPointer:
+                                            allPointer.append(y)
+                                        if realx not in allPointer:
+                                            allPointer.append(realx)
+                                        tmpStrStack.append(tmpStr)
+                                        relationmap.pop(x,"")
+                                    else:
+                                        realx = realx.replace("*","") # %3
+                                        realxx = relationmap.get(realx,"") # *%2
+                                        if len(realxx) != 0:
+                                            if "*" not in realxx:
+                                                tmpStr = "load: " + y + " = " + "*" + realxx + tmpStament.linenumber + "\\l "
+                                                if y not in allPointer:
+                                                    allPointer.append(y)
+                                                if realxx not in allPointer:
+                                                    allPointer.append(realxx)
+                                                tmpStrStack.append(tmpStr)
+                                                relationmap.pop(realx,"")
+                                            else:
+                                                tmpStr = "load: " + y + " = " + "*" + realx + tmpStament.linenumber +"\\l "
+                                                if y not in allPointer:
+                                                    allPointer.append(y)
+                                                if realx not in allPointer:
+                                                    allPointer.append(realx)
+                                                tmpStrStack.append(tmpStr)
+                                        else:
+                                            #不太应该出现
+                                            print("zyy5")
+                                            tmpStr = "load: " + y + " = " + "*" + realx + tmpStament.linenumber + "\\l "
+                                            if y not in allPointer:
+                                                allPointer.append(y)
+                                            if realx not in allPointer:
+                                                allPointer.append(realx)
+                                            tmpStrStack.append(tmpStr)
+
+
+
+                            else:
+                                if tmpStament.Op == "getelementptr":
+                                    # 非特殊情况
+                                    # 照常处理
+                                    tmpStr = "load: " + tmpStament.leftVal + " = " + "*" + tmpStament.rightVal + tmpStament.linenumber + "\\l "
+                                    if tmpStament.leftVal not in allPointer:
+                                        allPointer.append(tmpStament.leftVal)
+                                    if tmpStament.rightVal not in allPointer:
+                                        allPointer.append(tmpStament.rightVal)
+                                    tmpStrStack.append(tmpStr)
+                                else:
+                                    #不是第一条load的话
+                                    #先判断
+                                    realx = relationmap.get(tmpStament.leftVal,"")
+                                    if len(realx) == 0:
+                                        #没有匹配上的关系，说明已经在其他步骤中被处理掉了，
+                                        print("zyy1")
+                                    else:
+                                        if "*" in realx:
+                                            realx = realx.replace("*","")
+                                            realxx = relationmap.get(realx,"") #
+                                            if len(realxx) != 0:
+                                                if "*" not in realxx:
+                                                    tmpStr = "load: " + tmpStament.leftVal + " = " + "*" + realxx + tmpStament.linenumber + "\\l "
+                                                    if tmpStament.leftVal not in allPointer:
+                                                        allPointer.append(tmpStament.leftVal)
+                                                    if realxx not in allPointer:
+                                                        allPointer.append(realxx)
+                                                    tmpStrStack.append(tmpStr)
+                                                    relationmap.pop(realx,"")
+                                                else:
+                                                    tmpStr = "load: " + tmpStament.leftVal + " = " + "*" + realx + tmpStament.linenumber + "\\l "
+                                                    if tmpStament.leftVal not in allPointer:
+                                                        allPointer.append(tmpStament.leftVal)
+                                                    if realx not in allPointer:
+                                                        allPointer.append(realx)
+                                                    tmpStrStack.append(tmpStr)
+                                            else:
+                                                #不太应该出现
+                                                print("zyy6")
+                                                tmpStr = "load: " + tmpStament.leftVal + " = " + "*" + realx + tmpStament.linenumber + "\\l "
+                                                if tmpStament.leftVal not in allPointer:
+                                                    allPointer.append(tmpStament.leftVal)
+                                                if realx not in allPointer:
+                                                    allPointer.append(realx)
+                                                tmpStrStack.append(tmpStr)
+
+                                        else:
+                                            #讲道理不应出现这种情况
+                                            print("zyy2")
+                                            #不过如果出现的话，应该是看成assign的语句
+                                            #即，在getelementptr前出现的，且相关联的load可以看做assign
+                                            tmpStr = "assign: " + tmpStament.leftVal + " = " + tmpStament.rightVal + tmpStament.linenumber + "\\l "
+                                            if tmpStament.leftVal not in allPointer:
+                                                allPointer.append(tmpStament.leftVal)
+                                            if tmpStament.rightVal not in allPointer:
+                                                allPointer.append(tmpStament.rightVal)
+                                            tmpStrStack.append(tmpStr)
+
+                            index = index + 1
+
+
+
+                        toretStr = ""
+                        while(len(tmpStrStack) != 0):
+                            tmpStrtmp = tmpStrStack.pop()
+                            toretStr += tmpStrtmp
+                        # 清空map关系
+                        relationmap.clear()
+                        # 清空memvar
+                        memvar.clear()
+                        return toretStr
+                    else:
+                        #说明y是reg变量
+                        index = 0
+                        while(len(stackLV) != 0):
+                            tmpStament = stackLV.pop()
+                            if index == 0:
+                                if tmpStament.Op == "getelementpr":#不太可能出现，但还是放上来了
+                                    tmpStr = "load: " + tmpStament.leftVal + " = " + "*" + tmpStament.rightVal + tmpStament.linenumber + "\\l "
+                                    if tmpStament.leftVal not in allPointer:
+                                        allPointer.append(tmpStament.leftVal)
+                                    if tmpStament.rightVal not in allPointer:
+                                        allPointer.append(tmpStament.rightVal)
+                                    tmpStrStack.append(tmpStr)
+
+                                else:
+                                    #load语句
+                                    if tmpStament.leftVal == y:
+                                        realx = relationmap.get(tmpStament.leftVal,"") # %a
+                                        if "*" not in realx:
+                                            #到这可以确定左边
+                                            #接着确定右边
+                                            realxx = relationmap.get(x,"") # %b
+                                            if len(realxx) != 0:
+                                                if "*" not in realxx:
+                                                    tmpStr = "store: " + "*" + realx + " = " + realxx + tmpStament.linenumber + "\\l "
+                                                    if realx not in allPointer:
+                                                        allPointer.append(realx)
+                                                    if realxx not in allPointer:
+                                                        allPointer.append(realxx)
+                                                    tmpStrStack.append(tmpStr)
+                                                    relationmap.pop(x,"")
+                                                else:
+                                                    #如果realxx 是个 *%b 的类型
+                                                    tmpStr = "store: " + "*" + realx + " = " + x + tmpStament.linenumber + "\\l "
+                                                    if realx not in allPointer:
+                                                        allPointer.append(realx)
+                                                    if x not in allPointer:
+                                                        allPointer.append(x)
+                                                    tmpStrStack.append(tmpStr)
+                                            else:
+                                                #不太应该出现
+                                                print("zyy7")
+                                                tmpStr = "store: " + "*" + realx + " = " + x + tmpStament.linenumber + "\\l "
+                                                if realx not in allPointer:
+                                                    allPointer.append(realx)
+                                                if x not in allPointer:
+                                                    allPointer.append(x)
+                                                tmpStrStack.append(tmpStr)
+                                        else:
+                                            #讲道理也不应该出现这种情况
+                                            #store 左边也出现*的情况，即 会有**t2 = t1 的情况，所以要拆分
+                                            print("zyy4")
+                                            #如果出现的话 拆分 成load和 store两条
+                                            #store在这部输出，load在下面的情况输出
+                                            realxx = relationmap.get(x,"") # %b
+                                            if len(realxx) != 0:
+                                                if "*" not in realxx:
+                                                    tmpStr = "store: " + "*" + y + " = " + realxx + tmpStament.linenumber + "\\l "
+                                                    if y not in allPointer:
+                                                        allPointer.append(y)
+                                                    if realxx not in allPointer:
+                                                        allPointer.append(realxx)
+                                                    tmpStrStack.append(tmpStr)
+                                                    relationmap.pop(x,"")
+                                                else:
+                                                    #如果realxx 是个 *%b 的类型
+                                                    tmpStr = "store: " + "*" + y + " = " + x + tmpStament.linenumber + "\\l "
+                                                    if y not in allPointer:
+                                                        allPointer.append(y)
+                                                    if x not in allPointer:
+                                                        allPointer.append(x)
+                                                    tmpStrStack.append(tmpStr)
+                                            else:
+                                                #不太应该出现
+                                                print("zyy8")
+                                                tmpStr = "store: " + "*" + y + " = " + x + tmpStament.linenumber + "\\l "
+                                                if y not in allPointer:
+                                                    allPointer.append(y)
+                                                if x not in allPointer:
+                                                    allPointer.append(x)
+                                                tmpStrStack.append(tmpStr)
+
+
+                            else:
+                                if tmpStament.Op == "getelementpr":
+                                    tmpStr = "load: " + tmpStament.leftVal + " = " + "*" + tmpStament.rightVal + tmpStament.linenumber + "\\l "
+                                    if tmpStament.leftVal not in allPointer:
+                                        allPointer.append(tmpStament.leftVal)
+                                    if tmpStament.rightVal not in allPointer:
+                                        allPointer.append(tmpStament.rightVal)
+                                    tmpStrStack.append(tmpStr)
+                                else:
+                                    #load语句
+                                    realx = relationmap.get(tmpStament.leftVal,"")
+                                    if len(realx) == 0:
+                                        #不进行处理
+                                        continue
+                                    else:
+                                        if "*" in realx:
+                                            realx = realx.replace("*","")
+                                            realxx = relationmap.get(realx,"") #
+                                            if len(realxx) != 0:
+                                                if "*" not in realxx:
+                                                    tmpStr = "load: " + tmpStament.leftVal + " = " + "*" + realxx + tmpStament.linenumber + "\\l "
+                                                    if tmpStament.leftVal not in allPointer:
+                                                        allPointer.append(tmpStament.leftVal)
+                                                    if realxx not in allPointer:
+                                                        allPointer.append(realxx)
+                                                    tmpStrStack.append(tmpStr)
+                                                    relationmap.pop(realx,"")
+                                                else:
+                                                    tmpStr = "load: " + tmpStament.leftVal + " = " + "*" + realx + tmpStament.linenumber + "\\l "
+                                                    if tmpStament.leftVal not in allPointer:
+                                                        allPointer.append(tmpStament.leftVal)
+                                                    if realx not in allPointer:
+                                                        allPointer.append(realx)
+                                                    tmpStrStack.append(tmpStr)
+                                            else:
+                                                #不太应该出现
+                                                print("zyy9")
+                                                tmpStr = "load: " + tmpStament.leftVal + " = " + "*" + realx + tmpStament.linenumber + "\\l "
+                                                if tmpStament.leftVal not in allPointer:
+                                                    allPointer.append(tmpStament.leftVal)
+                                                if realx not in allPointer:
+                                                    allPointer.append(realx)
+                                                tmpStrStack.append(tmpStr)
+
+                                        else:
+                                            #讲道理这种情况不应该出现，但是如果有 当做assign处理，跟line 777处理一样
+                                            print("zyy3")
+                                            tmpStr = "assign: " + tmpStament.leftVal + " = " + tmpStament.rightVal + tmpStament.linenumber + "\\l "
+                                            if tmpStament.leftVal not in allPointer:
+                                                allPointer.append(tmpStament.leftVal)
+                                            if tmpStament.rightVal not in allPointer:
+                                                allPointer.append(tmpStament.rightVal)
+                                            tmpStrStack.append(tmpStr)
+                            index = index + 1
+
+                        toretStr = ""
+                        while(len(tmpStrStack) != 0):
+                            tmpStrtmp = tmpStrStack.pop()
+                            toretStr += tmpStrtmp
+                        # 清空map关系
+                        relationmap.clear()
+                        # 清空memvar
+                        memvar.clear()
+                        return toretStr
+
+
+        # if a call function has return value
+        if (len(res2) >= 5 and res2[4] == 'call'):
+            tmpSta = Statement()
+            tmpSta.Op = 'call'
+            tmpSta.leftVal = res2[2]
+            if res2[5] == 'zeroext':
+                tmpSta.firstType = res2[6]
+                funcName = res2[7].split('(')
+                tmpSta.secondType = funcName[0]
+            elif res2[5] == 'noalias':
+                tmpSta.firstType = res2[6]
+                funcName = res2[7].split('(')
+                tmpSta.secondType = funcName[0]
+            elif res2[5] == 'fastcc':
+                tmpSta.firstType = res2[6]
+                funcName = res2[7].split('(')
+                tmpSta.secondType = funcName[0]
+            elif '[' in res2[5]:
+                tmpSta.firstType = res2[7].replace(']','')
+                funcName = res2[8].split('(')
+                tmpSta.secondType = funcName[0]
+            else:
+                tmpSta.firstType = res2[5]  # return type of function
+                funcName = res2[6].split('(')
+                tmpSta.secondType = funcName[0]  # functionName
+            if '!dbg' in res2:
+                tmpSta.linenumber = res2[-1]
+
+            #如果asm在call函数中，不处理
+            if 'asm' in res2:
+                tmpStr = ""
+                return tmpStr
+
+            #如果一些奇怪的llvm的内在函数出现的话，直接无视掉
+            if '@llvm.umul.with.overflow' in line:
+                tmpStr = ""
+                return tmpStr
+            pppfunctionName=""
+            tmpStrStack = []
+            # 获取函数的形参列表
+            funformalPara.clear()
+            getFunctionPara(line)
+
+            print("after getFunctionPara~~~~~~~~~~~~~~")
+            if '...' in line:
+                #print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+                line1 = line.split("...")[-1].replace(") ", "")
+                #print(line1)
+                res = re.split("\(|\)", line1)
+                for item in res:
+                    #print("res item ", item)
+                    spitem = re.split(",", item)
+                    #print("spitem is ", spitem)
+                    for item2 in spitem:
+                        resz = re.split(" ", item2)
+                        #print("~~~~resz is ", resz)
+                        if len(resz) == 1:
+                            if '@' in resz[0]:
+                                #print("add ppp")
+                                pppfunctionName = resz[0]
+                                #print("PPP function Name is ", resz[0])
+                        if len(resz) == 5:
+                            if '@' in resz[1]:
+                                pppfunctionName=resz[1]
+                                #print("ppp function name could be ", resz[1])
+                tmpSta.secondType = pppfunctionName
+
+
+            tmpStr = "call: " + tmpSta.leftVal + " = " + tmpSta.firstType + " " + tmpSta.secondType + "("
+            sizeOfFunctionPara = len(funformalPara)  # 函数形参个数
+            #print("line is ", line)
+            #print("~~~~~funciton formalPara is :")
+            #for item in funformalPara:
+            #    print("in call block~", item)
+            if sizeOfFunctionPara == 0:
+                tmpStr += ")" + tmpSta.linenumber + "\\l "
+            else:
+                #把形参填写完整
+                for i in range(len(funformalPara)):
+                    if i == len(funformalPara) -1:
+                        #if '%call' in funformalPara[i]:
+                        tmpStr += funformalPara[i] + ")"+tmpSta.linenumber+"\\l "
+                    else:
+                        if funformalPara[i] == 'dereferenceable':
+                            tmpStr += "&"
+                        else:
+                            tmpStr += funformalPara[i] + ","
+            #如果是malloc函数或者是new函数，得当做alloca处理，并自己生成一个变量
+            if tmpSta.secondType == "@malloc" or tmpSta.secondType == "@_Znam" :
+                tmpVal = "T" + int(time.time()).__str__()
+                tmpStr1 = "alloca: " + tmpSta.leftVal + " = " + "&" + tmpVal + tmpSta.linenumber + "\\l "
+                if tmpVal not in addressTaken:
+                    addressTaken.append(tmpVal)
+                if tmpSta.leftVal not in allPointer:
+                    allPointer.append(tmpSta.leftVal)
+                tmpStrStack.append(tmpStr1)
+            else:
+                tmpStrStack.append(tmpStr)
+
+            #建立relationmap
+            relationmap = {}
+            memvar = []
+            for i in range(len(stackLV)):
+                if stackLV[i].Op == "load":
+                    x = stackLV[i].rightVal
+                    y = stackLV[i].leftVal
+                    if x in memoryvar_for_each_fun or x in memvar or '@' in x:
+                        # 说明x是mem变量
+                        relationmap[y] = x  # y = x
+                    else:
+                        # 说明x是reg变量
+                        relationmap[y] = "*" + x  # y = *x
+
+
+                elif stackLV[i].Op == "getelementptr":
+                    x = stackLV[i].rightVal
+                    y = stackLV[i].leftVal
+                    memvar.append(y)  # 把getelementptr的左值看成mem变量
+
+            while(len(stackLV) != 0):
+                tmpStament = stackLV.pop()
+                if tmpStament.Op == "getelementptr":
+                    tmpStr = "load: " + tmpStament.leftVal + " = " + "*" + tmpStament.rightVal + tmpStament.linenumber + "\\l "
+                    if tmpStament.leftVal not in allPointer:
+                        allPointer.append(tmpStament.leftVal)
+                    if tmpStament.rightVal not in allPointer:
+                        allPointer.append(tmpStament.rightVal)
+                    tmpStrStack.append(tmpStr)
+                else:
+                    #load语句
+                    realx = relationmap.get(tmpStament.leftVal,"")
+                    if len(realx) != 0:
+                        if "*" not in realx:
+                            tmpStr = "assign: " + tmpStament.leftVal + " = " + realx + tmpStament.linenumber + "\\l "
+                            if tmpStament.leftVal not in allPointer:
+                                allPointer.append(tmpStament.leftVal)
+                            if realx not in allPointer:
+                                allPointer.append(realx)
+                            tmpStrStack.append(tmpStr)
+                        else:
+                            realx = realx.replace("*","")
+                            realxx = relationmap.get(realx,"")
+                            if len(realxx) == 0:
+                                #不太应该出现
+                                print("zyy10")
+                                tmpStr = "load: " + tmpStament.leftVal + " = " + "*" + realx + tmpStament.linenumber + "\\l "
+                                if tmpStament.leftVal not in allPointer:
+                                    allPointer.append(tmpStament.leftVal)
+                                if realx not in allPointer:
+                                    allPointer.append(realx)
+                                tmpStrStack.append(tmpStr)
+                            else:
+                                if "*" not in realxx:
+                                    tmpStr = "load: " + tmpStament.leftVal + " = " + "*" +realxx + tmpStament.linenumber + "\\l "
+                                    if tmpStament.leftVal not in allPointer:
+                                        allPointer.append(tmpStament.leftVal)
+                                    if realxx not in allPointer:
+                                        allPointer.append(realxx)
+                                    relationmap.pop(realx,"")
+                                    tmpStrStack.append(tmpStr)
+                                else:
+                                    tmpStr = "load: " + tmpStament.leftVal + " = " + "*" + realx + tmpStament.linenumber + "\\l "
+                                    if tmpStament.leftVal not in allPointer:
+                                        allPointer.append(tmpStament.leftVal)
+                                    if realx not in allPointer:
+                                        allPointer.append(realx)
+                                    tmpStrStack.append(tmpStr)
+
+            # 离开前要清空形参列表
+            funformalPara.clear()
+            toretStr = ""
+            while(len(tmpStrStack) != 0):
+                tmpStr = tmpStrStack.pop()
+                toretStr += tmpStr
+
+            relationmap.clear()
+            memvar.clear()
+            return toretStr
+
 
         # if is a call key word
         if (len(res2) >= 3 and res2[2] == 'call'):
@@ -1172,10 +1624,11 @@ def analysisLine(line):
                 tmpStr = ""
                 return tmpStr
             pppfunctionName=""
+            tmpStrStack = []
             # 获取函数的形参列表
+            funformalPara.clear()
             getFunctionPara(line)
-            actualParaToWrite = ""  # 待写的实参
-            arrayIndex = -1 #struct或者数组的下标，初始化为-1，写完一个actualParaToWrite，也同时要将其设置为-1
+
             if '...' in line:
                 line1 = line.split("...")[-1].replace(") ", "")
                 print(line1)
@@ -1217,150 +1670,103 @@ def analysisLine(line):
                 tmpStr = ""
                 funformalPara.clear()
                 return tmpStr
-            print(tmpStr)
+            #print(tmpStr)
             sizeOfFunctionPara = len(funformalPara)  # 函数形参个数
-            for item in funformalPara:
-                print("in void call function formalPara is", item)
+            #for item in funformalPara:
+            #    print("in void call function formalPara is", item)
             # 需要先判断是否有stackLV存在
             if sizeOfFunctionPara == 0:
                 tmpStr += ")" + tmpSta.linenumber+"\\l "
             else:
-                if len(stackLV) != 0:
-                    # 在调用该函数处时，输出 传入该函数的实参 实现：
-                    while (len(stackLV) != 0):
-                        tmpStament1 = stackLV[-1]
-                        # 如果每次进来 代写实参不是空的且不是当前指令的左操作数
-                        if len(actualParaToWrite) != 0 and actualParaToWrite != tmpStament1.leftVal:
-                            if len(stackLV) >= 2:
-                                tmpStament3 = stackLV[-2]
-                                # 额外考虑类似于下面的例子
-                                #  %20 = load i8**, i8*** %argv.addr, align 8
-                                # %21 = load i32, i32* %i, align 4
-                                # %idxprom = sext i32 %21 to i64
-                                # %arrayidx = getelementptr inbounds i8*, i8** %20, i64 %idxprom
-                                # %22 = load i8*, i8** %arrayidx, align 8
-
-                                if tmpStament3.leftVal == actualParaToWrite:
-                                    stackLV.pop()
-                                    continue
-
-                            if sizeOfFunctionPara == 1:
-                                if arrayIndex == -1:
-                                    tmpStr += actualParaToWrite + ")" + tmpSta.linenumber+"\\l "
-                                    print(tmpStr)
-                                    break  # 写完最后一个实参 要break掉
-                                else:
-                                    tmpStr += actualParaToWrite+"."+arrayIndex + ")" + tmpSta.linenumber+"\\l "
-                                    arrayIndex = -1
-                                    break
-                            else:
-                                if arrayIndex == -1:
-                                    tmpStr += actualParaToWrite + ","
-                                    sizeOfFunctionPara = sizeOfFunctionPara - 1
-                                    actualParaToWrite = ""
-                                    continue
-                                else:
-                                    tmpStr += actualParaToWrite+"."+arrayIndex + ","
-                                    sizeOfFunctionPara = sizeOfFunctionPara - 1
-                                    actualParaToWrite = ""
-                                    arrayIndex = -1
-                                    continue
-
-                        elif len(actualParaToWrite) != 0 and actualParaToWrite == tmpStament1.leftVal:
-                            # 如果代写的实参不空但是为当前指令的左操作数，需要把代写实参重新赋值
-                            actualParaToWrite = tmpStament1.rightVal
-                            if tmpStament1.Op == 'getelementptr' or (tmpStament1.Op == 'load' and tmpStament1.secondType.isdigit()):
-                                arrayIndex = tmpStament1.secondType
-
-                            if len(stackLV) == 1:
-                                #如果只剩当前的这个条语句了，也是要写
-                                if arrayIndex == -1:
-                                    tmpStr += actualParaToWrite + ")" + tmpSta.linenumber+"\\l "
-                                else:
-                                    tmpStr += actualParaToWrite+"."+arrayIndex + ")" + tmpSta.linenumber+"\\l "
-                                    arrayIndex = -1
-                            stackLV.pop()
-                            continue
-
-                        if tmpStament1.leftVal in funformalPara:
-                            # 如果当前指令的左操作数在形参列表中出现
-                            # 就把当前指令的右操作数 用作实参
-                            actualParaToWrite = tmpStament1.rightVal
-                            if tmpStament1.Op == 'getelementptr' or (tmpStament1.Op == 'load' and tmpStament1.secondType.isdigit()):
-                                arrayIndex = tmpStament1.secondType
-                            #删除掉已经匹配上的形参
-                            funformalPara.remove(tmpStament1.leftVal)
-                            # 并且pop掉当前的指令
-                            stackLV.pop()
-                            if len(stackLV) != 0:
-                                tmpStament2 = stackLV[-1]
-                                if tmpStament2.leftVal == actualParaToWrite:
-                                    continue
-                                else:
-                                    if sizeOfFunctionPara == 1:
-                                        if arrayIndex == -1:
-                                            tmpStr += actualParaToWrite + ")" + tmpSta.linenumber+"\\l "
-                                            break
-                                        else:
-                                            tmpStr += actualParaToWrite+"."+arrayIndex + ")" + tmpSta.linenumber+"\\l "
-                                            arrayIndex = -1
-                                            break
-                            else:
-                                if sizeOfFunctionPara != 1:#如果已经把最后的一条load 指令pop掉，且只剩一个实际要写的实参，但是由于存在形参里有%call的变量存在，
-                                    #所以需要额外判断一下是不是只剩一个形参要写，如果不是
-                                    if arrayIndex == -1:
-                                        tmpStr += actualParaToWrite + ","
-                                    else:
-                                        tmpStr += actualParaToWrite + "." + arrayIndex+","
-                                        arrayIndex = -1
-                                else:#如果是
-                                    if arrayIndex == -1:
-                                        tmpStr += actualParaToWrite + ")" + tmpSta.linenumber+"\\l "
-                                    else:
-                                        tmpStr += actualParaToWrite+"."+arrayIndex + ")" + tmpSta.linenumber + "\\l "
-                                        arrayIndex = -1
-
-                                break  # 写完最后一个实参 要break掉
-                        else:
-                            if len(stackLV) != 0:
-                                stackLV.pop()
-
-            '''
-            #需要判断是函数名是否为空
-            if len(tmpSta.secondType) == 0:
-                tmpStr = ""
-                return tmpStr
-
-            #判断调用的函数 是否有传参数
-            if len(stackLV) == 0:
-                tmpStr += ")" + "\\l "
-            else:
-                for i in range(len(stackLV)):
-                    if i == len(stackLV)-1:
-                        tmpStr += stackLV[i].rightVal + ")" + "\\l "
-                    else:
-                        tmpStr += stackLV[i].rightVal+", "
-                #remove all load statement
-                for i in range(len(stackLV)):
-                    stackLV.pop()
-            '''
-            #在离开前需要检查一下tmpStr是否为完整的句子
-            #需要把形参中为%call等形式的参数放进去
-            if ')!' not in tmpStr:
-                #说明是不完整的句子
+                # 把形参填写完整
                 for i in range(len(funformalPara)):
-                    if i == len(funformalPara) -1:
-                        tmpStr += funformalPara[i] + ")"+tmpSta.linenumber+"\\l "
+                    if i == len(funformalPara) - 1:
+                        # if '%call' in funformalPara[i]:
+                        tmpStr += funformalPara[i] + ")" + tmpSta.linenumber + "\\l "
                     else:
                         if funformalPara[i] == 'dereferenceable':
                             tmpStr += "&"
                         else:
                             tmpStr += funformalPara[i] + ","
+            tmpStrStack.append(tmpStr)
 
+            relationmap = {}
+            memvar = []
+            for i in range(len(stackLV)):
+                if stackLV[i].Op == "load":
+                    x = stackLV[i].rightVal
+                    y = stackLV[i].leftVal
+                    if x in memoryvar_for_each_fun or x in memvar or '@' in x:
+                        # 说明x是mem变量
+                        relationmap[y] = x  # y = x
+                    else:
+                        # 说明x是reg变量
+                        relationmap[y] = "*" + x  # y = *x
+
+
+                elif stackLV[i].Op == "getelementptr":
+                    x = stackLV[i].rightVal
+                    y = stackLV[i].leftVal
+                    memvar.append(y)  # 把getelementptr的左值看成mem变量
+
+            while (len(stackLV) != 0):
+                tmpStament = stackLV.pop()
+                if tmpStament.Op == "getelementptr":
+                    tmpStr = "load: " + tmpStament.leftVal + " = " + "*" + tmpStament.rightVal + tmpStament.linenumber + "\\l "
+                    if tmpStament.leftVal not in allPointer:
+                        allPointer.append(tmpStament.leftVal)
+                    if tmpStament.rightVal not in allPointer:
+                        allPointer.append(tmpStament.rightVal)
+                    tmpStrStack.append(tmpStr)
+                else:
+                    # load语句
+                    realx = relationmap.get(tmpStament.leftVal, "")
+                    if len(realx) != 0:
+                        if "*" not in realx:
+                            tmpStr = "assign: " + tmpStament.leftVal + " = " + realx + tmpStament.linenumber + "\\l "
+                            if tmpStament.leftVal not in allPointer:
+                                allPointer.append(tmpStament.leftVal)
+                            if realx not in allPointer:
+                                allPointer.append(realx)
+                            tmpStrStack.append(tmpStr)
+                        else:
+                            realx = realx.replace("*", "")
+                            realxx = relationmap.get(realx, "")
+                            if len(realxx) == 0:
+                                # 不太应该出现
+                                print("zyy11")
+                                tmpStr = "load: " + tmpStament.leftVal + " = " + "*" + realx + tmpStament.linenumber + "\\l "
+                                if tmpStament.leftVal not in allPointer:
+                                    allPointer.append(tmpStament.leftVal)
+                                if realx not in allPointer:
+                                    allPointer.append(realx)
+                                tmpStrStack.append(tmpStr)
+                            else:
+                                if "*" not in realxx:
+                                    tmpStr = "load: " + tmpStament.leftVal + " = " + "*" + realxx + tmpStament.linenumber + "\\l "
+                                    if tmpStament.leftVal not in allPointer:
+                                        allPointer.append(tmpStament.leftVal)
+                                    if realxx not in allPointer:
+                                        allPointer.append(realxx)
+                                    relationmap.pop(realx,"")
+                                    tmpStrStack.append(tmpStr)
+                                else:
+                                    tmpStr = "load: " + tmpStament.leftVal + " = " + "*" + realx + tmpStament.linenumber + "\\l "
+                                    if tmpStament.leftVal not in allPointer:
+                                        allPointer.append(tmpStament.leftVal)
+                                    if realx not in allPointer:
+                                        allPointer.append(realx)
+                                    tmpStrStack.append(tmpStr)
 
             funformalPara.clear()
-            print("in void call case before return tmpStr is", tmpStr)
-            return tmpStr
+            toretStr = ""
+            while(len(tmpStrStack) != 0):
+                tmpStr = tmpStrStack.pop()
+                toretStr += tmpStr
+
+            relationmap.clear()
+            memvar.clear()
+            return toretStr
 
         # if is a ret instruction
         if (len(res2) >= 3 and res2[2] == 'ret'):
@@ -1372,29 +1778,88 @@ def analysisLine(line):
             tmpSta.firstType = res2[3]  # return value's type
             if tmpSta.firstType != 'void':
                 tmpSta.leftVal = res2[4]
+
+            tmpStrStack = []
             if tmpSta.firstType != 'void' and tmpSta.firstType != 'i32' and tmpSta.firstType != 'i8' and tmpSta.firstType != 'i64' and tmpSta.firstType != 'i16':
-                if len(stackLV) == 1:
-                    tmpStament1 = stackLV.pop()
-                    if tmpSta.leftVal == tmpStament1.leftVal:
-                        if tmpStament1.Op == 'getelementptr':
-                            tmpStr = 'ret ' + tmpStament1.rightVal + "." + tmpStament1.secondType + tmpSta.linenumber + "\\l "
+                tmpStr = "ret " + tmpSta.leftVal + tmpSta.linenumber + "\\l "
+                tmpStrStack.append(tmpStr)
+                relationmap = {}
+                memvar = []
+                for i in range(len(stackLV)):
+                    if stackLV[i].Op == "load":
+                        x = stackLV[i].rightVal
+                        y = stackLV[i].leftVal
+                        if x in memoryvar_for_each_fun or x in memvar or '@' in x:
+                            # 说明x是mem变量
+                            relationmap[y] = x  # y = x
                         else:
-                            tmpStr = 'ret ' + tmpStament1.rightVal + tmpSta.linenumber+"\\l "
-                        return tmpStr
-                if len(stackLV) == 2:
-                    tmpStament2 = stackLV.pop()
-                    tmpStament1 = stackLV.pop()
-                    if tmpStament1.leftVal == tmpStament2.rightVal and tmpStament2.leftVal == tmpSta.leftVal:
-                        if tmpStament1.Op == 'getelementptr':
-                            tmpStr = "ret " + tmpStament1.rightVal + "." + tmpStament1.secondType + tmpSta.linenumber + "\\l "
-                        else:
-                            tmpStr = 'ret ' + tmpStament1.rightVal + tmpSta.linenumber+"\\l "
-                        return tmpStr
-                    # 排除call 函数后，直接ret，没有ret语句的bug
-                    if tmpStament1.Op == 'call':
-                        if tmpStament2.leftVal == tmpSta.leftVal:
-                            tmpStr = 'ret ' + tmpStament2.rightVal + tmpSta.linenumber+"\\l "
-                            return tmpStr
+                            # 说明x是reg变量
+                            relationmap[y] = "*" + x  # y = *x
+
+
+                    elif stackLV[i].Op == "getelementptr":
+                        x = stackLV[i].rightVal
+                        y = stackLV[i].leftVal
+                        memvar.append(y)  # 把getelementptr的左值看成mem变量
+
+                while (len(stackLV) != 0):
+                    tmpStament = stackLV.pop()
+                    if tmpStament.Op == "getelementptr":
+                        tmpStr = "load: " + tmpStament.leftVal + " = " + "*" + tmpStament.rightVal + tmpStament.linenumber + "\\l "
+                        if tmpStament.leftVal not in allPointer:
+                            allPointer.append(tmpStament.leftVal)
+                        if tmpStament.rightVal not in allPointer:
+                            allPointer.append(tmpStament.rightVal)
+                        tmpStrStack.append(tmpStr)
+                    else:
+                        # load语句
+                        realx = relationmap.get(tmpStament.leftVal, "")
+                        if len(realx) != 0:
+                            if "*" not in realx:
+                                tmpStr = "assign: " + tmpStament.leftVal + " = " + realx + tmpStament.linenumber + "\\l "
+                                if tmpStament.leftVal not in allPointer:
+                                    allPointer.append(tmpStament.leftVal)
+                                if realx not in allPointer:
+                                    allPointer.append(realx)
+                                tmpStrStack.append(tmpStr)
+                            else:
+                                realx = realx.replace("*", "")
+                                realxx = relationmap.get(realx, "")
+                                if len(realxx) == 0:
+                                    # 不太应该出现
+                                    print("zyy11")
+                                    tmpStr = "load: " + tmpStament.leftVal + " = " + "*" + realx + tmpStament.linenumber + "\\l "
+                                    if tmpStament.leftVal not in allPointer:
+                                        allPointer.append(tmpStament.leftVal)
+                                    if realx not in allPointer:
+                                        allPointer.append(realx)
+                                    tmpStrStack.append(tmpStr)
+                                else:
+                                    if "*" not in realxx:
+                                        tmpStr = "load: " + tmpStament.leftVal + " = " + "*" + realxx + tmpStament.linenumber + "\\l "
+                                        if tmpStament.leftVal not in allPointer:
+                                            allPointer.append(tmpStament.leftVal)
+                                        if realxx not in allPointer:
+                                            allPointer.append(realxx)
+                                        relationmap.pop(realx,"")
+                                        tmpStrStack.append(tmpStr)
+                                    else:
+                                        tmpStr = "load: " + tmpStament.leftVal + " = " + "*" + realx + tmpStament.linenumber + "\\l "
+                                        if tmpStament.leftVal not in allPointer:
+                                            allPointer.append(tmpStament.leftVal)
+                                        if realx not in allPointer:
+                                            allPointer.append(realx)
+                                        tmpStrStack.append(tmpStr)
+
+
+                toretStr = ""
+                while (len(tmpStrStack) != 0):
+                    tmpStr = tmpStrStack.pop()
+                    toretStr += tmpStr
+
+                relationmap.clear()
+                memvar.clear()
+                return toretStr
 
 
 #drivers
