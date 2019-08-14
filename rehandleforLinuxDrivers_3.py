@@ -1,8 +1,8 @@
 #！/usr/bin/env python
 #!-*-coding:utf-8 -*-
-#!@Create :2019/8/13 13:59
+#!@Create :2019/8/14 9:39
 #!@Author : zyy
-#!@File   : rehandle.py
+#!@File   : rehandleforLinuxDrivers_3.py
 import os
 import re
 
@@ -224,63 +224,29 @@ def analysisLine(line):
 
 
 
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\httpd\debug\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\vim\\res"
+#drivers
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\isdn\\res"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\leds\\res"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\lightnvm\\res"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\macintosh\\res"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\mailbox\\res"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\mcb\\res"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\md\\res"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\media\\res"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\memstick\\res"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\message\\res"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\mfd\\res"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\misc\\res"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\mmc\\res"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\mtd\\res"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\net\\res"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\nfc\\res"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\ntb\\res"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\nvdimm\\res"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\nvme\\res"
+#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\nvmem\\res"
+path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\drivers\\opp\\res"
 
-
-#linux
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\arch\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\block\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\certs\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\crypto\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\fs\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\init\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\ipc\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\kernel\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\lib\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\mm\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\net\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\security\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\sound\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\linux\\virt\\res"
-
-
-
-#####firefox
-
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\accessiable\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\browser\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\buildunix\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\config\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\db_xpfe_hal\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\devtools\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\docshell\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\dom\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\editor\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\firefox\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\gfx\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\image\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\intl\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\ipc\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\js\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\layout\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\media\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\memory\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\mfbt\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\modules\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\mozglue\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\network\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\oth_license\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\parser\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\security\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\startupcache_chrome\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\storage\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\third_party\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\toolkit\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\uri_caps\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\widget\\res"
-#path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\x86_64_unknown\\res"
-path = "D:\Ouroboros\codes\Ouroboros-Project\\testfile\\firefox\\xpcom\\res"
 
 
 files = os.listdir(path)

@@ -275,8 +275,10 @@ print("Statement Op is: ", tmpSta.Op,", leftVal is: ",tmpSta.leftVal,", firstTyp
 #strLine = " call: %call1 = i32 @apr_os_sock_get(%osd,%1)!14768"
 #strLine = " alloca: %n = &%incdec.ptr!14850"
 #strLine = " cmp: *%outf!14846"
-#strLine = " ret %111!14953"
-strLine = " call: NULL = void @_ZN24nsJSScriptTimeoutHandlerC2EP9JSContextP19nsGlobalWindowInnerPN7mozilla3dom12LoadedScriptERK12nsTSubstringIDsEPbRNS4_11ErrorResultE(%0,%aCx,%aWindow,%call,&%aExpression,%allowEval,&%aError)!102923"
+strLine = " ret %111!14953"
+#strLine = " call: NULL = void @_ZN24nsJSScriptTimeoutHandlerC2EP9JSContextP19nsGlobalWindowInnerPN7mozilla3dom12LoadedScriptERK12nsTSubstringIDsEPbRNS4_11ErrorResultE(%0,%aCx,%aWindow,%call,&%aExpression,%allowEval,&%aError)!102923"
+#strLine = " ret %cmp17.7"
+
 if 'function' in strLine:
     print("now ! actually function is really in line!!!!!!!!")
 resZ = re.split(",| |!",strLine)
